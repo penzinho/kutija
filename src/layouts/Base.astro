@@ -1,0 +1,347 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '@fontsource/anton';
+import '@fontsource/schibsted-grotesk/400.css';
+import '@fontsource/schibsted-grotesk/500.css';
+import '@fontsource/schibsted-grotesk/600.css';
+import '@fontsource/schibsted-grotesk/700.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import { meta } from '../data/entries';
+
+interface Props {
+  /** Page title; the site name is appended. Omit on the home page. */
+  title?: string;
+  description?: string;
+  /** Absolute or root-relative OG image path (step 8 adds per-page images). */
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
+}
+
+const SITE_NAME = 'Narodni Maksimir';
+const DEFAULT_DESCRIPTION =
+  'Neslužbena galerija svih 88 radova s natječaja za novi stadion Maksimir. Usporedi radove u dvobojima i vidi kako narod rangira ono što je žiri već odlučio.';
+
+const { title, description = DEFAULT_DESCRIPTION, ogImage, ogType = 'website', noindex = false } = Astro.props;
+
+const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME} · Narod bira stadion`;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const ogImageUrl = ogImage && Astro.site ? new URL(ogImage, Astro.site).href : ogImage;
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const nav = [
+  { label: 'Radovi', href: '/', active: path === '/' || path.startsWith('/rad/') },
+  { label: 'Dvoboj', href: '/dvoboj', active: path === '/dvoboj' },
+  { label: 'Rang', href: '/rang', active: path === '/rang' },
+  { label: 'O projektu', href: '/o-projektu', active: path === '/o-projektu' },
+];
+---
+
+<!doctype html>
+<html lang="hr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content="hr_HR" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    {ogImageUrl && <meta property="og:image:width" content="1200" />}
+    {ogImageUrl && <meta property="og:image:height" content="630" />}
+    <meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
+
+    <ClientRouter />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <a class="skip-link" href="#main">Preskoči na sadržaj</a>
+
+    <header class="site-header">
+      <div class="bar">
+        <a href="/" class="brand">
+          <span class="brand-mark" aria-hidden="true"><span></span></span>
+          <span class="brand-name">Narodni Maksimir</span>
+        </a>
+        <nav class="top-nav" aria-label="Glavna navigacija">
+          {
+            nav.map((n) => (
+              <a href={n.href} class:list={{ active: n.active }} aria-current={n.active ? 'page' : undefined}>
+                {n.label}
+              </a>
+            ))
+          }
+        </nav>
+        <div class="bar-end">
+          {/* LiveCounter island goes here in step 7. */}
+          <a href="/dvoboj" class="cta">Kreni glasati →</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-about">
+          <span class="footer-name">Narodni Maksimir</span>
+          <span class="footer-note">
+            Neslužbena stranica. Autorska prava na radove pripadaju autorima.
+            <a href={meta.sourceUrl} target="_blank" rel="noopener">Izvor: službena objava natječaja ↗</a>
+          </span>
+        </div>
+        <nav class="footer-nav" aria-label="Podnožje">
+          {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+        </nav>
+      </div>
+    </footer>
+
+    <nav class="tab-bar" aria-label="Glavna navigacija">
+      {
+        nav.map((n) => (
+          <a href={n.href} class:list={{ active: n.active }} aria-current={n.active ? 'page' : undefined}>
+            <span class="tab-mark" aria-hidden="true" />
+            {n.label}
+          </a>
+        ))
+      }
+    </nav>
+  </body>
+</html>
+
+<style>
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-grain);
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .skip-link {
+    position: absolute;
+    left: var(--sp-4);
+    top: -100px;
+    z-index: var(--z-modal);
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--r-pill);
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+    font-weight: 700;
+  }
+  .skip-link:focus {
+    top: var(--sp-3);
+    color: var(--c-on-accent);
+  }
+
+  /* ---- Header ---- */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-nav);
+    background: var(--c-nav-bg);
+    backdrop-filter: blur(var(--blur-chrome));
+    -webkit-backdrop-filter: blur(var(--blur-chrome));
+    border-bottom: 1px solid var(--c-line);
+  }
+  .bar {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--c-ink);
+  }
+  .brand:hover {
+    color: var(--c-ink);
+  }
+  .brand-mark {
+    width: 32px;
+    height: 22px;
+    border: 2px solid var(--c-ink);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+  }
+  .brand-mark span {
+    width: 11px;
+    height: 7px;
+    border: 1.5px solid var(--c-accent);
+    border-radius: 2px;
+  }
+  .brand-name {
+    font-family: var(--font-display);
+    font-size: 21px;
+    letter-spacing: .02em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .top-nav {
+    display: flex;
+    gap: 26px;
+    margin-left: 12px;
+  }
+  .top-nav a {
+    position: relative;
+    padding: 22px 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--c-ink-2);
+  }
+  .top-nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: transparent;
+  }
+  .top-nav a:hover,
+  .top-nav a.active {
+    color: var(--c-ink);
+  }
+  .top-nav a.active::after {
+    background: var(--c-accent);
+  }
+  .bar-end {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .cta {
+    padding: 11px 18px;
+    border-radius: var(--r-pill);
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+    font-weight: 700;
+    font-size: var(--fs-small);
+    transition:
+      box-shadow var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  .cta:hover {
+    box-shadow: var(--sh-cta);
+    transform: translateY(-1px);
+    color: var(--c-on-accent);
+  }
+
+  /* ---- Footer ---- */
+  .site-footer {
+    border-top: 1px solid var(--c-line);
+    margin-top: var(--sp-5);
+  }
+  .footer-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 32px var(--gutter) 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px 40px;
+  }
+  .footer-about {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    max-width: 560px;
+  }
+  .footer-name {
+    font-family: var(--font-display);
+    font-size: 24px;
+    text-transform: uppercase;
+  }
+  .footer-note {
+    font-size: var(--fs-small);
+    color: var(--c-ink-2);
+    line-height: 1.5;
+  }
+  .footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) 22px;
+    font-size: var(--fs-small);
+  }
+  .footer-nav a {
+    color: var(--c-ink-2);
+  }
+  .footer-nav a:hover {
+    color: var(--c-ink);
+  }
+
+  /* ---- Mobile tab bar (<760px) ---- */
+  .tab-bar {
+    display: none;
+  }
+
+  @media (max-width: 759.98px) {
+    body {
+      padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+    }
+    .top-nav,
+    .cta {
+      display: none;
+    }
+    .tab-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: var(--z-tabbar);
+      height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--c-tabbar-bg);
+      backdrop-filter: blur(var(--blur-chrome));
+      -webkit-backdrop-filter: blur(var(--blur-chrome));
+      border-top: 1px solid var(--c-line);
+    }
+    .tab-bar a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--c-ink-2);
+      font-size: var(--fs-mono);
+      font-weight: 600;
+    }
+    .tab-bar a.active {
+      color: var(--c-ink);
+    }
+    .tab-mark {
+      width: 22px;
+      height: 3px;
+      border-radius: 2px;
+      background: transparent;
+    }
+    .tab-bar a.active .tab-mark {
+      background: var(--c-accent);
+    }
+  }
+</style>

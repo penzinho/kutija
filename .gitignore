@@ -7,3 +7,6 @@ dist/
 !.env.example
 .vercel/
 supabase/.temp/
+.idea/
+*.log
+.env.production

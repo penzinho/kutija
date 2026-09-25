@@ -18,6 +18,7 @@ Astro (static, TS strict) · Supabase (anonymous sessions, RPC, Edge Function `v
 ## Commands
 - install: `pnpm install`
 - dev: `pnpm dev`
+- check: `pnpm check` (astro check; needs TypeScript 6, not 7)
 - build: `pnpm build`
 - images: `pnpm tsx scripts/import-images.ts <folder>`
 - db: `pnpm dlx supabase db reset` (migrations + seed), `pnpm dlx supabase functions serve vote`

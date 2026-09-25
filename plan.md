@@ -40,13 +40,13 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 ## Steps
 
 ### 1. Scaffold
-- [ ] (you) create the git repo for `kutija/`; I add `.gitignore` (D15)
-- [ ] `pnpm create astro` (minimal, TS strict), set `output: 'static'`, add the Vercel adapter only if a later step needs it
-- [ ] Add Preact integration (for islands), zod, `@fontsource` for Anton, Schibsted Grotesk and JetBrains Mono
-- [ ] Copy the design `tokens.css` to `src/styles/tokens.css`
-- [ ] Move `entries.json` to `src/data/entries.json`; `src/data/entries.ts` = zod schema + typed helpers (`getEntry`, `awarded`, `duelEligible`, `statusLabel`)
-- [ ] `Base.astro`: fonts, tokens, header/nav, footer disclaimer, mobile tab bar (<760px), grain overlay, `<ClientRouter />`, SEO/OG props
-- [ ] `.env.example`
+- [x] (you) create the git repo for `kutija/`; I add `.gitignore` (D15)
+- [x] `pnpm create astro` (minimal, TS strict), set `output: 'static'`, add the Vercel adapter only if a later step needs it
+- [x] Add Preact integration (for islands), zod, `@fontsource` for Anton, Schibsted Grotesk and JetBrains Mono
+- [x] Copy the design `tokens.css` to `src/styles/tokens.css`
+- [x] Move `entries.json` to `src/data/entries.json`; `src/data/entries.ts` = zod schema + typed helpers (`getEntry`, `awarded`, `duelEligible`, `statusLabel`)
+- [x] `Base.astro`: fonts, tokens, header/nav, footer disclaimer, mobile tab bar (<760px), grain overlay, `<ClientRouter />`, SEO/OG props
+- [x] `.env.example`
 - ✅ Done when: `pnpm build` passes and the zod validation fails the build on bad data
 
 ### 2. Images

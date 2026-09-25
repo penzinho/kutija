@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import { entries, awarded } from '../data/entries';
+---
+
+<Base>
+  {/* Placeholder until step 3 builds the hero and grid. */}
+  <section>
+    <h1>Narodni Maksimir</h1>
+    <p>{entries.length} radova · {awarded.length} nagrađenih</p>
+  </section>
+</Base>
+
+<style>
+  section {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: var(--sp-9) var(--gutter);
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: var(--fs-display-l);
+    font-weight: 400;
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+    text-transform: uppercase;
+    margin: 0 0 var(--sp-5);
+  }
+  p {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+  }
+</style>
