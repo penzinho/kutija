@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=JetBrains+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="tokens.css">
+<style>
+html,body{margin:0;background:#030815;color:#F3F6FC}
+body{font-family:'Schibsted Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+*{box-sizing:border-box}
+a{color:#4DA3FF;text-decoration:none}
+a:hover{color:#9CCBFF}
+button{font:inherit;color:inherit}
+::selection{background:#0A3D9E;color:#fff}
+@keyframes nm-sweep-l{from{transform:rotate(-7deg)}to{transform:rotate(9deg)}}
+@keyframes nm-sweep-r{from{transform:rotate(7deg)}to{transform:rotate(-9deg)}}
+@keyframes nm-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes nm-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes nm-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+html[data-motion="calm"] *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:var(--c-navy-950);color:var(--c-ink);padding-bottom:{{ padBottom }}">
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.07;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.9%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E')"></div>
+
+<header style="position:sticky;top:0;z-index:50;background:rgba(3,8,21,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--c-line)">
+  <div style="max-width:var(--max-w);margin:0 auto;padding:0 var(--gutter);height:var(--nav-h);display:flex;align-items:center;gap:28px">
+    <a href="#/" style="display:flex;align-items:center;gap:10px;color:var(--c-ink)">
+      <span style="width:32px;height:22px;border:2px solid var(--c-ink);border-radius:50%;display:grid;place-items:center"><span style="width:11px;height:7px;border:1.5px solid var(--c-accent);border-radius:2px"></span></span>
+      <span style="font-family:var(--font-display);font-size:21px;letter-spacing:.02em;line-height:1;text-transform:uppercase">Narodni Maksimir</span>
+    </a>
+    <sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}">
+      <nav style="display:flex;gap:26px;margin-left:12px">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="4">
+          <a href="{{ n.href }}" style="position:relative;padding:22px 0;font-size:15px;font-weight:500;color:{{ n.color }}">{{ n.label }}<span style="position:absolute;left:0;right:0;bottom:-1px;height:2px;background:{{ n.bar }}"></span></a>
+        </sc-for>
+      </nav>
+    </sc-if>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
+      <span style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:12px;color:var(--c-ink-2)"><span style="width:7px;height:7px;border-radius:50%;background:var(--c-accent);box-shadow:0 0 10px var(--c-accent);animation:nm-pulse 1.6s ease-in-out infinite"></span><span data-counter="" style="display:flex;height:1.1em;line-height:1.1;font-variant-numeric:tabular-nums"></span></span>
+      <sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}">
+        <a href="#/dvoboj" style="padding:11px 18px;border-radius:var(--r-pill);background:var(--c-accent);color:var(--c-on-accent);font-weight:700;font-size:14px;transition:box-shadow var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)" style-hover="box-shadow:var(--sh-cta);transform:translateY(-1px);color:var(--c-on-accent)">Kreni glasati →</a>
+      </sc-if>
+    </div>
+  </div>
+</header>
+
+<!-- ================= POČETNA ================= -->
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Početna">
+  <section onMouseMove="{{ heroMove }}" style="position:relative;overflow:hidden;min-height:calc(100svh - var(--nav-h));display:flex;flex-direction:column;justify-content:center;background:radial-gradient(90% 70% at 70% 0%, rgba(20,82,200,.35), transparent 60%), radial-gradient(60% 50% at 0% 100%, rgba(10,61,158,.28), transparent 70%), var(--c-navy-950)">
+    <div aria-hidden="true" style="position:absolute;inset:0;background:conic-gradient(from 118deg at 0% 0%, transparent 0deg, rgba(120,175,255,.20) 9deg, rgba(120,175,255,.05) 18deg, transparent 26deg);transform-origin:0 0;animation:nm-sweep-l var(--dur-ambient) var(--ease-in-out) infinite alternate;pointer-events:none"></div>
+    <div aria-hidden="true" style="position:absolute;inset:0;background:conic-gradient(from 216deg at 100% 0%, transparent 0deg, rgba(120,175,255,.16) 8deg, rgba(120,175,255,.04) 16deg, transparent 24deg);transform-origin:100% 0;animation:nm-sweep-r 17s var(--ease-in-out) infinite alternate;pointer-events:none"></div>
+    <div aria-hidden="true" style="position:absolute;left:50%;bottom:-260px;width:620px;height:620px;margin-left:-310px;border:1px solid rgba(160,195,255,.10);border-radius:50%;pointer-events:none"></div>
+    <div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:50px;height:1px;background:rgba(160,195,255,.10);pointer-events:none"></div>
+    <div aria-hidden="true" style="position:absolute;left:50%;bottom:-3.5vw;transform:translateX(-50%);font-family:var(--font-display);font-size:31vw;line-height:.8;color:transparent;-webkit-text-stroke:1.5px rgba(160,195,255,.13);white-space:nowrap;pointer-events:none;text-transform:uppercase">Narod</div>
+
+    <div style="position:relative;max-width:var(--max-w);width:100%;margin:0 auto;padding:clamp(32px,6vw,80px) var(--gutter);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:clamp(40px,5vw,72px);align-items:center">
+      <div>
+        <div data-reveal="0" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-2)"><span style="color:var(--c-accent)">✶</span>Neslužbeno narodno glasanje<span style="color:var(--c-ink-3)">·</span>88 radova</div>
+        <h1 data-reveal="1" style="margin:20px 0 0;font-family:var(--font-display);font-weight:400;text-transform:uppercase;line-height:var(--lh-display);letter-spacing:var(--ls-display);font-size:var(--fs-display-xl)">
+          <span style="display:block;font-size:.4em;color:var(--c-ink-2);letter-spacing:.02em;margin-bottom:.25em">Žiri je odlučio.</span>
+          <span style="display:block">Sad je red</span>
+          <span style="display:block">na <span style="color:var(--c-accent);text-shadow:0 0 40px var(--c-accent-glow)">narodu.</span></span>
+        </h1>
+        <p data-reveal="2" style="margin:24px 0 0;max-width:30em;font-size:var(--fs-body-l);line-height:var(--lh-body);color:var(--c-ink-2);text-wrap:pretty">Na međunarodni natječaj za novi stadion Maksimir stiglo je 88 radova. Žiri je nagradio pet. Pogledaj sve, odigraj dvoboje i pokaži koji bi izabrao narod.</p>
+        <div data-reveal="3" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px">
+          <a href="#/dvoboj" style="display:inline-flex;align-items:center;gap:10px;padding:17px 28px;border-radius:var(--r-pill);background:var(--c-accent);color:var(--c-on-accent);font-weight:700;font-size:17px;transition:box-shadow var(--dur-base) var(--ease-out),transform var(--dur-base) var(--ease-out)" style-hover="box-shadow:var(--sh-cta);transform:translateY(-2px);color:var(--c-on-accent)" style-active="transform:scale(.97)">Kreni glasati <span>→</span></a>
+          <a href="#/" onClick="{{ scrollGrid }}" style="display:inline-flex;align-items:center;padding:17px 26px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong);color:var(--c-ink);font-weight:600;font-size:17px;transition:background var(--dur-fast)" style-hover="background:rgba(160,195,255,.08);color:var(--c-ink)">Pregledaj radove</a>
+        </div>
+        <div data-reveal="4" style="margin-top:36px;display:inline-flex;align-items:stretch;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:linear-gradient(180deg,rgba(14,38,96,.6),rgba(6,15,42,.8));overflow:hidden">
+          <div style="padding:14px 22px;display:flex;flex-direction:column;gap:8px">
+            <span style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-ink-2)"><span style="width:8px;height:8px;border-radius:50%;background:var(--c-accent);box-shadow:0 0 12px var(--c-accent);animation:nm-pulse 1.6s ease-in-out infinite"></span>Uživo</span>
+            <span data-counter="" style="display:flex;font-family:var(--font-display);font-size:clamp(40px,4.4vw,58px);line-height:1.1;height:1.1em;font-variant-numeric:tabular-nums"></span>
+            <span style="font-size:14px;color:var(--c-ink-2)">glasova do sada</span>
+          </div>
+          <div style="width:1px;background:var(--c-line-strong)"></div>
+          <div style="padding:14px 22px;display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-ink-2)">U igri</span>
+            <span style="font-family:var(--font-display);font-size:clamp(40px,4.4vw,58px);line-height:1.1">88</span>
+            <span style="font-size:14px;color:var(--c-ink-2)">radova</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="position:relative;width:min(100%,480px);aspect-ratio:1/1;margin:0 auto;perspective:1400px">
+        <div data-stack-inner="" style="position:absolute;inset:0;transform-style:preserve-3d;transition:transform 700ms var(--ease-out)">
+          <sc-for list="{{ heroCards }}" as="h" hint-placeholder-count="4">
+            <a href="{{ h.href }}" onClick="{{ h.open }}" style="position:absolute;left:4%;top:13%;width:70%;aspect-ratio:4/5;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-lift);color:var(--c-ink);transform:{{ h.tf }};opacity:{{ h.op }};z-index:{{ h.z }};transition:transform var(--dur-hero) var(--ease-out),opacity 700ms var(--ease-out);backface-visibility:hidden">
+              <div data-card-img="" style="position:absolute;inset:0;background:{{ h.bg }}"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.14),transparent 35%),linear-gradient(180deg,transparent 45%,rgba(3,8,21,.9))"></div>
+              <div style="position:absolute;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:5px 8px;border-radius:var(--r-xs);background:rgba(3,8,21,.6)">{{ h.code }}</span>
+                <sc-if value="{{ h.award }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:var(--r-pill);background:{{ h.bBg }};color:{{ h.bFg }};border:1px solid {{ h.bBd }};font-size:12px;font-weight:700;white-space:nowrap"><span style="font-family:var(--font-display);font-size:15px;font-weight:400;line-height:1">{{ h.awardNum }}</span>nagrada</span></sc-if>
+              </div>
+              <div style="position:absolute;left:18px;right:18px;bottom:14px;display:flex;justify-content:space-between;align-items:flex-end">
+                <div>
+                  <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;color:var(--c-ink-2);text-transform:uppercase">Rad</div>
+                  <div style="font-family:var(--font-display);font-size:clamp(80px,11vw,128px);line-height:.82">{{ h.num }}</div>
+                </div>
+                <span style="font-family:var(--font-mono);font-size:12px;padding:6px 9px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong);background:rgba(3,8,21,.55);white-space:nowrap">Narod {{ h.rankStr }}</span>
+              </div>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="background:var(--c-blue-600);border-top:1px solid rgba(255,255,255,.2);border-bottom:1px solid rgba(255,255,255,.2);overflow:hidden;white-space:nowrap">
+    <div style="display:inline-flex;animation:nm-marquee var(--dur-marquee) linear infinite">
+      <span style="font-family:var(--font-display);font-size:clamp(22px,2.4vw,34px);text-transform:uppercase;padding:14px 0;letter-spacing:.02em;word-spacing:.2em">Žiri je odlučio ✶ Sad je red na narodu ✶ 88 radova ✶ Jedan stadion ✶ Tvoj glas ✶ Narod vs Žiri ✶&#160;</span>
+      <span style="font-family:var(--font-display);font-size:clamp(22px,2.4vw,34px);text-transform:uppercase;padding:14px 0;letter-spacing:.02em;word-spacing:.2em">Žiri je odlučio ✶ Sad je red na narodu ✶ 88 radova ✶ Jedan stadion ✶ Tvoj glas ✶ Narod vs Žiri ✶&#160;</span>
+    </div>
+  </div>
+
+  <section id="radovi" style="max-width:var(--max-w);margin:0 auto;padding:clamp(56px,8vw,112px) var(--gutter) 64px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px 40px">
+      <div data-reveal="0">
+        <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">01 — Natječajni radovi</div>
+        <h2 style="margin:10px 0 0;font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:var(--fs-display-l);line-height:var(--lh-display)">88 radova.<br><span style="color:var(--c-ink-3)">Jedan stadion.</span></h2>
+      </div>
+      <p data-reveal="1" style="margin:0;max-width:340px;font-size:15px;line-height:1.5;color:var(--c-ink-2);text-wrap:pretty">Otvori rad za galeriju i detalje. Nagrađeni radovi su istaknuti. Većina rendera tek stiže — do tada vidiš shemu.</p>
+    </div>
+
+    <div style="position:sticky;top:var(--nav-h);z-index:20;margin:32px calc(var(--gutter) * -1) 24px;padding:12px var(--gutter);background:rgba(3,8,21,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--c-line);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px">
+      <div style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;max-width:100%">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+          <button onClick="{{ f.set }}" style="flex:none;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:var(--r-pill);border:1px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.fg }};font-size:14px;font-weight:600;cursor:pointer;transition:all var(--dur-fast) var(--ease-out)">{{ f.label }}<span style="font-family:var(--font-mono);font-size:11px;opacity:.7">{{ f.count }}</span></button>
+        </sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">Poredaj</span>
+        <div style="display:flex;padding:3px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong)">
+          <sc-for list="{{ sorts }}" as="o" hint-placeholder-count="2">
+            <button onClick="{{ o.set }}" style="padding:7px 13px;border:0;border-radius:var(--r-pill);background:{{ o.bg }};color:{{ o.fg }};font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background var(--dur-fast)">{{ o.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ showSkel }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:{{ gridCols }};gap:clamp(10px,1.6vw,20px)">
+        <sc-for list="{{ skel }}" as="k" hint-placeholder-count="8">
+          <div style="border-radius:var(--r-md);overflow:hidden;border:1px solid var(--c-line)">
+            <div style="aspect-ratio:4/3;background:linear-gradient(100deg,var(--c-surface) 30%,var(--c-surface-2) 50%,var(--c-surface) 70%);background-size:200% 100%;animation:nm-shimmer 1.4s linear infinite"></div>
+            <div style="padding:12px 14px;display:flex;justify-content:space-between;gap:10px"><span style="width:45%;height:12px;border-radius:4px;background:var(--c-surface-2)"></span><span style="width:25%;height:12px;border-radius:4px;background:var(--c-surface-2)"></span></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showGrid }}" hint-placeholder-val="{{ false }}">
+      <div data-grid="" style="display:grid;grid-template-columns:{{ gridCols }};grid-auto-flow:dense;gap:clamp(10px,1.6vw,20px)">
+        <sc-for list="{{ cards }}" as="c" hint-placeholder-count="8">
+          <a href="{{ c.href }}" onClick="{{ c.open }}" onMouseMove="{{ c.move }}" onMouseLeave="{{ c.leave }}" data-reveal="{{ c.stagger }}" style="grid-column:{{ c.gc }};grid-row:{{ c.gr }};position:relative;display:flex;flex-direction:column;border-radius:var(--r-md);overflow:hidden;background:var(--c-surface);border:1px solid {{ c.border }};color:var(--c-ink);transition:transform var(--dur-base) var(--ease-out),box-shadow var(--dur-base) var(--ease-out);will-change:transform">
+            <div style="position:relative;aspect-ratio:{{ c.ratio }};flex:{{ c.flex }};min-height:0;overflow:hidden">
+              <div data-card-img="" data-zoom="" style="position:absolute;inset:0;background:{{ c.bg }};transition:transform var(--dur-slow) var(--ease-out)"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,8,21,.35),transparent 30%,transparent 55%,rgba(3,8,21,.75))"></div>
+              <div style="position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                <span style="font-family:var(--font-display);font-size:{{ c.numSize }};line-height:.85">{{ c.num }}</span>
+                <sc-if value="{{ c.award }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:var(--r-pill);background:{{ c.bBg }};color:{{ c.bFg }};border:1px solid {{ c.bBd }};font-size:12px;font-weight:700;white-space:nowrap"><span style="font-family:var(--font-display);font-size:15px;font-weight:400;line-height:1">{{ c.awardNum }}</span>nagrada žirija</span></sc-if>
+              </div>
+              <span style="position:absolute;left:12px;bottom:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;color:rgba(220,232,255,.62);text-transform:uppercase">Render stiže</span>
+              <div data-panel="" style="position:absolute;left:0;right:0;bottom:0;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(10,61,158,.94);transform:translateY(100%);transition:transform var(--dur-base) var(--ease-out)">
+                <span style="font-weight:700;font-size:14px">Pogledaj rad →</span>
+                <span style="font-family:var(--font-mono);font-size:12px">Narod {{ c.rankStr }} · {{ c.rating }}</span>
+              </div>
+            </div>
+            <div style="padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--c-line)">
+              <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:var(--c-ink-2);overflow:hidden;text-overflow:ellipsis">{{ c.code }}</span>
+              <span style="flex:none;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px"><span style="color:var(--c-ink-3)">Narod</span><span style="font-weight:500">{{ c.rankStr }}</span><span style="color:{{ c.deltaColor }}">{{ c.deltaStr }}</span></span>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:clamp(48px,8vw,96px) 20px;border:1px dashed var(--c-line-strong);border-radius:var(--r-lg);display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
+        <span style="font-family:var(--font-display);font-size:120px;line-height:.8;color:transparent;-webkit-text-stroke:1.5px var(--c-ink-3)">0</span>
+        <h3 style="margin:8px 0 0;font-family:var(--font-display);font-weight:400;font-size:var(--fs-display-s);text-transform:uppercase">Još nemaš favorita</h3>
+        <p style="margin:0;max-width:26em;color:var(--c-ink-2);line-height:1.5">Otvori bilo koji rad i dodirni „Ovo je moj favorit“ — ili pusti dvoboje da ti pomognu odlučiti.</p>
+        <a href="#/dvoboj" style="margin-top:8px;padding:14px 22px;border-radius:var(--r-pill);background:var(--c-accent);color:var(--c-on-accent);font-weight:700">Kreni glasati →</a>
+      </div>
+    </sc-if>
+  </section>
+</div>
+</sc-if>
+
+<!-- ================= RAD ================= -->
+<sc-if value="{{ isRad }}" hint-placeholder-val="{{ false }}">
+<section data-screen-label="Rad" style="max-width:var(--max-w);margin:0 auto;padding:24px var(--gutter) 80px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px">
+    <a href="#/" style="display:inline-flex;align-items:center;gap:8px;color:var(--c-ink-2);font-weight:600;font-size:15px">← Svi radovi</a>
+    <div style="display:flex;gap:8px">
+      <a href="{{ d.prev }}" aria-label="Prethodni rad" style="width:44px;height:44px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--c-line-strong);color:var(--c-ink)" style-hover="background:rgba(160,195,255,.08);color:var(--c-ink)">←</a>
+      <a href="{{ d.next }}" aria-label="Sljedeći rad" style="width:44px;height:44px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--c-line-strong);color:var(--c-ink)" style-hover="background:rgba(160,195,255,.08);color:var(--c-ink)">→</a>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:clamp(24px,4vw,56px);align-items:start">
+    <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+      <div data-hero-img="" style="position:relative;aspect-ratio:16/10;border-radius:var(--r-lg);overflow:hidden;background:{{ d.mainBg }};box-shadow:var(--sh-lift)">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(3,8,21,.7))"></div>
+        <div style="position:absolute;left:18px;right:18px;bottom:16px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase">
+          <span>{{ d.view }} <span style="color:var(--c-ink-3)">· render stiže</span></span>
+          <span style="color:var(--c-ink-2)">{{ d.viewIdx }}</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <sc-for list="{{ d.thumbs }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.set }}" aria-label="{{ t.lab }}" style="aspect-ratio:16/10;padding:0;border-radius:var(--r-sm);border:2px solid {{ t.bd }};background:{{ t.bg }};opacity:{{ t.op }};cursor:pointer;transition:opacity var(--dur-fast),border-color var(--dur-fast)"></button>
+        </sc-for>
+      </div>
+    </div>
+
+    <aside style="display:flex;flex-direction:column;gap:22px;min-width:0">
+      <div data-reveal="0">
+        <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">Natječajni rad · {{ d.num }} / 88</div>
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 18px;margin-top:10px">
+          <span style="font-family:var(--font-display);font-size:var(--fs-num-giant);line-height:.78">{{ d.num }}</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding-bottom:6px">
+            <sc-if value="{{ d.award }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 10px;border-radius:var(--r-pill);background:{{ d.bBg }};color:{{ d.bFg }};border:1px solid {{ d.bBd }};font-size:14px;font-weight:700"><span style="font-family:var(--font-display);font-size:22px;font-weight:400;line-height:1">{{ d.awardNum }}</span>nagrada žirija</span></sc-if>
+            <sc-if value="{{ d.noAward }}" hint-placeholder-val="{{ true }}"><span style="padding:7px 14px;border-radius:var(--r-pill);border:1px dashed var(--c-line-strong);color:var(--c-ink-2);font-size:14px">Bez nagrade žirija</span></sc-if>
+            <span style="font-family:var(--font-mono);font-size:13px;letter-spacing:.06em;padding:6px 10px;border-radius:var(--r-xs);background:var(--c-surface);border:1px solid var(--c-line)"><span style="color:var(--c-ink-3)">Šifra </span>{{ d.code }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div data-reveal="1" style="display:grid;grid-template-columns:auto 1fr;gap:10px 20px;padding:18px 0;border-top:1px solid var(--c-line);border-bottom:1px solid var(--c-line);font-size:15px">
+        <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);padding-top:3px">Autori</span><span>{{ d.authors }}</span>
+        <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);padding-top:3px">Zemlja</span><span>{{ d.country }}</span>
+        <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);padding-top:3px">Dokumentacija</span><a href="#/rad" onClick="{{ pdfClick }}" style="font-weight:600">Službeni PDF ↗</a>
+      </div>
+
+      <div data-reveal="2" style="display:grid;grid-template-columns:1fr auto 1fr;border:1px solid var(--c-line-strong);border-radius:var(--r-md);overflow:hidden;background:linear-gradient(180deg,rgba(14,38,96,.55),rgba(6,15,42,.8))">
+        <div style="padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+          <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-ink-2)">Žiri</span>
+          <span style="font-family:var(--font-display);font-size:var(--fs-display-s);line-height:1.1">{{ d.juryShort }}</span>
+          <span style="font-size:13px;color:var(--c-ink-2)">{{ d.juryLabel }}</span>
+        </div>
+        <div style="display:grid;place-items:center;padding:0 10px;border-left:1px solid var(--c-line);border-right:1px solid var(--c-line);font-family:var(--font-display);font-size:18px;color:var(--c-ink-3)">VS</div>
+        <div style="padding:16px 18px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right">
+          <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-accent)">Narod</span>
+          <span style="display:flex;font-family:var(--font-display);font-size:var(--fs-display-s);line-height:1.1"><span>#</span><span data-reel="{{ d.rankReel }}" style="display:flex;height:1.1em;line-height:1.1"></span></span>
+          <span style="font-size:13px;color:var(--c-ink-2)">od 88 radova</span>
+        </div>
+      </div>
+
+      <div data-reveal="3" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--c-line);border-radius:var(--r-md);overflow:hidden">
+        <div style="background:var(--c-navy-950);padding:12px"><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">Ocjena</div><div style="font-family:var(--font-display);font-size:24px;margin-top:4px">{{ d.rating }}</div></div>
+        <div style="background:var(--c-navy-950);padding:12px"><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">Dvoboji</div><div style="font-family:var(--font-display);font-size:24px;margin-top:4px">{{ d.duels }}</div></div>
+        <div style="background:var(--c-navy-950);padding:12px"><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">Pobjede</div><div style="font-family:var(--font-display);font-size:24px;margin-top:4px">{{ d.win }}</div></div>
+        <div style="background:var(--c-navy-950);padding:12px"><div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">Favoriti</div><div style="font-family:var(--font-display);font-size:24px;margin-top:4px">{{ d.favs }}</div></div>
+      </div>
+
+      <div data-reveal="4" style="display:flex;flex-wrap:wrap;gap:10px">
+        <button onClick="{{ d.toggleFav }}" style="flex:1 1 200px;display:inline-flex;justify-content:center;align-items:center;gap:10px;padding:16px 22px;border-radius:var(--r-pill);border:1px solid {{ d.favBd }};background:{{ d.favBg }};color:{{ d.favFg }};font-weight:700;font-size:16px;cursor:pointer;transition:all var(--dur-base) var(--ease-out)" style-active="transform:scale(.97)"><span style="font-size:18px">{{ d.favIcon }}</span>{{ d.favLabel }}</button>
+        <a href="{{ d.duel }}" style="flex:1 1 200px;display:inline-flex;justify-content:center;align-items:center;gap:10px;padding:16px 22px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong);color:var(--c-ink);font-weight:700;font-size:16px" style-hover="background:rgba(160,195,255,.08);color:var(--c-ink)">Usporedi u dvoboju <span style="font-family:var(--font-display);font-weight:400">VS</span></a>
+      </div>
+    </aside>
+  </div>
+</section>
+</sc-if>
+
+<!-- ================= DVOBOJ ================= -->
+<sc-if value="{{ isDuel }}" hint-placeholder-val="{{ false }}">
+<section data-screen-label="Dvoboj" style="max-width:1240px;margin:0 auto;padding:clamp(16px,3vw,40px) var(--gutter) 56px">
+  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px 32px;margin-bottom:clamp(14px,2.4vw,28px)">
+    <div>
+      <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">Dvoboj · tvoj glas</div>
+      <h1 style="margin:6px 0 0;font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:clamp(40px,5.4vw,84px);line-height:var(--lh-display)">Koji je bolji?</h1>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;min-width:min(100%,300px)">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:15px">
+        <span style="display:flex;align-items:baseline;gap:6px">Odigrao si <span data-reel="{{ playedReel }}" style="display:inline-flex;height:1.1em;line-height:1.1;font-family:var(--font-display);font-size:22px;color:var(--c-accent)"></span> {{ playedWord }}</span>
+        <span style="font-family:var(--font-mono);font-size:11px;color:var(--c-ink-3)">još {{ toGo }} do top 3</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px">
+        <sc-for list="{{ segs }}" as="g" hint-placeholder-count="10"><span style="height:6px;border-radius:2px;background:{{ g.bg }};box-shadow:{{ g.sh }};transition:background var(--dur-base)"></span></sc-for>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ rateLimited }}" hint-placeholder-val="{{ false }}">
+    <div role="alert" style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding:14px 18px;border-radius:var(--r-md);border:1px solid var(--c-danger);background:rgba(255,107,122,.10)">
+      <span style="flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--c-danger);color:var(--c-navy-950);font-weight:700">!</span>
+      <div style="flex:1"><div style="font-weight:700">Previše glasova, pričekaj trenutak</div><div style="font-size:14px;color:var(--c-ink-2)">Štitimo glasanje od botova. Možeš ponovno za {{ rateLeft }} s.</div></div>
+    </div>
+  </sc-if>
+
+  <div style="position:relative;display:flex;flex-wrap:wrap;gap:clamp(14px,3vw,44px)">
+    <sc-for list="{{ duel }}" as="x" hint-placeholder-count="2">
+      <button data-duel-card="{{ x.key }}" onClick="{{ x.vote }}" onMouseEnter="{{ x.enter }}" onMouseLeave="{{ x.leave }}" style="flex:1 1 340px;min-width:0;position:relative;display:flex;flex-direction:column;padding:0;border:0;text-align:left;cursor:pointer;background:var(--c-surface);border-radius:var(--r-lg);overflow:hidden;color:var(--c-ink);box-shadow:{{ x.shadow }};transform:{{ x.tf }};filter:{{ x.filter }};opacity:{{ x.op }};outline:2px solid {{ x.ring }};outline-offset:3px;transition:transform 420ms var(--ease-spring),filter 300ms var(--ease-out),opacity 300ms,box-shadow 300ms,outline-color 200ms">
+        <div style="position:relative;width:100%;aspect-ratio:{{ duelRatio }};overflow:hidden">
+          <div style="position:absolute;inset:0;background:{{ x.bg }}"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,8,21,.25),transparent 35%,rgba(3,8,21,.85))"></div>
+          <div style="position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;gap:8px">
+            <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:5px 8px;border-radius:var(--r-xs);background:rgba(3,8,21,.6)">{{ x.code }}</span>
+            <sc-if value="{{ x.award }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:var(--r-pill);background:{{ x.bBg }};color:{{ x.bFg }};border:1px solid {{ x.bBd }};font-size:12px;font-weight:700;white-space:nowrap"><span style="font-family:var(--font-display);font-size:15px;font-weight:400;line-height:1">{{ x.awardNum }}</span>nagrada</span></sc-if>
+          </div>
+          <div style="position:absolute;left:16px;bottom:10px;font-family:var(--font-display);font-size:clamp(72px,9vw,132px);line-height:.82">{{ x.num }}</div>
+          <sc-if value="{{ x.chosen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;display:grid;place-items:center"><span style="font-family:var(--font-display);font-size:clamp(44px,6vw,84px);text-transform:uppercase;padding:6px 22px;border:4px solid var(--c-ink);border-radius:var(--r-sm);transform:rotate(-8deg);background:rgba(10,61,158,.55);text-shadow:0 0 30px var(--c-accent-glow)">Pobjeda</span></div>
+          </sc-if>
+        </div>
+        <div style="width:100%;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <div style="min-width:0"><div style="font-weight:700;font-size:16px">Rad {{ x.num }}</div><div style="font-size:13px;color:var(--c-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ x.country }} · Narod {{ x.rankStr }}</div></div>
+          <sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}"><span style="flex:none;display:inline-grid;place-items:center;min-width:34px;height:34px;padding:0 8px;border:1px solid var(--c-line-strong);border-bottom-width:3px;border-radius:8px;font-family:var(--font-mono);font-size:15px">{{ x.kbd }}</span></sc-if>
+        </div>
+      </button>
+    </sc-for>
+    <div data-vs="" style="position:absolute;left:50%;top:{{ vsTop }};transform:translate(-50%,-50%);width:clamp(64px,7vw,92px);height:clamp(64px,7vw,92px);border-radius:50%;display:grid;place-items:center;background:var(--c-navy-950);border:2px solid var(--c-accent);box-shadow:0 0 0 8px rgba(3,8,21,.75),0 0 50px var(--c-accent-glow);font-family:var(--font-display);font-size:clamp(24px,2.6vw,34px);z-index:5;pointer-events:none">VS</div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px 24px;margin-top:22px">
+    <sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}"><span style="font-size:14px;color:var(--c-ink-3)">Tipke <span style="font-family:var(--font-mono);color:var(--c-ink-2)">← / →</span> za glas</span></sc-if>
+    <sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:var(--c-ink-3)">Dodirni rad koji ti je bolji</span></sc-if>
+    <button onClick="{{ skip }}" style="display:inline-flex;align-items:center;gap:10px;padding:12px 20px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong);background:transparent;color:var(--c-ink);font-weight:600;cursor:pointer;min-height:44px" style-hover="background:rgba(160,195,255,.08)">Preskoči <span style="font-family:var(--font-mono);font-size:11px;color:var(--c-ink-3)">razmak</span></button>
+    <span data-vote-toast="" style="opacity:0;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:var(--r-pill);background:var(--c-blue-600);font-size:14px;font-weight:600"><span style="color:var(--c-accent)">✓</span>Glas zabilježen · Rad {{ lastWin }}</span>
+  </div>
+</section>
+</sc-if>
+
+<!-- ================= RANG ================= -->
+<sc-if value="{{ isRang }}" hint-placeholder-val="{{ false }}">
+<section data-screen-label="Rang" style="max-width:var(--max-w);margin:0 auto;padding:clamp(24px,4vw,56px) var(--gutter) 72px">
+  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 40px">
+    <div data-reveal="0">
+      <div style="display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">03 — Narodni rang <span style="display:inline-flex;align-items:center;gap:6px;color:var(--c-accent)"><span style="width:7px;height:7px;border-radius:50%;background:var(--c-accent);animation:nm-pulse 1.6s ease-in-out infinite"></span>uživo</span></div>
+      <h1 style="margin:10px 0 0;font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:var(--fs-display-l);line-height:var(--lh-display)">Narod <span style="color:var(--c-ink-3)">vs</span> Žiri</h1>
+    </div>
+    <p data-reveal="1" style="margin:0;max-width:380px;font-size:15px;line-height:1.5;color:var(--c-ink-2)">Rang se računa iz svih odigranih dvoboja (Elo, kao u šahu). Svaki glas pomiče ljestvicu — prati je uživo.</p>
+  </div>
+
+  <div data-reveal="2" style="margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1px;background:var(--c-line-strong);border-radius:var(--r-lg);overflow:hidden">
+    <a href="{{ jury.href }}" style="position:relative;min-height:240px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;color:var(--c-ink);background:linear-gradient(90deg,rgba(3,8,21,.92),rgba(3,8,21,.55)),{{ jury.bg }}">
+      <span style="font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-ink-2)">Izbor žirija</span>
+      <div><div style="font-family:var(--font-display);font-size:clamp(56px,6vw,92px);line-height:.85;text-transform:uppercase">Rad {{ jury.num }}</div><div style="margin-top:10px;font-size:15px;color:var(--c-ink-2)">1. nagrada · kod naroda tek <strong style="color:var(--c-ink)">{{ jury.rankStr }}</strong></div></div>
+    </a>
+    <a href="{{ people.href }}" style="position:relative;min-height:240px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;color:var(--c-ink);background:linear-gradient(90deg,rgba(10,61,158,.92),rgba(10,61,158,.55)),{{ people.bg }}">
+      <span style="font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-ink)">Izbor naroda · #1</span>
+      <div><div style="font-family:var(--font-display);font-size:clamp(56px,6vw,92px);line-height:.85;text-transform:uppercase">Rad {{ people.num }}</div><div style="margin-top:10px;font-size:15px">{{ people.juryNote }}</div></div>
+    </a>
+  </div>
+
+  <h2 data-reveal="0" style="margin:56px 0 18px;font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:var(--fs-display-s)">Najveća neslaganja</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:12px">
+    <sc-for list="{{ dis }}" as="q" hint-placeholder-count="5">
+      <a href="{{ q.href }}" data-reveal="{{ q.stagger }}" style="padding:16px;border-radius:var(--r-md);background:var(--c-surface);border:1px solid var(--c-line);color:var(--c-ink);display:flex;flex-direction:column;gap:14px" style-hover="border-color:var(--c-line-strong);color:var(--c-ink)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div><div style="font-weight:700">Rad {{ q.num }}</div><div style="font-size:13px;color:var(--c-ink-2)">{{ q.awardNum }} nagrada → narod {{ q.rankStr }}</div></div>
+          <span style="font-family:var(--font-display);font-size:40px;line-height:.9;color:{{ q.bigColor }}">{{ q.big }}</span>
+        </div>
+        <div style="position:relative;height:28px">
+          <div style="position:absolute;left:0;right:0;top:13px;height:2px;background:var(--c-line-strong)"></div>
+          <div style="position:absolute;top:13px;height:2px;left:{{ q.lineLeft }};width:{{ q.span }};background:linear-gradient(90deg,var(--c-ink),var(--c-accent))"></div>
+          <span title="Žiri" style="position:absolute;top:6px;left:{{ q.jPos }};width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--c-ink);color:var(--c-navy-950);font-size:9px;font-weight:700;display:grid;place-items:center">Ž</span>
+          <span title="Narod" style="position:absolute;top:6px;left:{{ q.nPos }};width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--c-accent);color:var(--c-navy-950);font-size:9px;font-weight:700;display:grid;place-items:center">N</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--c-ink-3)"><span>#1</span><span>{{ q.note }}</span><span>#88</span></div>
+      </a>
+    </sc-for>
+  </div>
+
+  <h2 style="margin:56px 0 12px;font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:var(--fs-display-s)">Ljestvica</h2>
+  <div style="border-top:1px solid var(--c-line-strong)">
+    <sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:{{ rowCols }};gap:12px;align-items:center;padding:10px 12px;font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);border-bottom:1px solid var(--c-line)">
+        <span>Narod</span><span>24 h</span><span>Rad</span><span>Žiri</span><span style="text-align:right">Ocjena</span><span style="text-align:right">Dvoboji</span><span style="text-align:right">Favoriti</span><span style="text-align:right">Pobjede</span>
+      </div>
+    </sc-if>
+    <sc-for list="{{ rows }}" as="w" hint-placeholder-count="10">
+      <a href="{{ w.href }}" data-row="{{ w.id }}" style="position:relative;display:grid;grid-template-columns:{{ rowCols }};gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--c-line);background:{{ w.rowBg }};color:var(--c-ink)" style-hover="background:rgba(160,195,255,.06);color:var(--c-ink)">
+        <span style="display:flex;font-family:var(--font-display);font-size:26px;line-height:1.1"><span data-reel="{{ w.rank }}" style="display:flex;height:1.1em;line-height:1.1"></span></span>
+        <sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}"><span style="font-family:var(--font-mono);font-size:12px;color:{{ w.deltaColor }}">{{ w.deltaStr }}</span></sc-if>
+        <span style="display:flex;align-items:center;gap:12px;min-width:0">
+          <span style="flex:none;width:56px;height:38px;border-radius:6px;background:{{ w.bg }}"></span>
+          <span style="min-width:0"><span style="display:block;font-weight:700">Rad {{ w.num }}</span><span style="display:block;font-family:var(--font-mono);font-size:11px;color:var(--c-ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ w.code }} · {{ w.juryMini }}</span></span>
+        </span>
+        <sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}">
+          <span style="font-size:14px;color:{{ w.juryColor }}">{{ w.juryLabel }}</span>
+          <span style="text-align:right;font-family:var(--font-mono);font-size:13px">{{ w.rating }}</span>
+          <span style="text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--c-ink-2)">{{ w.duels }}</span>
+          <span style="text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--c-ink-2)">{{ w.favs }}</span>
+          <span style="text-align:right;font-family:var(--font-mono);font-size:13px;color:var(--c-ink-2)">{{ w.win }}</span>
+        </sc-if>
+        <sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}">
+          <span style="text-align:right;font-family:var(--font-mono);font-size:12px"><span style="display:block">{{ w.rating }}</span><span style="display:block;color:{{ w.deltaColor }}">{{ w.deltaStr }}</span></span>
+        </sc-if>
+      </a>
+    </sc-for>
+  </div>
+  <div style="display:flex;justify-content:center;margin-top:22px">
+    <button onClick="{{ toggleAll }}" style="padding:13px 22px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong);background:transparent;color:var(--c-ink);font-weight:600;cursor:pointer;min-height:44px" style-hover="background:rgba(160,195,255,.08)">{{ allLabel }}</button>
+  </div>
+</section>
+</sc-if>
+
+<!-- ================= O PROJEKTU ================= -->
+<sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+<section data-screen-label="O projektu" style="max-width:1120px;margin:0 auto;padding:clamp(28px,5vw,72px) var(--gutter) 80px">
+  <div data-reveal="0" style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">05 — O projektu</div>
+  <h1 data-reveal="1" style="margin:10px 0 0;font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:var(--fs-display-l);line-height:var(--lh-display)">Stadion je naš.<br><span style="color:var(--c-accent)">Mišljenje isto.</span></h1>
+  <p data-reveal="2" style="margin:26px 0 0;max-width:38em;font-size:var(--fs-body-l);line-height:var(--lh-body);color:var(--c-ink-2);text-wrap:pretty">Narodni Maksimir je nezavisna stranica na kojoj svatko može pregledati svih 88 radova s međunarodnog natječaja za novi stadion Maksimir i glasati za onaj koji mu je najbolji. Žiri je donio svoju odluku. Ovo je mjesto za glas navijača i građana.</p>
+
+  <div data-reveal="3" style="margin:40px 0;padding:clamp(20px,3vw,32px);border:2px solid var(--c-ink);border-radius:var(--r-lg);display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start">
+    <span style="font-family:var(--font-display);font-size:clamp(28px,3vw,40px);text-transform:uppercase;padding:4px 12px;border:2px solid var(--c-ink);border-radius:var(--r-xs);transform:rotate(-4deg)">Neslužbeno</span>
+    <p style="margin:0;font-size:16px;line-height:1.6;text-wrap:pretty">Ova stranica nije povezana s klubom, Gradom Zagrebom, Društvom arhitekata Zagreba ni organizatorima natječaja i ne koristi njihove znakove. Rezultati narodnog glasanja nemaju pravni učinak na ishod natječaja. Autorska prava na sve radove pripadaju njihovim autorima.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1px;background:var(--c-line);border-radius:var(--r-lg);overflow:hidden">
+    <div data-reveal="0" style="background:var(--c-navy-950);padding:26px"><div style="font-family:var(--font-display);font-size:44px;color:var(--c-ink-3);line-height:1">01</div><h3 style="margin:12px 0 8px;font-size:20px">Kako se glasa</h3><p style="margin:0;color:var(--c-ink-2);line-height:1.55">Dobiješ dva rada i izabereš bolji. Iz svih dvoboja računamo Elo ocjenu za svaki rad — pobjeda protiv jačeg donosi više bodova. Jedan glas malo mijenja, tisuće mijenjaju sve.</p></div>
+    <div data-reveal="1" style="background:var(--c-navy-950);padding:26px"><div style="font-family:var(--font-display);font-size:44px;color:var(--c-ink-3);line-height:1">02</div><h3 style="margin:12px 0 8px;font-size:20px">Izvori</h3><p style="margin:0 0 10px;color:var(--c-ink-2);line-height:1.55">Svi podaci i slike preuzeti su iz javno objavljenih materijala natječaja.</p><div style="display:flex;flex-direction:column;gap:6px;font-weight:600"><a href="#/o-projektu">Službena objava rezultata ↗</a><a href="#/o-projektu">Katalog natječajnih radova (PDF) ↗</a><a href="#/o-projektu">Izvješće ocjenjivačkog suda ↗</a></div></div>
+    <div data-reveal="2" style="background:var(--c-navy-950);padding:26px"><div style="font-family:var(--font-display);font-size:44px;color:var(--c-ink-3);line-height:1">03</div><h3 style="margin:12px 0 8px;font-size:20px">Tko stoji iza</h3><p style="margin:0;color:var(--c-ink-2);line-height:1.55">[Ime autora], navijač i [zanimanje] iz Zagreba. Projekt je volonterski, bez oglasa i bez prikupljanja osobnih podataka.</p></div>
+    <div data-reveal="3" style="background:var(--c-navy-950);padding:26px"><div style="font-family:var(--font-display);font-size:44px;color:var(--c-ink-3);line-height:1">04</div><h3 style="margin:12px 0 8px;font-size:20px">Uklanjanje sadržaja</h3><p style="margin:0 0 10px;color:var(--c-ink-2);line-height:1.55">Autor si rada ili nositelj prava? Javi se i uklonit ćemo ili ispraviti sadržaj u roku od 48 sati.</p><a href="mailto:ukloni@narodni-maksimir.hr" style="font-weight:600">ukloni@narodni-maksimir.hr</a></div>
+  </div>
+</section>
+</sc-if>
+
+<!-- ================= KOMPONENTE (spec sheet) ================= -->
+<sc-if value="{{ isSheet }}" hint-placeholder-val="{{ false }}">
+<section data-screen-label="Komponente" style="max-width:1400px;margin:0 auto;padding:40px var(--gutter) 80px;display:flex;flex-direction:column;gap:48px">
+  <div><div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3)">Handoff · tokens.css</div><h1 style="margin:8px 0 0;font-family:var(--font-display);font-weight:400;text-transform:uppercase;font-size:var(--fs-display-m);line-height:var(--lh-display)">Komponente i stanja</h1></div>
+
+  <div>
+    <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Kartica rada — zadano · hover · nagrađena · bez slike · učitavanje</div>
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;align-items:start">
+      <sc-for list="{{ sheetCards }}" as="c" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="position:relative;display:flex;flex-direction:column;border-radius:var(--r-md);overflow:hidden;background:var(--c-surface);border:1px solid {{ c.border }};transform:{{ c.tf }};box-shadow:{{ c.sh }}">
+            <div style="position:relative;aspect-ratio:4/3;overflow:hidden">
+              <div style="position:absolute;inset:0;background:{{ c.bg }};transform:{{ c.zoom }}"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,8,21,.35),transparent 30%,transparent 55%,rgba(3,8,21,.75))"></div>
+              <div style="position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px"><span style="font-family:var(--font-display);font-size:34px;line-height:.85">{{ c.num }}</span><sc-if value="{{ c.award }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:var(--r-pill);background:{{ c.bBg }};color:{{ c.bFg }};font-size:12px;font-weight:700"><span style="font-family:var(--font-display);font-size:15px;font-weight:400;line-height:1">{{ c.awardNum }}</span>nagrada</span></sc-if></div>
+              <span style="position:absolute;left:12px;bottom:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;color:rgba(220,232,255,.62);text-transform:uppercase">{{ c.phLabel }}</span>
+              <sc-if value="{{ c.hover }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;right:0;bottom:0;padding:12px 14px;display:flex;justify-content:space-between;background:rgba(10,61,158,.94)"><span style="font-weight:700;font-size:14px">Pogledaj rad →</span><span style="font-family:var(--font-mono);font-size:12px">Narod {{ c.rankStr }}</span></div></sc-if>
+            </div>
+            <div style="padding:11px 14px;display:flex;justify-content:space-between;border-top:1px solid var(--c-line);font-family:var(--font-mono);font-size:11px"><span style="color:var(--c-ink-2)">{{ c.code }}</span><span>Narod {{ c.rankStr }} <span style="color:{{ c.deltaColor }}">{{ c.deltaStr }}</span></span></div>
+          </div>
+          <span style="font-size:13px;color:var(--c-ink-2)">{{ c.state }}</span>
+        </div>
+      </sc-for>
+      <div style="display:flex;flex-direction:column;gap:8px"><div style="border-radius:var(--r-md);overflow:hidden;border:1px solid var(--c-line)"><div style="aspect-ratio:4/3;background:linear-gradient(100deg,var(--c-surface) 30%,var(--c-surface-2) 50%,var(--c-surface) 70%);background-size:200% 100%;animation:nm-shimmer 1.4s linear infinite"></div><div style="padding:12px 14px;display:flex;justify-content:space-between"><span style="width:45%;height:12px;border-radius:4px;background:var(--c-surface-2)"></span><span style="width:25%;height:12px;border-radius:4px;background:var(--c-surface-2)"></span></div></div><span style="font-size:13px;color:var(--c-ink-2)">Skeleton (shimmer 1.4 s)</span></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:40px">
+    <div>
+      <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Nagrada žirija 1.–5.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <sc-for list="{{ badges }}" as="b" hint-placeholder-count="5"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:var(--r-pill);background:{{ b.bg }};color:{{ b.fg }};border:1px solid {{ b.bd }};font-size:12px;font-weight:700"><span style="font-family:var(--font-display);font-size:15px;font-weight:400;line-height:1">{{ b.num }}</span>nagrada žirija</span></sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Rang čip — gore · dolje · bez promjene</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;font-family:var(--font-mono);font-size:12px">
+        <span style="padding:6px 10px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong)">Narod #4 <span style="color:var(--c-accent)">▲ 3</span></span>
+        <span style="padding:6px 10px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong)">Narod #41 <span style="color:var(--c-ink-3)">▼ 6</span></span>
+        <span style="padding:6px 10px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong)">Narod #12 <span style="color:var(--c-ink-3)">—</span></span>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Filter čipovi · sortiranje</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="padding:9px 14px;border-radius:var(--r-pill);background:var(--c-ink);color:var(--c-navy-950);font-size:14px;font-weight:600">Svi <span style="font-family:var(--font-mono);font-size:11px;opacity:.7">88</span></span>
+        <span style="padding:9px 14px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong);font-size:14px;font-weight:600">Nagrađeni <span style="font-family:var(--font-mono);font-size:11px;opacity:.7">5</span></span>
+        <span style="display:flex;padding:3px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong)"><span style="padding:7px 13px;border-radius:var(--r-pill);background:var(--c-blue-600);font-size:13px;font-weight:600">Po broju</span><span style="padding:7px 13px;font-size:13px;font-weight:600;color:var(--c-ink-2)">Po narodnom rangu</span></span>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Gumbi</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <span style="padding:15px 24px;border-radius:var(--r-pill);background:var(--c-accent);color:var(--c-on-accent);font-weight:700">Kreni glasati →</span>
+        <span style="padding:15px 24px;border-radius:var(--r-pill);background:var(--c-accent);color:var(--c-on-accent);font-weight:700;box-shadow:var(--sh-cta);transform:translateY(-2px)">Hover</span>
+        <span style="padding:15px 22px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong);font-weight:600">Preskoči</span>
+        <span style="padding:15px 22px;border-radius:var(--r-pill);background:var(--c-ink);color:var(--c-navy-950);font-weight:700">★ Tvoj favorit</span>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Dvoboj kartica — mirno · hover · odabrana · poražena</div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px">
+      <sc-for list="{{ sheetDuel }}" as="x" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="position:relative;border-radius:var(--r-lg);overflow:hidden;background:var(--c-surface);box-shadow:{{ x.shadow }};transform:{{ x.tf }};filter:{{ x.filter }};opacity:{{ x.op }};outline:2px solid {{ x.ring }};outline-offset:3px">
+            <div style="position:relative;aspect-ratio:4/3"><div style="position:absolute;inset:0;background:{{ x.bg }}"></div><div style="position:absolute;left:14px;bottom:8px;font-family:var(--font-display);font-size:72px;line-height:.82">{{ x.num }}</div>
+              <sc-if value="{{ x.chosen }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;display:grid;place-items:center"><span style="font-family:var(--font-display);font-size:40px;text-transform:uppercase;padding:4px 16px;border:3px solid var(--c-ink);border-radius:var(--r-sm);transform:rotate(-8deg);background:rgba(10,61,158,.55)">Pobjeda</span></div></sc-if>
+            </div>
+            <div style="padding:12px 14px;font-weight:700">Rad {{ x.num }}</div>
+          </div>
+          <span style="font-size:13px;color:var(--c-ink-2)">{{ x.state }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:40px;align-items:start">
+    <div>
+      <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Live brojač (flip-reel)</div>
+      <div style="display:inline-flex;flex-direction:column;gap:8px;padding:14px 22px;border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:linear-gradient(180deg,rgba(14,38,96,.6),rgba(6,15,42,.8))"><span style="font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-ink-2)">● Uživo</span><span data-counter="" style="display:flex;font-family:var(--font-display);font-size:56px;line-height:1.1;height:1.1em"></span><span style="font-size:14px;color:var(--c-ink-2)">glasova do sada</span></div>
+    </div>
+    <div>
+      <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Povratne poruke</div>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+        <span style="display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:var(--r-pill);background:var(--c-blue-600);font-size:14px;font-weight:600"><span style="color:var(--c-accent)">✓</span>Glas zabilježen · Rad 47</span>
+        <span style="display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:var(--r-pill);background:var(--c-ink);color:var(--c-navy-950);font-size:14px;font-weight:600">Rad 12 je tvoj favorit</span>
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:var(--r-md);border:1px solid var(--c-danger);background:rgba(255,107,122,.10)"><span style="width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--c-danger);color:var(--c-navy-950);font-weight:700">!</span><div><div style="font-weight:700">Previše glasova, pričekaj trenutak</div><div style="font-size:14px;color:var(--c-ink-2)">Možeš ponovno za 4 s.</div></div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Red ljestvice — skok gore · pad</div>
+      <div style="border-top:1px solid var(--c-line-strong)">
+        <sc-for list="{{ sheetRows }}" as="w" hint-placeholder-count="2">
+          <div style="display:grid;grid-template-columns:48px 52px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--c-line);background:{{ w.flash }}">
+            <span style="font-family:var(--font-display);font-size:26px">{{ w.rank }}</span><span style="font-family:var(--font-mono);font-size:12px;color:{{ w.deltaColor }}">{{ w.deltaStr }}</span><span style="font-weight:700">Rad {{ w.num }}</span><span style="font-family:var(--font-mono);font-size:13px">{{ w.rating }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Share kartica „Moj top 3“ — OG 1200 × 630 (prikaz 50 %)</div>
+    <div style="width:600px;height:315px;overflow:hidden;border-radius:12px">
+      <div style="width:1200px;height:630px;transform:scale(.5);transform-origin:0 0;position:relative;overflow:hidden;background:radial-gradient(80% 90% at 85% 0%,rgba(20,82,200,.55),transparent 60%),#030815;color:#F3F6FC;display:grid;grid-template-columns:1.05fr 1fr;padding:64px;gap:48px">
+        <div style="position:absolute;inset:0;background:conic-gradient(from 118deg at 0% 0%,transparent 0deg,rgba(120,175,255,.22) 9deg,transparent 22deg)"></div>
+        <div style="position:relative;display:flex;flex-direction:column;justify-content:space-between">
+          <div style="font-family:var(--font-mono);font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:#B8C4DE">✶ Narodni Maksimir</div>
+          <div><div style="font-family:var(--font-display);font-size:176px;line-height:.84;text-transform:uppercase">Moj<br>top 3</div><div style="margin-top:22px;font-size:32px;color:#B8C4DE">Žiri je odlučio. Ja sam glasao.</div></div>
+          <div style="font-family:var(--font-mono);font-size:22px;color:#4DA3FF">narodni-maksimir.hr/dvoboj</div>
+        </div>
+        <div style="position:relative;display:flex;flex-direction:column;justify-content:center;gap:18px">
+          <sc-for list="{{ top3 }}" as="t" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:70px 190px 1fr;align-items:center;gap:22px;padding:14px;border-radius:18px;background:rgba(14,38,96,.55);border:1px solid rgba(180,200,255,.2)">
+              <span style="font-family:var(--font-display);font-size:84px;line-height:.9;text-align:center;color:{{ t.col }}">{{ t.place }}</span>
+              <span style="height:118px;border-radius:12px;background:{{ t.bg }}"></span>
+              <span><span style="display:block;font-family:var(--font-display);font-size:52px;line-height:1;text-transform:uppercase">Rad {{ t.num }}</span><span style="display:block;font-family:var(--font-mono);font-size:18px;color:#8595BB;margin-top:6px">{{ t.code }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-ink-3);margin-bottom:14px">Prazno stanje</div>
+    <div style="max-width:520px;padding:40px 20px;border:1px dashed var(--c-line-strong);border-radius:var(--r-lg);display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px"><span style="font-family:var(--font-display);font-size:96px;line-height:.8;color:transparent;-webkit-text-stroke:1.5px var(--c-ink-3)">0</span><span style="font-family:var(--font-display);font-size:30px;text-transform:uppercase">Još nemaš favorita</span><span style="color:var(--c-ink-2)">Otvori rad i dodirni „Ovo je moj favorit“.</span></div>
+  </div>
+</section>
+</sc-if>
+
+<footer style="border-top:1px solid var(--c-line);margin-top:24px">
+  <div style="max-width:var(--max-w);margin:0 auto;padding:32px var(--gutter) 40px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px 40px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:560px">
+      <span style="font-family:var(--font-display);font-size:24px;text-transform:uppercase">Narodni Maksimir</span>
+      <span style="font-size:14px;color:var(--c-ink-2);line-height:1.5">Neslužbena stranica. Autorska prava na radove pripadaju autorima. <a href="#/o-projektu">Izvor: službena objava natječaja ↗</a></span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px">
+      <a href="#/" style="color:var(--c-ink-2)">Radovi</a><a href="#/dvoboj" style="color:var(--c-ink-2)">Dvoboj</a><a href="#/rang" style="color:var(--c-ink-2)">Rang</a><a href="#/o-projektu" style="color:var(--c-ink-2)">O projektu</a><a href="#/komponente" style="color:var(--c-ink-3)">Komponente</a>
+    </div>
+  </div>
+</footer>
+
+<sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}">
+  <nav style="position:fixed;left:0;right:0;bottom:0;z-index:60;height:var(--tabbar-h);padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(4,1fr);background:rgba(3,8,21,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--c-line)">
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="4">
+      <a href="{{ n.href }}" style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:{{ n.color }};font-size:12px;font-weight:600"><span style="width:22px;height:3px;border-radius:2px;background:{{ n.bar }}"></span>{{ n.label }}</a>
+    </sc-for>
+  </nav>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:fixed;left:50%;bottom:{{ toastBottom }};transform:translateX(-50%);z-index:80;padding:12px 18px;border-radius:var(--r-pill);background:var(--c-ink);color:var(--c-navy-950);font-weight:600;font-size:14px;box-shadow:0 20px 50px -20px rgba(0,0,0,.8);white-space:nowrap">{{ toast }}</div>
+</sc-if>
+
+<sc-if value="{{ shareOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:100;background:rgba(3,8,21,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center;padding:20px;overflow:auto">
+    <div style="width:{{ shareW }}px;max-width:100%;display:flex;flex-direction:column;gap:18px">
+      <div><div style="font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-accent)">{{ played }} dvoboja odigrano</div><div style="font-family:var(--font-display);font-size:clamp(34px,5vw,60px);text-transform:uppercase;line-height:.95;margin-top:6px">Tvoj top 3 je spreman</div></div>
+      <div style="width:{{ shareW }}px;height:{{ shareH }}px;overflow:hidden;border-radius:14px;box-shadow:var(--sh-lift)">
+        <div style="width:1200px;height:630px;transform:scale({{ shareScale }});transform-origin:0 0;position:relative;overflow:hidden;background:radial-gradient(80% 90% at 85% 0%,rgba(20,82,200,.55),transparent 60%),#030815;color:#F3F6FC;display:grid;grid-template-columns:1.05fr 1fr;padding:64px;gap:48px">
+          <div style="position:absolute;inset:0;background:conic-gradient(from 118deg at 0% 0%,transparent 0deg,rgba(120,175,255,.22) 9deg,transparent 22deg)"></div>
+          <div style="position:relative;display:flex;flex-direction:column;justify-content:space-between">
+            <div style="font-family:var(--font-mono);font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:#B8C4DE">✶ Narodni Maksimir</div>
+            <div><div style="font-family:var(--font-display);font-size:176px;line-height:.84;text-transform:uppercase">Moj<br>top 3</div><div style="margin-top:22px;font-size:32px;color:#B8C4DE">Žiri je odlučio. Ja sam glasao.</div></div>
+            <div style="font-family:var(--font-mono);font-size:22px;color:#4DA3FF">narodni-maksimir.hr/dvoboj</div>
+          </div>
+          <div style="position:relative;display:flex;flex-direction:column;justify-content:center;gap:18px">
+            <sc-for list="{{ top3 }}" as="t" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:70px 190px 1fr;align-items:center;gap:22px;padding:14px;border-radius:18px;background:rgba(14,38,96,.55);border:1px solid rgba(180,200,255,.2)">
+                <span style="font-family:var(--font-display);font-size:84px;line-height:.9;text-align:center;color:{{ t.col }}">{{ t.place }}</span>
+                <span style="height:118px;border-radius:12px;background:{{ t.bg }}"></span>
+                <span><span style="display:block;font-family:var(--font-display);font-size:52px;line-height:1;text-transform:uppercase">Rad {{ t.num }}</span><span style="display:block;font-family:var(--font-mono);font-size:18px;color:#8595BB;margin-top:6px">{{ t.code }}</span></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <button onClick="{{ doShare }}" style="flex:1 1 180px;padding:16px 22px;border-radius:var(--r-pill);border:0;background:var(--c-accent);color:var(--c-on-accent);font-weight:700;font-size:16px;cursor:pointer;min-height:48px">Podijeli</button>
+        <button onClick="{{ closeShare }}" style="flex:1 1 180px;padding:16px 22px;border-radius:var(--r-pill);border:1px solid var(--c-line-strong);background:transparent;color:var(--c-ink);font-weight:700;font-size:16px;cursor:pointer;min-height:48px">Nastavi igrati</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;motion&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;full&quot;,&quot;calm&quot;],&quot;default&quot;:&quot;full&quot;,&quot;tsType&quot;:&quot;'full'|'calm'&quot;,&quot;section&quot;:&quot;Ponašanje&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;electric&quot;,&quot;white&quot;],&quot;default&quot;:&quot;electric&quot;,&quot;tsType&quot;:&quot;'electric'|'white'&quot;,&quot;section&quot;:&quot;Izgled&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;komforna&quot;,&quot;gusta&quot;],&quot;default&quot;:&quot;komforna&quot;,&quot;tsType&quot;:&quot;'komforna'|'gusta'&quot;,&quot;section&quot;:&quot;Izgled&quot;}}">
+const AW=['6TVJ3MUHR','GY0F1A9OM','W3YS5VJBZ','6PPWVBBBZ','CYFXC7LIM'];
+const CO=['Hrvatska','Njemačka','Španjolska','Italija','Nizozemska','Austrija','Slovenija','Francuska','Danska','Portugal','Švicarska','Ujedinjeno Kraljevstvo','Srbija','Poljska','Japan','Belgija'];
+const SA=['Atelier','Studio','Ured','Kolektiv','Arhitekti','Radionica','Biro'];
+const SB=['Sjever','Tribina','Luk','Beton','Kvadrat','Horizont','Os','Mreža','Svjetlo','Rub','Polje','Kontra','Plato','Vijenac'];
+const AWE={1:1471,2:1528,3:1671,4:1597,5:1446};
+const HERO=[1,47,3,23,2,12,4,5];
+const VIEWS=['Pogled iz zraka','Tribine iznutra','Pročelje','Situacija'];
+const KEY='nm-v1';
+const AWS={1:{bg:'var(--award-1-bg)',fg:'var(--award-1-fg)',bd:'var(--award-1-bd)'},2:{bg:'var(--award-2-bg)',fg:'var(--award-2-fg)',bd:'var(--award-2-bd)'},3:{bg:'var(--award-3-bg)',fg:'var(--award-3-fg)',bd:'var(--award-3-bd)'},4:{bg:'var(--award-4-bg)',fg:'var(--award-4-fg)',bd:'var(--award-4-bd)'},5:{bg:'var(--award-5-bg)',fg:'var(--award-5-fg)',bd:'var(--award-5-bd)'}};
+const ROT='rotateY(-16deg) rotateX(4deg)';
+const SL=[[`translate3d(0,0,0) ${ROT} rotateZ(-2deg)`,1,10],[`translate3d(9%,-6%,-90px) ${ROT} rotateZ(1deg)`,.8,9],[`translate3d(18%,-12%,-180px) ${ROT} rotateZ(3deg)`,.5,8],[`translate3d(27%,-18%,-270px) ${ROT} rotateZ(5deg)`,.25,7],[`translate3d(36%,-24%,-360px) ${ROT} rotateZ(7deg)`,0,6],[`translate3d(36%,-24%,-360px) ${ROT} rotateZ(7deg)`,0,6],[`translate3d(36%,-24%,-360px) ${ROT} rotateZ(7deg)`,0,6],['translate3d(-80%,8%,120px) rotateY(-30deg) rotateZ(-12deg)',0,11]];
+function mk(seed){let s=(Math.imul(seed,2654435761)>>>0)||7;return()=>{s^=s<<13;s>>>=0;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296;};}
+const pad=n=>String(n).padStart(2,'0');
+const fmt=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const pl=(n,a,b,c)=>(n%10===1&&n%100!==11)?a:(n%10>=2&&n%10<=4&&(n%100<10||n%100>=20))?b:c;
+function build(){const out=[];for(let i=1;i<=88;i++){const r=mk(i+11);let code=AW[i-1];if(!code){code='';const ch='ABCDEFGHJKLMNPRSTUVWXYZ0123456789';for(let k=0;k<9;k++)code+=ch[Math.floor(r()*ch.length)];}
+ const elo=i<=5?AWE[i]:i===47?1714:i===23?1686:1500+(r()-.5)*300;const duels=Math.round(380+r()*900);
+ let au=SA[Math.floor(r()*SA.length)]+' '+SB[Math.floor(r()*SB.length)];if(r()>.55)au+=' + '+SA[Math.floor(r()*SA.length)]+' '+SB[Math.floor(r()*SB.length)];
+ out.push({id:i,code,award:i<=5?i:0,country:CO[Math.floor(r()*CO.length)],authors:au,elo,duels,wins:Math.round(duels*Math.min(.85,Math.max(.15,.5+(elo-1500)/500))),favs:Math.max(3,Math.round((elo-1300)*1.4+r()*120)),hue:212+Math.floor(r()*18),px:20+Math.floor(r()*60),py:38+Math.floor(r()*30),d24:Math.round((r()-.5)*12)});}
+ return out;}
+function rankMap(es){const s=es.slice().sort((a,b)=>b.elo-a.elo);const m={};s.forEach((e,i)=>m[e.id]=i+1);return m;}
+function parseHash(){const h=(location.hash||'').replace(/^#\/?/,'');const p=h.split('/');return {route:p[0]||'pocetna',param:p[1]||null};}
+function newPair(es,fixed){let a=fixed&&es.find(e=>e.id===fixed)?fixed:es[Math.floor(Math.random()*es.length)].id;const A=es.find(e=>e.id===a);const near=es.filter(e=>e.id!==a).sort((x,y)=>Math.abs(x.elo-A.elo)-Math.abs(y.elo-A.elo)).slice(0,14);const b=near[Math.floor(Math.random()*near.length)].id;return (fixed||Math.random()<.5)?[a,b]:[b,a];}
+function ph(e,v){v=v||0;const x=(e.px+v*23)%70+15,y=(e.py+v*13)%36+34,h=e.hue+v*3;
+ return `radial-gradient(34% 24% at ${x}% ${y}%, transparent 57%, rgba(175,210,255,.62) 59%, transparent 62%), radial-gradient(20% 12% at ${x}% ${y}%, rgba(150,200,255,.2) 0 96%, transparent 100%), repeating-radial-gradient(ellipse at ${x}% ${y}%, rgba(130,175,255,.14) 0 1.5px, transparent 1.5px 13px), repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 1px, transparent 1px 9px), radial-gradient(130% 100% at ${x}% ${Math.max(0,y-28)}%, hsl(${h} 72% 34%), hsl(${h+6} 85% 8%))`;}
+function reel(el,val){const str=String(val);if(el._str===str)return;const H=1.1;
+ if(!el._cells||el._len!==str.length){el.innerHTML='';el._len=str.length;el._cells=[...str].map(ch=>{const c=document.createElement('span');c.style.cssText=`display:inline-block;height:${H}em;overflow:hidden;line-height:${H};vertical-align:top`;if(/\d/.test(ch)){const st=document.createElement('span');st.style.cssText=`display:flex;flex-direction:column;transition:transform var(--dur-reel) var(--ease-snap)`;for(let d=0;d<10;d++){const s=document.createElement('span');s.textContent=d;s.style.cssText=`display:block;height:${H}em;text-align:center`;st.appendChild(s);}c.appendChild(st);c._st=st;}else{c.textContent=ch;}el.appendChild(c);return c;});}
+ [...str].forEach((ch,i)=>{const c=el._cells[i];if(c._st)c._st.style.transform=`translateY(${-(+ch)*H}em)`;else c.textContent=ch;});el._str=str;}
+
+class Component extends DCLogic {
+  state = this.init();
+  init(){
+    const entries=build();const rk=rankMap(entries);
+    entries.forEach(e=>{e.r24=Math.min(88,Math.max(1,rk[e.id]+e.d24));});
+    let sv={};try{sv=JSON.parse(localStorage.getItem(KEY)||'{}');}catch(_){}
+    const {route,param}=parseHash();
+    this.count=48213+(sv.played||0);
+    return {entries,route,param,w:window.innerWidth,filter:'svi',sort:'broj',loading:true,heroIdx:0,fav:sv.fav||[],played:sv.played||0,userWins:sv.userWins||{},pair:newPair(entries,route==='dvoboj'&&param?+param:null),phase:'idle',winSide:null,hov:null,rateLeft:0,share:false,gIdx:0,showAll:false,toast:null,lastWin:'—'};
+  }
+  applyProps(){
+    const p=this.props,root=document.documentElement,white=p.accent==='white';
+    root.style.setProperty('--c-accent',white?'#FFFFFF':'#4DA3FF');
+    root.style.setProperty('--c-accent-glow',white?'rgba(255,255,255,.38)':'rgba(77,163,255,.45)');
+    root.dataset.motion=p.motion==='calm'?'calm':'full';
+    this.reduced=p.motion==='calm'||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+  componentDidMount(){
+    this.applyProps();
+    this._h=()=>{const {route,param}=parseHash();const u={route,param,gIdx:0,hov:null};if(route==='dvoboj'){u.pair=newPair(this.state.entries,param?+param:null);u.phase='idle';this._enter=true;}window.scrollTo(0,0);this.setState(u);};
+    this._r=()=>this.setState({w:window.innerWidth});
+    this._k=e=>{if(this.state.route!=='dvoboj')return;if(this.state.share){if(e.key==='Escape')this.closeShare();return;}
+      if(e.key==='ArrowLeft'){e.preventDefault();this.vote('a');}else if(e.key==='ArrowRight'){e.preventDefault();this.vote('b');}else if(e.key===' '||e.key==='ArrowDown'){e.preventDefault();this.skip();}};
+    addEventListener('hashchange',this._h);addEventListener('resize',this._r);addEventListener('keydown',this._k);
+    this._io=new IntersectionObserver(es=>es.forEach(en=>{if(!en.isIntersecting)return;const el=en.target;this._io.unobserve(el);if(this.reduced)return;
+      el.animate([{opacity:0,transform:'translateY(28px)'},{opacity:1,transform:'none'}],{duration:640,delay:(+el.getAttribute('data-reveal')||0)*70,easing:'cubic-bezier(.2,.8,.2,1)',fill:'backwards'});}),{rootMargin:'0px 0px -6% 0px'});
+    this._t=[setInterval(()=>{this.count+=1+Math.floor(Math.random()*3);this.counters();},1100),
+      setInterval(()=>{if(!this.reduced&&this.state.route==='pocetna'&&!document.hidden)this.setState(s=>({heroIdx:s.heroIdx+1}));},3200),
+      setInterval(()=>this.sim(),3800)];
+    this._lt=setTimeout(()=>this.setState({loading:false}),900);
+    this.enhance();
+  }
+  componentWillUnmount(){removeEventListener('hashchange',this._h);removeEventListener('resize',this._r);removeEventListener('keydown',this._k);this._t.forEach(clearInterval);clearTimeout(this._lt);this._io&&this._io.disconnect();}
+  componentDidUpdate(){
+    this.applyProps();this.enhance();
+    if(this._morph&&this.state.route==='rad'){const m=this._morph;this._morph=null;requestAnimationFrame(()=>{const t=document.querySelector('[data-hero-img]');if(!t){m.c.remove();return;}const tr=t.getBoundingClientRect();t.style.opacity='0';
+      const a=m.c.animate([{left:m.r.left+'px',top:m.r.top+'px',width:m.r.width+'px',height:m.r.height+'px',borderRadius:'14px'},{left:tr.left+'px',top:tr.top+'px',width:tr.width+'px',height:tr.height+'px',borderRadius:'22px'}],{duration:560,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'});
+      a.onfinish=()=>{t.style.opacity='';m.c.animate([{opacity:1},{opacity:0}],{duration:180,fill:'forwards'}).onfinish=()=>m.c.remove();};});}
+    if(this._flip){const old=this._flip;this._flip=null;document.querySelectorAll('[data-row]').forEach(el=>{const o=old[el.getAttribute('data-row')];if(o==null)return;const dy=o-el.getBoundingClientRect().top;if(Math.abs(dy)>2)el.animate([{transform:`translateY(${dy}px)`,backgroundColor:'rgba(77,163,255,.18)'},{transform:'none',backgroundColor:'rgba(77,163,255,0)'}],{duration:760,easing:'cubic-bezier(.2,.8,.2,1)'});});}
+    if(this._enter){this._enter=false;if(!this.reduced){const mob=this.state.w<760;[['a',-1],['b',1]].forEach(([k,d])=>{const el=document.querySelector(`[data-duel-card="${k}"]`);el&&el.animate([{transform:mob?`translateY(${d*30}px)`:`translateX(${d*70}px)`,opacity:0},{transform:'none',opacity:1}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});});}}
+    if(this._regrid){this._regrid=false;if(!this.reduced)document.querySelectorAll('[data-grid] > a').forEach((el,i)=>{if(i<16)el.animate([{opacity:0,transform:'translateY(18px) scale(.98)'},{opacity:1,transform:'none'}],{duration:420,delay:i*35,easing:'cubic-bezier(.2,.8,.2,1)',fill:'backwards'});});}
+  }
+  counters(){const s=fmt(this.count);document.querySelectorAll('[data-counter]').forEach(el=>reel(el,s));}
+  enhance(){this.counters();document.querySelectorAll('[data-reel]').forEach(el=>reel(el,el.getAttribute('data-reel')));document.querySelectorAll('[data-reveal]:not([data-rv])').forEach(el=>{el.setAttribute('data-rv','');this._io&&this._io.observe(el);});}
+  save(){try{const s=this.state;localStorage.setItem(KEY,JSON.stringify({fav:s.fav,played:s.played,userWins:s.userWins}));}catch(_){}}
+  nav(p){location.hash='/'+p;}
+  sim(){const s=this.state;if(s.phase!=='idle')return;const es=s.entries.map(e=>({...e}));const a=es[Math.floor(Math.random()*88)],b=es[Math.floor(Math.random()*88)];if(a===b)return;
+    const aw=Math.random()<1/(1+10**((b.elo-a.elo)/400));const W=aw?a:b,L=aw?b:a;const ew=1/(1+10**((L.elo-W.elo)/400));W.elo+=30*(1-ew);L.elo-=30*(1-ew);W.duels++;L.duels++;W.wins++;
+    if(s.route==='rang'&&!this.reduced){const m={};document.querySelectorAll('[data-row]').forEach(el=>m[el.getAttribute('data-row')]=el.getBoundingClientRect().top);this._flip=m;}
+    this.setState({entries:es});}
+  openCard(ev,id){ev.preventDefault();if(!this.reduced){const src=ev.currentTarget.querySelector('[data-card-img]');if(src){const r=src.getBoundingClientRect();const c=src.cloneNode(true);c.removeAttribute('data-card-img');Object.assign(c.style,{inset:'auto',position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',margin:'0',zIndex:'300',borderRadius:'14px',transform:'none',transition:'none',pointerEvents:'none',overflow:'hidden'});document.body.appendChild(c);this._morph={c,r};}}this.nav('rad/'+id);}
+  tilt(ev){const el=ev.currentTarget;const p=el.querySelector('[data-panel]');if(p)p.style.transform='translateY(0)';if(this.reduced)return;const r=el.getBoundingClientRect();const x=(ev.clientX-r.left)/r.width-.5,y=(ev.clientY-r.top)/r.height-.5;
+    el.style.transform=`perspective(900px) rotateX(${(-y*6).toFixed(2)}deg) rotateY(${(x*8).toFixed(2)}deg) translateY(-4px)`;el.style.boxShadow='0 28px 60px -28px var(--c-accent-glow), 0 0 0 1px rgba(160,200,255,.35)';const z=el.querySelector('[data-zoom]');if(z)z.style.transform='scale(1.07)';}
+  untilt(ev){const el=ev.currentTarget;el.style.transform='';el.style.boxShadow='';const z=el.querySelector('[data-zoom]');if(z)z.style.transform='';const p=el.querySelector('[data-panel]');if(p)p.style.transform='translateY(100%)';}
+  heroMove(ev){if(this.reduced)return;const el=document.querySelector('[data-stack-inner]');if(!el)return;const r=ev.currentTarget.getBoundingClientRect();const x=(ev.clientX-r.left)/r.width-.5,y=(ev.clientY-r.top)/r.height-.5;el.style.transform=`rotateY(${(x*14).toFixed(2)}deg) rotateX(${(-y*10).toFixed(2)}deg)`;}
+  toastMsg(m){this.setState({toast:m});clearTimeout(this._tt);this._tt=setTimeout(()=>this.setState({toast:null}),2200);}
+  toggleFav(id){const s=this.state,on=s.fav.includes(id);const fav=on?s.fav.filter(x=>x!==id):[...s.fav,id];const entries=s.entries.map(e=>e.id===id?{...e,favs:e.favs+(on?-1:1)}:e);this.setState({fav,entries},()=>this.save());this.toastMsg(on?'Uklonjeno iz favorita':'Rad '+pad(id)+' je tvoj favorit');}
+  vote(k){const s=this.state;if(s.phase!=='idle'||s.rateLeft>0||s.share)return;const now=Date.now();this._vt=(this._vt||[]).filter(t=>now-t<5000);this._vt.push(now);
+    if(this._vt.length>7){this.startRate();return;}
+    const [a,b]=s.pair;const w=k==='a'?a:b,l=k==='a'?b:a;const entries=s.entries.map(e=>({...e}));const W=entries.find(e=>e.id===w),L=entries.find(e=>e.id===l);
+    const ew=1/(1+10**((L.elo-W.elo)/400));W.elo+=24*(1-ew);L.elo-=24*(1-ew);W.duels++;L.duels++;W.wins++;
+    const userWins={...s.userWins,[w]:(s.userWins[w]||0)+1};const played=s.played+1;this.count+=1;this.counters();
+    this.setState({entries,userWins,played,phase:'won',winSide:k,hov:null,lastWin:pad(w)},()=>{this.save();this.burst(k);});
+    clearTimeout(this._nt);this._nt=setTimeout(()=>{this._enter=true;this.setState({phase:'idle',winSide:null,pair:newPair(this.state.entries,null),share:played%10===0});},this.reduced?260:720);}
+  skip(){const s=this.state;if(s.phase!=='idle'||s.rateLeft>0||s.share)return;this._enter=true;this.setState({pair:newPair(s.entries,null),hov:null});}
+  startRate(){this.setState({rateLeft:5});clearInterval(this._ri);this._ri=setInterval(()=>{this.setState(s=>{const n=s.rateLeft-1;if(n<=0){clearInterval(this._ri);this._vt=[];}return {rateLeft:Math.max(0,n)};});},1000);}
+  burst(k){const t=document.querySelector('[data-vote-toast]');t&&t.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none',offset:.15},{opacity:1,transform:'none',offset:.8},{opacity:0,transform:'translateY(-6px)'}],{duration:1500,fill:'both'});
+    if(this.reduced)return;const el=document.querySelector(`[data-duel-card="${k}"]`);if(!el)return;const r=el.getBoundingClientRect();
+    const fl=document.createElement('div');Object.assign(fl.style,{position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',borderRadius:'22px',background:'radial-gradient(circle at 50% 40%, rgba(255,255,255,.9), rgba(77,163,255,.35) 45%, transparent 75%)',pointerEvents:'none',zIndex:'120'});document.body.appendChild(fl);fl.animate([{opacity:.95},{opacity:0}],{duration:520,easing:'ease-out',fill:'forwards'}).onfinish=()=>fl.remove();
+    const cx=r.left+r.width/2,cy=r.top+r.height*.42,cols=['#FFFFFF','#4DA3FF','#0A3D9E','#9CC7FF'];
+    for(let i=0;i<34;i++){const p=document.createElement('div');const sz=5+Math.random()*7;Object.assign(p.style,{position:'fixed',left:cx+'px',top:cy+'px',width:sz+'px',height:(sz*(i%2?.45:1))+'px',background:cols[i%4],zIndex:'121',pointerEvents:'none',borderRadius:i%3?'1px':'50%'});document.body.appendChild(p);
+      const an=Math.random()*Math.PI*2,di=100+Math.random()*Math.min(260,r.width*.6),dx=Math.cos(an)*di,dy=Math.sin(an)*di-60;
+      p.animate([{transform:'translate(-50%,-50%) rotate(0deg)',opacity:1},{transform:`translate(${dx}px,${dy+150}px) rotate(${Math.random()*720-360}deg)`,opacity:0}],{duration:900+Math.random()*500,easing:'cubic-bezier(.15,.7,.3,1)',fill:'forwards'}).onfinish=()=>p.remove();}
+    const vs=document.querySelector('[data-vs]');vs&&vs.animate([{transform:'translate(-50%,-50%) scale(1)'},{transform:'translate(-50%,-50%) scale(1.35)'},{transform:'translate(-50%,-50%) scale(1)'}],{duration:440,easing:'cubic-bezier(.34,1.56,.64,1)'});}
+  closeShare(){this._enter=true;this.setState({share:false});}
+  doShare(){const url=location.href.split('#')[0]+'#/dvoboj';const text='Moj top 3 za novi Maksimir. Žiri je odlučio, sad je red na narodu.';
+    if(navigator.share)navigator.share({title:'Narodni Maksimir',text,url}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(url).then(()=>this.toastMsg('Poveznica kopirana'),()=>this.toastMsg('Kopiraj poveznicu iz preglednika'));}
+  vm(e,rk){const r=rk[e.id],d=e.r24-r,a=e.award,st=AWS[a]||{};
+    return {id:e.id,num:pad(e.id),code:e.code,href:'#/rad/'+e.id,award:!!a,noAward:!a,awardNum:a?a+'.':'',bBg:st.bg,bFg:st.fg,bBd:st.bd,rank:String(r),rankStr:'#'+r,rating:fmt(e.elo),deltaStr:d>0?'▲ '+d:d<0?'▼ '+(-d):'—',deltaColor:d>0?'var(--c-accent)':'var(--c-ink-3)',bg:ph(e,0),country:e.country,authors:e.authors,duels:fmt(e.duels),favs:fmt(e.favs),win:Math.round(e.wins/e.duels*100)+'%',
+      juryLabel:a?a+'. nagrada':'—',juryMini:a?a+'. nagrada':e.country,juryColor:a?'var(--c-ink)':'var(--c-ink-3)',juryNote:a?`Žiri: ${a}. nagrada`:'Žiri: bez nagrade'};}
+  renderVals(){
+    const s=this.state,P=this.props,mob=s.w<760,rk=rankMap(s.entries),by={};s.entries.forEach(e=>by[e.id]=e);const V=e=>this.vm(e,rk);
+    const r=s.route,known=['pocetna','rad','dvoboj','rang','o-projektu','komponente'].includes(r);
+    const isHome=r==='pocetna'||!known,isRad=r==='rad',isDuel=r==='dvoboj',isRang=r==='rang',isAbout=r==='o-projektu',isSheet=r==='komponente';
+    const nav=[['Radovi','#/',isHome||isRad],['Dvoboj','#/dvoboj',isDuel],['Rang','#/rang',isRang],['O projektu','#/o-projektu',isAbout]].map(([label,href,act])=>({label,href,color:act?'var(--c-ink)':'var(--c-ink-2)',bar:act?'var(--c-accent)':'transparent'}));
+    const hidx=((s.heroIdx%8)+8)%8;
+    const heroCards=HERO.map((id,k)=>{const sl=SL[(k-hidx+8)%8];return {...V(by[id]),tf:sl[0],op:sl[1],z:sl[2],open:ev=>this.openCard(ev,id)};});
+    let list=s.entries.slice();
+    if(s.filter==='nagradeni')list=list.filter(e=>e.award);else if(s.filter==='ostali')list=list.filter(e=>!e.award);else if(s.filter==='favoriti')list=list.filter(e=>s.fav.includes(e.id));
+    list.sort(s.sort==='rang'?(a,b)=>rk[a.id]-rk[b.id]:(a,b)=>a.id-b.id);
+    const cards=list.map((e,i)=>{const big=!!e.award;return {...V(e),stagger:String(i%8),gc:big?'span 2':'span 1',gr:big&&!mob?'span 2':'span 1',ratio:big?(mob?'16/10':'auto'):'4/3',flex:big&&!mob?'1':'none',numSize:big?'64px':'34px',border:big?'rgba(160,200,255,.3)':'var(--c-line)',open:ev=>this.openCard(ev,e.id),move:ev=>this.tilt(ev),leave:ev=>this.untilt(ev)};});
+    const setF=f=>()=>{this._regrid=true;this.setState({filter:f});};const setS=o=>()=>{this._regrid=true;this.setState({sort:o});};
+    const filters=[['svi','Svi',88],['nagradeni','Nagrađeni',5],['ostali','Ostali',83],['favoriti','Moji favoriti',s.fav.length]].map(([k,label,count])=>{const act=s.filter===k;return {label,count:String(count),set:setF(k),bg:act?'var(--c-ink)':'transparent',fg:act?'var(--c-navy-950)':'var(--c-ink)',bd:act?'var(--c-ink)':'var(--c-line-strong)'};});
+    const sorts=[['broj','Po broju'],['rang',mob?'Po rangu':'Po narodnom rangu']].map(([k,label])=>{const act=s.sort===k;return {label,set:setS(k),bg:act?'var(--c-blue-600)':'transparent',fg:act?'var(--c-ink)':'var(--c-ink-2)'};});
+    const gridCols=`repeat(auto-fill,minmax(${P.density==='gusta'?'clamp(140px,17vw,220px)':'clamp(150px,22vw,290px)'},1fr))`;
+    const de=by[+s.param]||by[1],dv=V(de),isFav=s.fav.includes(de.id);
+    const d={...dv,mainBg:ph(de,s.gIdx),view:VIEWS[s.gIdx],viewIdx:(s.gIdx+1)+' / 4',thumbs:VIEWS.map((lab,i)=>({lab,bg:ph(de,i),set:()=>this.setState({gIdx:i}),bd:i===s.gIdx?'var(--c-accent)':'transparent',op:i===s.gIdx?'1':'.55'})),
+      prev:'#/rad/'+(de.id===1?88:de.id-1),next:'#/rad/'+(de.id===88?1:de.id+1),rankReel:dv.rank,juryShort:de.award?de.award+'.':'—',juryLabel:de.award?'nagrada žirija':'bez nagrade',
+      favLabel:isFav?'Tvoj favorit':'Ovo je moj favorit',favIcon:isFav?'★':'☆',favBg:isFav?'var(--c-ink)':'var(--c-accent)',favFg:'var(--c-navy-950)',favBd:isFav?'var(--c-ink)':'var(--c-accent)',toggleFav:()=>this.toggleFav(de.id),duel:'#/dvoboj/'+de.id};
+    const won=s.phase==='won';
+    const dside=(id,k)=>{const me=s.winSide===k,hov=s.hov===k&&!won;return {...V(by[id]),key:k,kbd:k==='a'?'←':'→',vote:()=>this.vote(k),enter:()=>{if(!mob)this.setState({hov:k});},leave:()=>this.setState({hov:null}),
+      tf:won?(me?'scale(1.035) translateY(-6px)':'scale(.94)'):(hov?'translateY(-6px)':'none'),filter:won&&!me?'grayscale(.85) brightness(.55)':'none',op:won&&!me?'.75':'1',ring:won&&me?'var(--c-accent)':(hov?'rgba(160,200,255,.55)':'transparent'),shadow:won&&me?'var(--sh-glow)':(hov?'var(--sh-lift)':'var(--sh-card)'),chosen:won&&me};};
+    const duel=[dside(s.pair[0],'a'),dside(s.pair[1],'b')];
+    const inSet=s.played%10===0&&s.played>0?10:s.played%10;
+    const segs=Array.from({length:10},(_,i)=>({bg:i<inSet?'var(--c-accent)':'var(--c-line-strong)',sh:i<inSet?'0 0 10px var(--c-accent-glow)':'none'}));
+    const ranked=s.entries.slice().sort((a,b)=>rk[a.id]-rk[b.id]);
+    const rows=(s.showAll?ranked:ranked.slice(0,20)).map(e=>({...V(e),rowBg:e.award?'rgba(10,61,158,.2)':'transparent'}));
+    const dis=s.entries.filter(e=>e.award).map(e=>{const v=V(e),diff=rk[e.id]-e.award,lo=Math.min(e.award,rk[e.id]),hi=Math.max(e.award,rk[e.id]);return {...v,diff,big:diff>0?'−'+diff:'+'+(-diff),bigColor:diff>0?'var(--c-ink)':'var(--c-accent)',note:diff>0?`pad ${diff} ${pl(diff,'mjesto','mjesta','mjesta')}`:'narod se slaže',jPos:((e.award-1)/87*100).toFixed(1)+'%',nPos:((rk[e.id]-1)/87*100).toFixed(1)+'%',lineLeft:((lo-1)/87*100).toFixed(1)+'%',span:((hi-lo)/87*100).toFixed(1)+'%'};}).sort((a,b)=>b.diff-a.diff).map((q,i)=>({...q,stagger:String(i)}));
+    const rowCols=mob?'40px minmax(0,1fr) auto':'64px 64px minmax(0,1.6fr) minmax(0,1fr) 90px 90px 90px 72px';
+    const ids=Object.keys(s.userWins).map(Number).sort((a,b)=>s.userWins[b]-s.userWins[a]);ranked.forEach(e=>{if(ids.length<3&&!ids.includes(e.id))ids.push(e.id);});
+    const top3=ids.slice(0,3).map((id,i)=>({...V(by[id]),place:String(i+1),col:i===0?'#4DA3FF':'#F3F6FC'}));
+    const shareW=Math.min(s.w-40,880),shareScale=shareW/1200;
+    const sheetCards=[{...V(by[12]),state:'Zadano',tf:'none',sh:'none',zoom:'none',hover:false,phLabel:'Render stiže',border:'var(--c-line)'},{...V(by[12]),state:'Hover / fokus (tilt, zoom, panel)',tf:'perspective(900px) rotateY(4deg) translateY(-4px)',sh:'0 28px 60px -28px var(--c-accent-glow), 0 0 0 1px rgba(160,200,255,.35)',zoom:'scale(1.07)',hover:true,phLabel:'Render stiže',border:'var(--c-line)'},{...V(by[2]),state:'Nagrađena (2 × 2 u gridu)',tf:'none',sh:'none',zoom:'none',hover:false,phLabel:'Render stiže',border:'rgba(160,200,255,.3)'},{...V(by[31]),bg:'repeating-linear-gradient(135deg, rgba(180,200,255,.07) 0 10px, transparent 10px 20px), var(--c-navy-900)',state:'Slika nedostaje',tf:'none',sh:'none',zoom:'none',hover:false,phLabel:'Slika nije dostupna',border:'var(--c-line)'}];
+    const badges=[1,2,3,4,5].map(a=>({num:a+'.',...AWS[a]}));
+    const sd=(id,state,o)=>({...V(by[id]),state,tf:'none',filter:'none',op:'1',ring:'transparent',shadow:'var(--sh-card)',chosen:false,...o});
+    const sheetDuel=[sd(47,'Mirno'),sd(47,'Hover',{tf:'translateY(-6px)',ring:'rgba(160,200,255,.55)',shadow:'var(--sh-lift)'}),sd(47,'Odabrana (+ flash, konfeti)',{tf:'scale(1.035) translateY(-6px)',ring:'var(--c-accent)',shadow:'var(--sh-glow)',chosen:true}),sd(12,'Poražena',{tf:'scale(.94)',filter:'grayscale(.85) brightness(.55)',op:'.75'})];
+    const sheetRows=[{rank:'4',num:'47',deltaStr:'▲ 3',deltaColor:'var(--c-accent)',rating:'1.714',flash:'rgba(77,163,255,.14)'},{rank:'9',num:'12',deltaStr:'▼ 2',deltaColor:'var(--c-ink-3)',rating:'1.602',flash:'transparent'}];
+    return {mob,desk:!mob,padBottom:mob?'var(--tabbar-h)':'0',nav,isHome,isRad,isDuel,isRang,isAbout,isSheet,
+      heroCards,heroMove:ev=>this.heroMove(ev),scrollGrid:ev=>{ev.preventDefault();const el=document.getElementById('radovi');if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-64,behavior:this.reduced?'auto':'smooth'});},
+      filters,sorts,gridCols,cards,skel:Array.from({length:mob?4:8},(_,i)=>({i})),showSkel:s.loading,showGrid:!s.loading&&cards.length>0,showEmpty:!s.loading&&cards.length===0,
+      d,pdfClick:ev=>{ev.preventDefault();this.toastMsg('Službeni PDF — poveznica stiže');},
+      duel,duelRatio:mob?'16/10':'4/3',vsTop:mob?'50%':'42%',skip:()=>this.skip(),played:String(s.played),playedReel:String(s.played),playedWord:pl(s.played,'dvoboj','dvoboja','dvoboja'),toGo:String(10-inSet===0?10:10-inSet),segs,rateLimited:s.rateLeft>0,rateLeft:String(s.rateLeft),lastWin:s.lastWin,
+      jury:V(by[1]),people:V(ranked[0]),dis,rows,rowCols,toggleAll:()=>this.setState(x=>({showAll:!x.showAll})),allLabel:s.showAll?'Prikaži top 20':'Prikaži svih 88',
+      top3,shareOpen:s.share,shareW:String(shareW),shareH:String(Math.round(630*shareScale)),shareScale:shareScale.toFixed(4),doShare:()=>this.doShare(),closeShare:()=>this.closeShare(),
+      hasToast:!!s.toast,toast:s.toast||'',toastBottom:mob?'calc(var(--tabbar-h) + 16px)':'28px',
+      sheetCards,badges,sheetDuel,sheetRows};
+  }
+}
+</script>
+</body>
+</html>

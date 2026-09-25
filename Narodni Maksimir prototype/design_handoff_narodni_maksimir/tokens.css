@@ -1,0 +1,110 @@
+/* ==========================================================================
+   Narodni Maksimir — design tokens (single source of truth)
+   Astro: import once in the base layout: import '../styles/tokens.css'
+   ========================================================================== */
+:root {
+  /* ---- Color: stage (navy, dark-mode-first) ---- */
+  --c-navy-950: #030815;   /* page background */
+  --c-navy-900: #060F2A;   /* raised stage */
+  --c-navy-800: #0A1A42;
+  --c-navy-700: #0E2660;
+  --c-surface: #0B1734;    /* cards */
+  --c-surface-2: #13244F;  /* skeleton highlight, hovered surface */
+
+  /* ---- Color: brand blue ---- */
+  --c-blue-600: #0A3D9E;   /* royal / "Dinamo" blue — bands, active sort, table tint */
+  --c-blue-500: #1452C8;
+  --c-blue-400: #2F6FEA;
+
+  /* ---- Color: accent (ONE sharp accent — CTAs, live, highlights) ---- */
+  --c-accent: #4DA3FF;                    /* alt "white glow" theme: #FFFFFF */
+  --c-accent-glow: rgba(77, 163, 255, .45);
+  --c-on-accent: #030815;                 /* text on accent (contrast 7.4:1) */
+
+  /* ---- Color: ink ---- */
+  --c-ink: #F3F6FC;        /* primary text (17:1 on navy-950) */
+  --c-ink-2: #B8C4DE;      /* secondary text (10:1) */
+  --c-ink-3: #8595BB;      /* tertiary / mono labels (5.9:1) */
+  --c-line: rgba(180, 200, 255, .14);
+  --c-line-strong: rgba(180, 200, 255, .28);
+
+  /* ---- Color: status (used sparingly) ---- */
+  --c-danger: #FF6B7A;     /* rate-limit / error only */
+  --c-up: var(--c-accent); /* rank up ▲ */
+  --c-down: var(--c-ink-3);/* rank down ▼ */
+
+  /* ---- Jury award tiers (monochrome blue ladder, no gold) ---- */
+  --award-1-bg: #FFFFFF;  --award-1-fg: #061233; --award-1-bd: #FFFFFF;
+  --award-2-bg: #CFE0FF;  --award-2-fg: #061233; --award-2-bd: #CFE0FF;
+  --award-3-bg: #8DB8FF;  --award-3-fg: #061233; --award-3-bd: #8DB8FF;
+  --award-4-bg: rgba(3, 8, 21, .55); --award-4-fg: #FFFFFF; --award-4-bd: rgba(255, 255, 255, .85);
+  --award-5-bg: rgba(3, 8, 21, .55); --award-5-fg: #CFE0FF; --award-5-bd: rgba(207, 224, 255, .6);
+
+  /* ---- Type ---- (all three families ship latin-ext: č ć đ š ž) */
+  --font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;      /* always uppercase, weight 400 */
+  --font-body: 'Schibsted Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;      /* codes, labels, kbd */
+
+  --fs-display-xl: clamp(58px, 7.6vw, 128px); /* hero h1 */
+  --fs-display-l: clamp(48px, 7vw, 112px);    /* page titles */
+  --fs-display-m: clamp(36px, 4.6vw, 72px);   /* section titles */
+  --fs-display-s: clamp(28px, 3vw, 44px);     /* scoreboard values */
+  --fs-num-giant: clamp(120px, 15vw, 220px);  /* entry number on detail */
+  --fs-h3: 22px;
+  --fs-body-l: 19px;
+  --fs-body: 16px;
+  --fs-small: 14px;
+  --fs-mono: 12px;
+  --fs-micro: 11px;
+
+  --lh-display: .88;
+  --lh-tight: 1.2;
+  --lh-body: 1.55;
+  --ls-display: .005em;
+  --ls-mono: .12em;        /* mono labels are uppercase */
+
+  /* ---- Spacing (4px base) ---- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px; --sp-5: 24px;
+  --sp-6: 32px; --sp-7: 48px; --sp-8: 64px; --sp-9: 96px; --sp-10: 128px;
+  --gutter: clamp(16px, 4vw, 48px);
+  --max-w: 1320px;
+  --nav-h: 64px;
+  --tabbar-h: 68px;        /* mobile bottom nav */
+
+  /* ---- Radii ---- */
+  --r-xs: 4px; --r-sm: 8px; --r-md: 14px; --r-lg: 22px; --r-pill: 999px;
+
+  /* ---- Shadows ---- */
+  --sh-card: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 12px 30px -18px rgba(0, 0, 0, .8);
+  --sh-lift: 0 30px 70px -30px rgba(0, 0, 0, .9), 0 0 0 1px rgba(160, 200, 255, .22);
+  --sh-glow: 0 0 0 1px var(--c-accent), 0 30px 80px -20px var(--c-accent-glow);
+  --sh-cta: 0 10px 40px -10px var(--c-accent-glow);
+
+  /* ---- Motion ---- */
+  --dur-instant: 90ms;     /* press feedback */
+  --dur-fast: 160ms;       /* chips, colors */
+  --dur-base: 260ms;       /* hover lift, tilt follow, panel reveal */
+  --dur-slow: 480ms;       /* image zoom */
+  --dur-reveal: 640ms;     /* scroll reveal (+70ms stagger per index) */
+  --dur-reel: 700ms;       /* flip-digit reels */
+  --dur-morph: 560ms;      /* card → detail shared element */
+  --dur-hero: 900ms;       /* hero stack step */
+  --dur-win: 720ms;        /* duel win hold before next pair */
+  --dur-ambient: 14s;      /* floodlight sweep (alternate) */
+  --dur-marquee: 38s;
+
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-snap: cubic-bezier(.7, 0, .2, 1);
+
+  /* ---- Z ---- */
+  --z-nav: 50; --z-toast: 80; --z-grain: 90; --z-modal: 100; --z-fx: 120; --z-morph: 300;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-base: 1ms; --dur-slow: 1ms; --dur-reveal: 1ms; --dur-reel: 1ms;
+    --dur-morph: 1ms; --dur-hero: 1ms; --dur-win: 250ms;
+  }
+}
