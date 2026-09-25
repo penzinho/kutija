@@ -43,6 +43,11 @@ button {
   color: var(--c-selection-fg);
 }
 
+/* Component rules like `display: flex` must not beat the hidden attribute. */
+[hidden] {
+  display: none !important;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

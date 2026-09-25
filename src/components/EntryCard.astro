@@ -21,7 +21,15 @@ const num = String(entry.id).padStart(2, '0');
 const fmt = new Intl.NumberFormat('hr-HR');
 ---
 
-<a href={`/rad/${entry.id}`} class:list={['entry-card', { featured }]} data-tilt>
+<a
+  href={`/rad/${entry.id}`}
+  class:list={['entry-card', { featured }]}
+  data-tilt
+  data-id={entry.id}
+  data-code={entry.code}
+  data-award={entry.award ?? undefined}
+  data-rank={rank?.rank}
+>
   <div class="media">
     <div class="img" transition:name={`entry-${entry.id}`}>
       {

@@ -1,0 +1,99 @@
+/* Sticky under the nav; bleeds to the gutter edges of its section. */
+.bar {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: var(--z-filterbar);
+  margin: var(--sp-6) calc(var(--gutter) * -1) var(--sp-5);
+  padding: var(--sp-3) var(--gutter);
+  background: var(--c-filterbar-bg);
+  backdrop-filter: blur(var(--blur-filterbar));
+  -webkit-backdrop-filter: blur(var(--blur-filterbar));
+  border-bottom: 1px solid var(--c-line);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+/* Scrolls sideways on phones. */
+.chips {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 9px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--c-line-strong);
+  background: transparent;
+  color: var(--c-ink);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.chip[aria-pressed='true'] {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  color: var(--c-navy-950);
+}
+.count {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  opacity: .7;
+}
+
+.sort {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sortLabel {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--c-ink-3);
+}
+.segments {
+  display: flex;
+  padding: 3px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--c-line-strong);
+}
+.segment {
+  padding: 7px 13px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--c-ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+.segment[aria-pressed='true'] {
+  background: var(--c-blue-600);
+  color: var(--c-ink);
+}
+
+/* "Po rangu" on phones. */
+@media (max-width: 759.98px) {
+  .wide {
+    display: none;
+  }
+}

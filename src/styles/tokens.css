@@ -131,3 +131,30 @@
   --c-img-missing: repeating-linear-gradient(135deg, rgba(180, 200, 255, .07) 0 10px, transparent 10px 20px), var(--c-navy-900);
   --sh-card-hover: 0 28px 60px -28px var(--c-accent-glow), 0 0 0 1px rgba(160, 200, 255, .35);
 }
+
+/* Home: hero, marquee, filter bar, "Moj top 3" */
+:root {
+  --c-hero-bg:
+    radial-gradient(90% 70% at 70% 0%, rgba(20, 82, 200, .35), transparent 60%),
+    radial-gradient(60% 50% at 0% 100%, rgba(10, 61, 158, .28), transparent 70%),
+    var(--c-navy-950);
+  --c-beam-l: conic-gradient(from 118deg at 0% 0%, transparent 0deg, rgba(120, 175, 255, .20) 9deg, rgba(120, 175, 255, .05) 18deg, transparent 26deg);
+  --c-beam-r: conic-gradient(from 216deg at 100% 0%, transparent 0deg, rgba(120, 175, 255, .16) 8deg, rgba(120, 175, 255, .04) 16deg, transparent 24deg);
+  --dur-ambient-2: 17s;                   /* second floodlight beam */
+  --c-pitch-line: rgba(160, 195, 255, .10);
+  --c-hero-outline: rgba(160, 195, 255, .13); /* giant outlined "NAROD" */
+  --c-scoreboard-bg: linear-gradient(180deg, rgba(14, 38, 96, .6), rgba(6, 15, 42, .8));
+  --c-hero-card-sheen: linear-gradient(160deg, rgba(255, 255, 255, .14), transparent 35%), linear-gradient(180deg, transparent 45%, rgba(3, 8, 21, .9));
+  --c-chip-dark: rgba(3, 8, 21, .6);      /* code / rank chips over images */
+  --c-hover-tint: rgba(160, 195, 255, .08); /* secondary button hover */
+  --c-marquee-bd: rgba(255, 255, 255, .2);
+  --c-filterbar-bg: rgba(3, 8, 21, .86);
+  --blur-filterbar: 12px;
+  --z-filterbar: 20;
+  --c-top3-bg:
+    conic-gradient(from 118deg at 0% 0%, transparent 0deg, rgba(120, 175, 255, .22) 9deg, transparent 22deg),
+    radial-gradient(80% 90% at 85% 0%, rgba(20, 82, 200, .55), transparent 60%),
+    var(--c-navy-950);
+  --c-top3-row: rgba(14, 38, 96, .55);
+  --c-top3-row-bd: rgba(180, 200, 255, .2);
+}

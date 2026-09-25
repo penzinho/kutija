@@ -48,3 +48,6 @@ const ranks = buildStub();
 export function getRank(id: number): RankInfo | undefined {
   return ranks.get(id);
 }
+
+/** Total duels played so far (the `stats` view, D11). STUB: every duel counts for two entries. */
+export const totalDuels = Math.round([...ranks.values()].reduce((sum, r) => sum + r.duels, 0) / 2);

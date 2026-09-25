@@ -45,6 +45,14 @@ export const IMAGE_PRESETS = {
     formats: ['avif'],
     fallbackFormat: 'webp',
   },
+  // Hero stack card, 4:5 crop; 70% of a 480 px stack on desktop, of the full width on phones.
+  hero: {
+    width: 480,
+    widths: [320, 480, 720],
+    sizes: '(max-width: 760px) 70vw, 340px',
+    formats: ['avif'],
+    fallbackFormat: 'webp',
+  },
   // Detail gallery, 16:10; about half of the 1320 px max width.
   detail: {
     width: 1280,

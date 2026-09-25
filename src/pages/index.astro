@@ -1,36 +1,420 @@
 ---
 import Base from '../layouts/Base.astro';
-import { entries, awarded } from '../data/entries';
+import EntryCard from '../components/EntryCard.astro';
+import HeroStack from '../components/HeroStack.astro';
+import DigitReel from '../components/DigitReel.astro';
+import TopPicks from '../components/TopPicks.astro';
+import FilterBar from '../components/FilterBar';
+import { entries, awarded, duelEligible } from '../data/entries';
+import { getRank, totalDuels } from '../data/ranks';
+
+// Hero stack: the jury's five interleaved with the people's top three (outside the awards),
+// the same mix as the design reference.
+const peoplesTop = duelEligible
+  .filter((e) => e.award === null)
+  .sort((a, b) => getRank(a.id)!.rank - getRank(b.id)!.rank)
+  .slice(0, 3);
+const heroEntries = [awarded[0], peoplesTop[0], awarded[2], peoplesTop[1], awarded[1], peoplesTop[2], awarded[3], awarded[4]];
+
+const MARQUEE = `Žiri je odlučio ✶ Sad je red na narodu ✶ ${entries.length} radova ✶ Jedan stadion ✶ Tvoj glas ✶ Narod vs Žiri ✶ `;
 ---
 
 <Base>
-  {/* Placeholder until step 3 builds the hero and grid. */}
-  <section>
-    <h1>Narodni Maksimir</h1>
-    <p>{entries.length} radova · {awarded.length} nagrađenih</p>
+  <TopPicks grid="radovi-grid" />
+
+  <section class="hero" data-hero>
+    <div class="beam beam-l" aria-hidden="true"></div>
+    <div class="beam beam-r" aria-hidden="true"></div>
+    <div class="pitch-circle" aria-hidden="true"></div>
+    <div class="pitch-line" aria-hidden="true"></div>
+    <div class="outline" aria-hidden="true">Narod</div>
+
+    <div class="hero-inner">
+      <div>
+        <div class="kicker">
+          <span class="star" aria-hidden="true">✶</span>Neslužbeno narodno glasanje<span class="dot" aria-hidden="true"
+            >·</span
+          >{entries.length} radova
+        </div>
+        <h1 class="h1">
+          <span class="h1-pre">Žiri je odlučio.</span>
+          <span class="h1-line">Sad je red</span>
+          <span class="h1-line">na <span class="glow">narodu.</span></span>
+        </h1>
+        <p class="lead">
+          Na međunarodni natječaj za novi stadion Maksimir stiglo je {entries.length} radova. Žiri je nagradio pet. Pogledaj
+          sve, odigraj dvoboje i pokaži koji bi izabrao narod.
+        </p>
+        <div class="ctas">
+          <a href="/dvoboj" class="btn btn-primary">Kreni glasati <span aria-hidden="true">→</span></a>
+          <a href="#radovi" class="btn btn-secondary">Pregledaj radove</a>
+        </div>
+        <div class="scoreboard">
+          <div class="score">
+            <span class="score-label"><span class="live-dot" aria-hidden="true"></span>Uživo</span>
+            <span class="score-value" data-counter><DigitReel value={totalDuels} /></span>
+            <span class="score-note">glasova do sada</span>
+          </div>
+          <div class="score-sep" aria-hidden="true"></div>
+          <div class="score">
+            <span class="score-label">U igri</span>
+            <span class="score-value">{duelEligible.length}</span>
+            <span class="score-note">radova</span>
+          </div>
+        </div>
+      </div>
+
+      <HeroStack entries={heroEntries} />
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>{MARQUEE}</span>
+      <span>{MARQUEE}</span>
+    </div>
+  </div>
+
+  <section id="radovi" class="works" aria-labelledby="radovi-title">
+    <div class="works-head">
+      <div>
+        <div class="eyebrow">01 — Natječajni radovi</div>
+        <h2 id="radovi-title" class="h2">{entries.length} radova.<br /><span class="dim">Jedan stadion.</span></h2>
+      </div>
+      <p class="works-note">
+        Otvori rad za galeriju i detalje. Nagrađeni radovi su istaknuti, a narodni rang se mijenja sa svakim dvobojem.
+      </p>
+    </div>
+
+    <FilterBar client:idle grid="radovi-grid" empty="radovi-empty" total={entries.length} awarded={awarded.length} />
+
+    <div id="radovi-grid" class="grid">
+      {entries.map((e) => <EntryCard entry={e} rank={getRank(e.id)} />)}
+    </div>
+
+    <div id="radovi-empty" class="empty" hidden>
+      <span class="empty-num" aria-hidden="true">0</span>
+      <h3 class="empty-title">Još nemaš favorita</h3>
+      <p class="empty-text">
+        Otvori bilo koji rad i dodirni „Ovo je moj favorit“ — ili pusti dvoboje da ti pomognu odlučiti.
+      </p>
+      <a href="/dvoboj" class="btn btn-primary btn-sm">Kreni glasati <span aria-hidden="true">→</span></a>
+    </div>
   </section>
 </Base>
 
 <style>
-  section {
-    max-width: var(--max-w);
-    margin: 0 auto;
-    padding: var(--sp-9) var(--gutter);
+  /* ---- Hero ---- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    min-height: calc(100svh - var(--nav-h));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--c-hero-bg);
   }
-  h1 {
+  .beam {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .beam-l {
+    background: var(--c-beam-l);
+    transform-origin: 0 0;
+    animation: nm-sweep-l var(--dur-ambient) var(--ease-in-out) infinite alternate;
+  }
+  .beam-r {
+    background: var(--c-beam-r);
+    transform-origin: 100% 0;
+    animation: nm-sweep-r var(--dur-ambient-2) var(--ease-in-out) infinite alternate;
+  }
+  .pitch-circle {
+    position: absolute;
+    left: 50%;
+    bottom: -260px;
+    width: 620px;
+    height: 620px;
+    margin-left: -310px;
+    border: 1px solid var(--c-pitch-line);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .pitch-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 50px;
+    height: 1px;
+    background: var(--c-pitch-line);
+    pointer-events: none;
+  }
+  .outline {
+    position: absolute;
+    left: 50%;
+    bottom: -3.5vw;
+    transform: translateX(-50%);
     font-family: var(--font-display);
-    font-size: var(--fs-display-l);
+    font-size: 31vw;
+    line-height: .8;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--c-hero-outline);
+    white-space: nowrap;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+    max-width: var(--max-w);
+    width: 100%;
+    margin: 0 auto;
+    padding: clamp(32px, 6vw, 80px) var(--gutter);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+    gap: clamp(40px, 5vw, 72px);
+    align-items: center;
+  }
+  .kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink-2);
+  }
+  .star {
+    color: var(--c-accent);
+  }
+  .dot {
+    color: var(--c-ink-3);
+  }
+  .h1 {
+    margin: 20px 0 0;
+    font-family: var(--font-display);
     font-weight: 400;
+    font-size: var(--fs-display-xl);
     line-height: var(--lh-display);
     letter-spacing: var(--ls-display);
     text-transform: uppercase;
-    margin: 0 0 var(--sp-5);
   }
-  p {
+  .h1-pre {
+    display: block;
+    font-size: .4em;
+    color: var(--c-ink-2);
+    letter-spacing: .02em;
+    margin-bottom: .25em;
+  }
+  .h1-line {
+    display: block;
+  }
+  .glow {
+    color: var(--c-accent);
+    text-shadow: 0 0 40px var(--c-accent-glow);
+  }
+  .lead {
+    margin: var(--sp-5) 0 0;
+    max-width: 30em;
+    font-size: var(--fs-body-l);
+    line-height: var(--lh-body);
+    color: var(--c-ink-2);
+    text-wrap: pretty;
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin-top: 30px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 17px 28px;
+    border-radius: var(--r-pill);
+    font-size: 17px;
+    transition:
+      box-shadow var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out),
+      background var(--dur-fast);
+  }
+  .btn:active {
+    transform: scale(.97);
+  }
+  .btn-primary {
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+    font-weight: 700;
+  }
+  .btn-primary:hover {
+    box-shadow: var(--sh-cta);
+    transform: translateY(-2px);
+    color: var(--c-on-accent);
+  }
+  .btn-secondary {
+    padding: 17px 26px;
+    border: 1px solid var(--c-line-strong);
+    color: var(--c-ink);
+    font-weight: 600;
+  }
+  .btn-secondary:hover {
+    background: var(--c-hover-tint);
+    color: var(--c-ink);
+  }
+  .btn-sm {
+    margin-top: var(--sp-2);
+    padding: 14px 22px;
+    font-size: var(--fs-body);
+  }
+
+  .scoreboard {
+    margin-top: 36px;
+    display: inline-flex;
+    align-items: stretch;
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-md);
+    background: var(--c-scoreboard-bg);
+    overflow: hidden;
+  }
+  .score {
+    padding: 14px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+  .score-sep {
+    width: 1px;
+    background: var(--c-line-strong);
+  }
+  .score-label {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--c-ink-2);
+  }
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    box-shadow: 0 0 12px var(--c-accent);
+    animation: nm-pulse 1.6s ease-in-out infinite;
+  }
+  .score-value {
+    display: flex;
+    font-family: var(--font-display);
+    font-size: clamp(40px, 4.4vw, 58px);
+    line-height: 1.1;
+  }
+  .score-note {
+    font-size: var(--fs-small);
+    color: var(--c-ink-2);
+  }
+
+  /* ---- Marquee ---- */
+  .marquee {
+    background: var(--c-blue-600);
+    border-block: 1px solid var(--c-marquee-bd);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .marquee-track {
+    display: inline-flex;
+    animation: nm-marquee var(--dur-marquee) linear infinite;
+  }
+  .marquee-track span {
+    padding: 14px 0;
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.4vw, 34px);
+    letter-spacing: .02em;
+    word-spacing: .2em;
+    text-transform: uppercase;
+  }
+
+  /* ---- Works ---- */
+  .works {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: clamp(56px, 8vw, 112px) var(--gutter) var(--sp-8);
+    scroll-margin-top: var(--nav-h);
+  }
+  .works-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px 40px;
+  }
+  .eyebrow {
     font-family: var(--font-mono);
     font-size: var(--fs-mono);
     letter-spacing: var(--ls-mono);
     text-transform: uppercase;
     color: var(--c-ink-3);
+  }
+  .h2 {
+    margin: 10px 0 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-display-l);
+    line-height: var(--lh-display);
+    text-transform: uppercase;
+  }
+  .dim {
+    color: var(--c-ink-3);
+  }
+  .works-note {
+    margin: 0;
+    max-width: 340px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--c-ink-2);
+    text-wrap: pretty;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(150px, 22vw, 290px), 1fr));
+    grid-auto-flow: dense;
+    gap: clamp(10px, 1.6vw, 20px);
+  }
+
+  .empty {
+    padding: clamp(48px, 8vw, 96px) 20px;
+    border: 1px dashed var(--c-line-strong);
+    border-radius: var(--r-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+  .empty-num {
+    font-family: var(--font-display);
+    font-size: 120px;
+    line-height: .8;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--c-ink-3);
+  }
+  .empty-title {
+    margin: var(--sp-2) 0 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-display-s);
+    text-transform: uppercase;
+  }
+  .empty-text {
+    margin: 0;
+    max-width: 26em;
+    color: var(--c-ink-2);
+    line-height: 1.5;
   }
 </style>
