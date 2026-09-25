@@ -27,7 +27,7 @@ const entrySchema = z
     roundNoteEn: z.array(text),
     authors: z.array(text),
     country: z.string().regex(/^[A-Z]{2}$/).nullable(),
-    images: z.array(z.string().min(1)),
+    images: z.array(z.string().regex(/^\d+-\d+\.jpg$/)), // files in src/assets/entries/
     pdf: z.url().nullable(),
   })
   .strict()
@@ -37,6 +37,7 @@ const entrySchema = z
     if ((e.status === 'eliminated') !== (e.eliminatedInRound !== null))
       fail('eliminatedInRound must be set exactly when status is "eliminated"');
     if (e.status !== 'excluded' && e.descriptionHr === null) fail('descriptionHr is required unless excluded');
+    for (const img of e.images) if (!img.startsWith(`${e.id}-`)) fail(`image "${img}" does not belong to entry ${e.id}`);
   });
 
 const fileSchema = z

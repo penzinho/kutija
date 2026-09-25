@@ -50,9 +50,9 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - ✅ Done when: `pnpm build` passes and the zod validation fails the build on bad data
 
 ### 2. Images
-- [ ] `scripts/import-images.ts <folder>`: reads `<id>-<n>.jpg`, writes optimized files to `src/assets/entries/` (so `astro:assets` makes AVIF/WebP + srcset), fills `images[]` in entries.json
-- [ ] Run it on `entries/`; move the originals out of the repo or gitignore them (30 MB)
-- [ ] Alt text = `Rad {id} · {code} · {authors}`
+- [x] `scripts/import-images.ts <folder>`: reads `<id>-<n>.jpg`, writes optimized files to `src/assets/entries/` (so `astro:assets` makes AVIF/WebP + srcset), fills `images[]` in entries.json
+- [x] Run it on `entries/`; move the originals out of the repo or gitignore them (30 MB)
+- [x] Alt text = `Rad {id} · {code} · {authors}`
 - ✅ Done when: all 88 entries have `images[0]`; the build output per image is reasonable (< ~150 KB for the card size)
 
 ### 3. Static pages (no backend yet; ranks and counts are mocked from a local stub)

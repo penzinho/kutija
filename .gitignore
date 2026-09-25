@@ -10,3 +10,6 @@ supabase/.temp/
 .idea/
 *.log
 .env.production
+
+# Original renders; the imported masters live in src/assets/entries/
+/entries/
