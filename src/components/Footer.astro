@@ -1,0 +1,70 @@
+---
+import { meta } from '../data/entries';
+import type { NavItem } from '../lib/nav';
+
+interface Props {
+  nav: NavItem[];
+}
+
+const { nav } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-about">
+      <span class="footer-name">Narodni Maksimir</span>
+      <span class="footer-note">
+        Neslužbena stranica. Autorska prava na radove pripadaju autorima.
+        <a href={meta.sourceUrl} target="_blank" rel="noopener">Izvor: službena objava natječaja ↗</a>
+      </span>
+    </div>
+    <nav class="footer-nav" aria-label="Podnožje">
+      {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--c-line);
+    margin-top: var(--sp-5);
+  }
+  .footer-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 32px var(--gutter) 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px 40px;
+  }
+  .footer-about {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    max-width: 560px;
+  }
+  .footer-name {
+    font-family: var(--font-display);
+    font-size: 24px;
+    text-transform: uppercase;
+  }
+  .footer-note {
+    font-size: var(--fs-small);
+    color: var(--c-ink-2);
+    line-height: 1.5;
+  }
+  .footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) 22px;
+    font-size: var(--fs-small);
+  }
+  .footer-nav a {
+    color: var(--c-ink-2);
+  }
+  .footer-nav a:hover {
+    color: var(--c-ink);
+  }
+</style>

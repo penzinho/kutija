@@ -1,0 +1,67 @@
+---
+import type { RankInfo } from '../data/ranks';
+
+interface Props {
+  /** Undefined for entries outside the people's ranking (excluded). */
+  rank: RankInfo | undefined;
+  /** pill: bordered chip; inline: bare text, as in the card meta row. */
+  variant?: 'pill' | 'inline';
+}
+
+const { rank, variant = 'pill' } = Astro.props;
+
+// Positive = climbed since the 24h snapshot.
+const delta = rank && rank.rank24h !== null ? rank.rank24h - rank.rank : null;
+const trend = delta === null || delta === 0 ? 'flat' : delta > 0 ? 'up' : 'down';
+const deltaText = trend === 'up' ? `▲ ${delta}` : trend === 'down' ? `▼ ${-delta!}` : '—';
+const deltaLabel =
+  delta === null ? 'bez podatka od jučer' : trend === 'flat' ? 'bez promjene u 24 h' : `${trend === 'up' ? 'gore' : 'dolje'} ${Math.abs(delta)} u 24 h`;
+---
+
+<span class:list={['rank-chip', variant]}>
+  <span class="label">Narod</span>
+  {
+    rank ? (
+      <>
+        <span class="rank">#{rank.rank}</span>
+        <span class:list={['delta', trend]} aria-hidden="true">{deltaText}</span>
+        <span class="visually-hidden">{deltaLabel}</span>
+      </>
+    ) : (
+      <span class="rank">—</span>
+    )
+  }
+</span>
+
+<style>
+  .rank-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    white-space: nowrap;
+  }
+  .pill {
+    padding: 6px 10px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--c-line-strong);
+  }
+  .inline {
+    font-size: var(--fs-micro);
+  }
+  .inline .label {
+    color: var(--c-ink-3);
+  }
+  .rank {
+    font-weight: 500;
+  }
+  .delta.up {
+    color: var(--c-up);
+  }
+  .delta.down,
+  .delta.flat {
+    color: var(--c-down);
+  }
+</style>

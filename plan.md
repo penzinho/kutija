@@ -56,7 +56,7 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - ✅ Done when: all 88 entries have `images[0]`; the build output per image is reasonable (< ~150 KB for the card size)
 
 ### 3. Static pages (no backend yet; ranks and counts are mocked from a local stub)
-- [ ] Components: `EntryCard`, `AwardBadge`, `StatusBadge` ("Ispao u X. krugu" / "Finalist" / excluded), `RankChip`, `Footer`, `TabBar`
+- [x] Components: `EntryCard`, `AwardBadge`, `StatusBadge` ("Ispao u X. krugu" / "Finalist" / excluded), `RankChip`, `Footer`, `TabBar`
 - [ ] `/`: hero (headline, CTAs, scoreboard, card stack), marquee, grid, sticky `FilterBar` island (Svi / Nagrađeni / Ostali / Moji favoriti + counts; sort Po broju / Po narodnom rangu), awarded cards 2×2, `?top=` renders the "Moj top 3" block
 - [ ] `/rad/[id]`: gallery, aside (number, badge, code, authors, country, PDF), description, jury text, round note, Žiri vs Narod box, stats row, favorite + "Usporedi u dvoboju" buttons, prev/next, view-transition morph
 - [ ] `/o-projektu`: disclaimer, 4 blocks, placeholder takedown email

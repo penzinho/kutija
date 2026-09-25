@@ -1,0 +1,52 @@
+---
+import type { Award } from '../data/entries';
+
+interface Props {
+  award: Award;
+  /** sm: cards and lists; lg: detail page aside. */
+  size?: 'sm' | 'lg';
+  /** "nagrada žirija" (default) or just "nagrada" where space is tight. */
+  short?: boolean;
+}
+
+const { award, size = 'sm', short = false } = Astro.props;
+---
+
+<span class:list={['award-badge', size]} data-tier={award}>
+  <span class="num">{award}.</span>{short ? 'nagrada' : 'nagrada žirija'}
+</span>
+
+<style>
+  .award-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px 5px 8px;
+    border-radius: var(--r-pill);
+    border: 1px solid;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .num {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1;
+  }
+  .lg {
+    gap: 8px;
+    padding: 7px 14px 7px 10px;
+    font-size: var(--fs-small);
+  }
+  .lg .num {
+    font-size: 22px;
+  }
+
+  [data-tier='1'] { background: var(--award-1-bg); color: var(--award-1-fg); border-color: var(--award-1-bd); }
+  [data-tier='2'] { background: var(--award-2-bg); color: var(--award-2-fg); border-color: var(--award-2-bd); }
+  [data-tier='3'] { background: var(--award-3-bg); color: var(--award-3-fg); border-color: var(--award-3-bd); }
+  [data-tier='4'] { background: var(--award-4-bg); color: var(--award-4-fg); border-color: var(--award-4-bd); }
+  [data-tier='5'] { background: var(--award-5-bg); color: var(--award-5-fg); border-color: var(--award-5-bd); }
+</style>

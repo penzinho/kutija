@@ -1,0 +1,46 @@
+---
+import AwardBadge from './AwardBadge.astro';
+import { statusLabel, type Entry } from '../data/entries';
+
+interface Props {
+  entry: Entry;
+  size?: 'sm' | 'lg';
+}
+
+const { entry, size = 'sm' } = Astro.props;
+---
+
+{
+  entry.award !== null ? (
+    <AwardBadge award={entry.award} size={size} />
+  ) : (
+    <span class:list={['status-badge', size, entry.status]}>{statusLabel(entry)}</span>
+  )
+}
+
+<style>
+  /* Not in the design reference; styled after its dashed "Bez nagrade žirija" pill. */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: var(--r-pill);
+    border: 1px dashed var(--c-line-strong);
+    color: var(--c-ink-2);
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .lg {
+    padding: 7px 14px;
+    font-size: var(--fs-small);
+  }
+  .finalist {
+    border-style: solid;
+    color: var(--c-ink);
+    font-weight: 700;
+  }
+  .excluded {
+    color: var(--c-ink-3);
+  }
+</style>

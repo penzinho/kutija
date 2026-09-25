@@ -9,7 +9,9 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
 import '../styles/tokens.css';
 import '../styles/global.css';
-import { meta } from '../data/entries';
+import Footer from '../components/Footer.astro';
+import TabBar from '../components/TabBar.astro';
+import { navItems } from '../lib/nav';
 
 interface Props {
   /** Page title; the site name is appended. Omit on the home page. */
@@ -31,13 +33,7 @@ const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME} · Narod bi
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 const ogImageUrl = ogImage && Astro.site ? new URL(ogImage, Astro.site).href : ogImage;
 
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const nav = [
-  { label: 'Radovi', href: '/', active: path === '/' || path.startsWith('/rad/') },
-  { label: 'Dvoboj', href: '/dvoboj', active: path === '/dvoboj' },
-  { label: 'Rang', href: '/rang', active: path === '/rang' },
-  { label: 'O projektu', href: '/o-projektu', active: path === '/o-projektu' },
-];
+const nav = navItems(Astro.url.pathname);
 ---
 
 <!doctype html>
@@ -95,31 +91,9 @@ const nav = [
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <div class="footer-inner">
-        <div class="footer-about">
-          <span class="footer-name">Narodni Maksimir</span>
-          <span class="footer-note">
-            Neslužbena stranica. Autorska prava na radove pripadaju autorima.
-            <a href={meta.sourceUrl} target="_blank" rel="noopener">Izvor: službena objava natječaja ↗</a>
-          </span>
-        </div>
-        <nav class="footer-nav" aria-label="Podnožje">
-          {nav.map((n) => <a href={n.href}>{n.label}</a>)}
-        </nav>
-      </div>
-    </footer>
+    <Footer nav={nav} />
 
-    <nav class="tab-bar" aria-label="Glavna navigacija">
-      {
-        nav.map((n) => (
-          <a href={n.href} class:list={{ active: n.active }} aria-current={n.active ? 'page' : undefined}>
-            <span class="tab-mark" aria-hidden="true" />
-            {n.label}
-          </a>
-        ))
-      }
-    </nav>
+    <TabBar nav={nav} />
   </body>
 </html>
 
@@ -249,55 +223,6 @@ const nav = [
     color: var(--c-on-accent);
   }
 
-  /* ---- Footer ---- */
-  .site-footer {
-    border-top: 1px solid var(--c-line);
-    margin-top: var(--sp-5);
-  }
-  .footer-inner {
-    max-width: var(--max-w);
-    margin: 0 auto;
-    padding: 32px var(--gutter) 40px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px 40px;
-  }
-  .footer-about {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-2);
-    max-width: 560px;
-  }
-  .footer-name {
-    font-family: var(--font-display);
-    font-size: 24px;
-    text-transform: uppercase;
-  }
-  .footer-note {
-    font-size: var(--fs-small);
-    color: var(--c-ink-2);
-    line-height: 1.5;
-  }
-  .footer-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2) 22px;
-    font-size: var(--fs-small);
-  }
-  .footer-nav a {
-    color: var(--c-ink-2);
-  }
-  .footer-nav a:hover {
-    color: var(--c-ink);
-  }
-
-  /* ---- Mobile tab bar (<760px) ---- */
-  .tab-bar {
-    display: none;
-  }
-
   @media (max-width: 759.98px) {
     body {
       padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
@@ -305,43 +230,6 @@ const nav = [
     .top-nav,
     .cta {
       display: none;
-    }
-    .tab-bar {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: var(--z-tabbar);
-      height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
-      padding-bottom: env(safe-area-inset-bottom);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      background: var(--c-tabbar-bg);
-      backdrop-filter: blur(var(--blur-chrome));
-      -webkit-backdrop-filter: blur(var(--blur-chrome));
-      border-top: 1px solid var(--c-line);
-    }
-    .tab-bar a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      color: var(--c-ink-2);
-      font-size: var(--fs-mono);
-      font-weight: 600;
-    }
-    .tab-bar a.active {
-      color: var(--c-ink);
-    }
-    .tab-mark {
-      width: 22px;
-      height: 3px;
-      border-radius: 2px;
-      background: transparent;
-    }
-    .tab-bar a.active .tab-mark {
-      background: var(--c-accent);
     }
   }
 </style>

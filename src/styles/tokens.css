@@ -122,4 +122,12 @@
   --blur-chrome: 14px;
   --grain-opacity: .07;
   --z-tabbar: 60;
+
+  /* Entry card */
+  --c-card-scrim: linear-gradient(180deg, rgba(3, 8, 21, .35), transparent 30%, transparent 55%, rgba(3, 8, 21, .75));
+  --c-card-panel: rgba(10, 61, 158, .94); /* hover reveal panel, --c-blue-600 at 94% */
+  --c-card-label: rgba(220, 232, 255, .62);
+  --c-card-bd-featured: rgba(160, 200, 255, .3);
+  --c-img-missing: repeating-linear-gradient(135deg, rgba(180, 200, 255, .07) 0 10px, transparent 10px 20px), var(--c-navy-900);
+  --sh-card-hover: 0 28px 60px -28px var(--c-accent-glow), 0 0 0 1px rgba(160, 200, 255, .35);
 }

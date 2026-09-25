@@ -1,0 +1,249 @@
+---
+import { Picture } from 'astro:assets';
+import AwardBadge from './AwardBadge.astro';
+import RankChip from './RankChip.astro';
+import type { Entry } from '../data/entries';
+import type { RankInfo } from '../data/ranks';
+import { coverImage, imageAlt, IMAGE_PRESETS } from '../data/images';
+
+interface Props {
+  entry: Entry;
+  rank: RankInfo | undefined;
+  /** Big 2×2 card (2×1 on mobile). Defaults to true for awarded entries. */
+  featured?: boolean;
+  /** Load the image eagerly (cards above the fold). */
+  eager?: boolean;
+}
+
+const { entry, rank, featured = entry.award !== null, eager = false } = Astro.props;
+const img = coverImage(entry);
+const num = String(entry.id).padStart(2, '0');
+const fmt = new Intl.NumberFormat('hr-HR');
+---
+
+<a href={`/rad/${entry.id}`} class:list={['entry-card', { featured }]} data-tilt>
+  <div class="media">
+    <div class="img" transition:name={`entry-${entry.id}`}>
+      {
+        img ? (
+          <Picture src={img} alt={imageAlt(entry)} loading={eager ? 'eager' : 'lazy'} {...IMAGE_PRESETS.card} />
+        ) : (
+          <div class="missing" role="img" aria-label={imageAlt(entry)} />
+        )
+      }
+    </div>
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="top">
+      <span class="num"><span class="visually-hidden">Rad </span>{num}</span>
+      {entry.award !== null && <AwardBadge award={entry.award} />}
+    </div>
+    {!img && <span class="img-label">Slika nije dostupna</span>}
+    <div class="panel" aria-hidden="true">
+      <span class="panel-cta">Pogledaj rad →</span>
+      {rank && <span class="panel-rank">Narod #{rank.rank} · {fmt.format(rank.elo)}</span>}
+    </div>
+  </div>
+  <div class="meta">
+    <span class="code">{entry.code}</span>
+    <RankChip rank={rank} variant="inline" />
+  </div>
+</a>
+
+<style>
+  .entry-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    color: var(--c-ink);
+    box-shadow: var(--sh-card);
+    transition:
+      transform var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+  }
+  .entry-card:hover,
+  .entry-card:focus-visible {
+    color: var(--c-ink);
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px);
+    box-shadow: var(--sh-card-hover);
+    will-change: transform;
+  }
+
+  .media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+  .img {
+    position: absolute;
+    inset: 0;
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+  .img :global(picture),
+  .img :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .entry-card:hover .img,
+  .entry-card:focus-visible .img {
+    transform: scale(1.07);
+  }
+  .missing {
+    width: 100%;
+    height: 100%;
+    background: var(--c-img-missing);
+  }
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: var(--c-card-scrim);
+    pointer-events: none;
+  }
+
+  .top {
+    position: absolute;
+    top: var(--sp-3);
+    left: var(--sp-3);
+    right: var(--sp-3);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--sp-2);
+  }
+  .num {
+    font-family: var(--font-display);
+    font-size: 34px;
+    line-height: .85;
+  }
+  .img-label {
+    position: absolute;
+    left: var(--sp-3);
+    bottom: var(--sp-3);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    color: var(--c-card-label);
+    text-transform: uppercase;
+  }
+
+  .panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: var(--sp-3) 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    background: var(--c-card-panel);
+    transform: translateY(100%);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .entry-card:hover .panel,
+  .entry-card:focus-visible .panel {
+    transform: none;
+  }
+  .panel-cta {
+    font-weight: 700;
+    font-size: var(--fs-small);
+  }
+  .panel-rank {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    white-space: nowrap;
+  }
+
+  .meta {
+    padding: 11px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-2);
+    border-top: 1px solid var(--c-line);
+  }
+  .code {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: .06em;
+    color: var(--c-ink-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Awarded: 2×2 on desktop with the image filling the height; 2×1 at 16:10 on mobile. */
+  .featured {
+    grid-column: span 2;
+    grid-row: span 2;
+    border-color: var(--c-card-bd-featured);
+  }
+  /* 4:3 is the floor (rows made only of featured cards have no other height);
+     it grows to fill the two rows when small cards set them taller. */
+  .featured .media {
+    flex: 1 0 auto;
+  }
+  .featured .num {
+    font-size: 64px;
+  }
+  @media (max-width: 759.98px) {
+    .featured {
+      grid-row: span 1;
+    }
+    .featured .media {
+      aspect-ratio: 16 / 10;
+      flex: none;
+    }
+  }
+
+  /* Reduced motion: keep the panel, drop tilt, lift and zoom. */
+  @media (prefers-reduced-motion: reduce) {
+    .entry-card:hover,
+    .entry-card:focus-visible,
+    .entry-card:hover .img,
+    .entry-card:focus-visible .img {
+      transform: none;
+    }
+  }
+  :global(html[data-motion='calm']) .entry-card:hover,
+  :global(html[data-motion='calm']) .entry-card:focus-visible,
+  :global(html[data-motion='calm']) .entry-card:hover .img,
+  :global(html[data-motion='calm']) .entry-card:focus-visible .img {
+    transform: none;
+  }
+</style>
+
+<script>
+  // Pointer tilt (max ±6° X / ±8° Y). One delegated listener survives ClientRouter navigations.
+  const MAX_X = 6;
+  const MAX_Y = 8;
+  const canTilt = () =>
+    matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    !matchMedia('(prefers-reduced-motion: reduce)').matches &&
+    document.documentElement.dataset.motion !== 'calm';
+
+  document.addEventListener('pointermove', (ev) => {
+    const card = (ev.target as Element | null)?.closest?.<HTMLElement>('[data-tilt]');
+    if (!card || !canTilt()) return;
+    const r = card.getBoundingClientRect();
+    const x = (ev.clientX - r.left) / r.width - 0.5;
+    const y = (ev.clientY - r.top) / r.height - 0.5;
+    card.style.setProperty('--rx', `${(-y * MAX_X).toFixed(2)}deg`);
+    card.style.setProperty('--ry', `${(x * MAX_Y).toFixed(2)}deg`);
+  });
+  document.addEventListener(
+    'pointerleave',
+    (ev) => {
+      const card = ev.target as HTMLElement;
+      if (card instanceof HTMLElement && card.matches('[data-tilt]')) {
+        card.style.removeProperty('--rx');
+        card.style.removeProperty('--ry');
+      }
+    },
+    true,
+  );
+</script>

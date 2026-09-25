@@ -1,0 +1,86 @@
+---
+// Component sheet (mirrors #/komponente in the design reference). Not linked, not indexed.
+import Base from '../layouts/Base.astro';
+import EntryCard from '../components/EntryCard.astro';
+import AwardBadge from '../components/AwardBadge.astro';
+import StatusBadge from '../components/StatusBadge.astro';
+import RankChip from '../components/RankChip.astro';
+import { awarded, entries, getEntry } from '../data/entries';
+import { getRank, type RankInfo } from '../data/ranks';
+
+const sample = (s: string) => entries.find((e) => e.status === s)!;
+const statusSamples = [sample('awarded'), sample('finalist'), ...[1, 3, 6].flatMap((r) => entries.find((e) => e.eliminatedInRound === r) ?? []), sample('excluded')];
+const chip = (rank: number, rank24h: number | null): RankInfo => ({ rank, rank24h, elo: 1500, duels: 0, wins: 0, favorites: 0 });
+const plain = [getEntry(12)!, getEntry(40)!, sample('excluded')];
+---
+
+<Base title="Komponente" noindex>
+  <div class="sheet">
+    <h1>Komponente</h1>
+
+    <h2>Nagrada žirija 1.–5.</h2>
+    <div class="row">
+      {([1, 2, 3, 4, 5] as const).map((a) => <AwardBadge award={a} />)}
+    </div>
+    <div class="row">
+      {([1, 4] as const).map((a) => <AwardBadge award={a} size="lg" />)}
+      <AwardBadge award={2} short />
+    </div>
+
+    <h2>Status</h2>
+    <div class="row">{statusSamples.map((e) => <StatusBadge entry={e} />)}</div>
+    <div class="row">{statusSamples.slice(1, 3).map((e) => <StatusBadge entry={e} size="lg" />)}</div>
+
+    <h2>Rang čip — gore · dolje · bez promjene · bez snimke · izvan ranga</h2>
+    <div class="row">
+      <RankChip rank={chip(4, 7)} />
+      <RankChip rank={chip(41, 35)} />
+      <RankChip rank={chip(12, 12)} />
+      <RankChip rank={chip(20, null)} />
+      <RankChip rank={undefined} />
+    </div>
+
+    <h2>Kartica rada</h2>
+    <div class="grid">
+      {awarded.slice(0, 2).map((e) => <EntryCard entry={e} rank={getRank(e.id)} />)}
+      {plain.map((e) => <EntryCard entry={e} rank={getRank(e.id)} />)}
+      <EntryCard entry={{ ...getEntry(13)!, images: [] }} rank={getRank(13)} />
+    </div>
+  </div>
+</Base>
+
+<style>
+  .sheet {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: var(--sp-8) var(--gutter);
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: var(--fs-display-m);
+    font-weight: 400;
+    text-transform: uppercase;
+    margin: 0 0 var(--sp-6);
+  }
+  h2 {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    font-weight: 400;
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+    margin: var(--sp-7) 0 14px;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(150px, 22vw, 290px), 1fr));
+    grid-auto-flow: dense;
+    gap: clamp(10px, 1.6vw, 20px);
+  }
+</style>
