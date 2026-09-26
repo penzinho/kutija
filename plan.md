@@ -64,19 +64,19 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - ✅ Done when: all pages match the reference at 1440px and 390px, keyboard focus works, and the Lighthouse mobile score on `/` is ≥ 90
 
 ### 4. Supabase database
-- [ ] `supabase init`; migrations: `entries` (seeded 1..88, with an `eligible` flag false for 56/87/88), `duels`, `favorites`, `pair_tokens`, `rank_snapshots` (D10)
-- [ ] RLS on everything; clients may only SELECT `leaderboard` and `stats`
-- [ ] SECURITY DEFINER functions: `get_pair(session, ip_hash, pin?)`, `vote_duel(token, winner, session, ip_hash)` (row locks, Elo K=32, delete token), `set_favorite(entry, session, ip_hash)`, `recompute_elo()`, `snapshot_ranks()`
-- [ ] Rate limits inside the functions: 1 per 1.5 s, 300 per day per session, 1000 per day per IP hash, 5 favorites per day per IP hash; errors return a typed code plus `retry_after`
-- [ ] Views: `leaderboard` (id, elo, rank, rank_24h, duels, wins, favorites; non-excluded rows only), `stats` (total duels, voters today)
-- [ ] `supabase/tests/voting.sql`: Elo math, rate limit, invalid or expired token, wrong session, duplicate pair, excluded entry never paired
-- ✅ Done when: `pnpm dlx supabase db reset` passes and the SQL tests pass locally
+- [x] `supabase init`, linked to the cloud project `srqdfixcngwpfwllljse` (no Docker: we test on remote); migrations: `entries` (seeded 1..88, with an `eligible` flag false for 56/87/88), `duels`, `favorites`, `pair_tokens`, `rank_snapshots` (D10)
+- [x] RLS on everything; clients may only SELECT `leaderboard` and `stats`
+- [x] SECURITY DEFINER functions: `get_pair(session, ip_hash, pin?)`, `vote_duel(token, winner, session, ip_hash)` (row locks, Elo K=32, delete token), `set_favorite(entry, session, ip_hash)`, `recompute_elo()`, `snapshot_ranks()`
+- [x] Rate limits inside the functions: 1 per 1.5 s per session (not per IP: shared households), 300 per day per session, 1000 per day per IP hash, 5 favorites per day per IP hash; errors return a typed code plus `retry_after`
+- [x] Views: `leaderboard` (id, elo, rank, rank_24h, duels, wins, favorites; non-excluded rows only), `stats` (total duels, voters today)
+- [x] `supabase/tests/voting.sql`: Elo math, rate limit, invalid or expired token, wrong session, duplicate pair, excluded entry never paired
+- ✅ Done when: `pnpm dlx supabase db push` applies cleanly and `pnpm dlx supabase db query --linked -f supabase/tests/voting.sql` prints "all passed" (each test rolls itself back)
 
 ### 5. Edge Function `vote` + session
 - [ ] `supabase/functions/vote`: verify the JWT (anonymous user), take the IP from `x-forwarded-for`, `ip_hash` = sha256(ip + daily salt derived from `IP_HASH_SALT_SECRET`), route `get_pair` / `vote_duel` / `set_favorite` to the service-role RPC, set CORS
 - [ ] Client `src/lib/session.ts`: lazy anonymous sign-in with the Turnstile token (invisible widget), only when the visitor first interacts with voting, so page views set no session
 - [ ] Enable anonymous sign-ins + Turnstile captcha in the Supabase dashboard (documented in the README)
-- ✅ Done when: a local `functions serve` round trip works (get pair → vote → Elo changes; a replayed token is rejected)
+- ✅ Done when: a `functions serve` (or deployed) round trip works (get pair → vote → Elo changes; a replayed token is rejected)
 
 ### 6. Duel island (`/dvoboj`)
 - [ ] Two cards + VS; tap / ← → to vote, Space / ↓ to skip; prefetch the next pair
