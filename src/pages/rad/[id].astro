@@ -92,6 +92,20 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
             {entry.authors.length ? entry.authors.join(', ') : 'Autori nisu objavljeni'}
           </dd>
           {
+            entry.authorsSources.length > 0 && (
+              <>
+                <dt>Izvor</dt>
+                <dd class="sources">
+                  {entry.authorsSources.map((s) => (
+                    <a href={s.url} target="_blank" rel="noopener" title={s.note}>
+                      {new URL(s.url).hostname.replace(/^www\./, '')} <span aria-hidden="true">↗</span>
+                    </a>
+                  ))}
+                </dd>
+              </>
+            )
+          }
+          {
             country && (
               <>
                 <dt>Zemlja</dt>
@@ -337,6 +351,12 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
   }
   .pdf {
     font-weight: 600;
+  }
+  .sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    font-size: var(--fs-micro);
   }
 
   .versus {

@@ -106,8 +106,8 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - ✅ Done when: a seeded abusive session is flagged, excluded, and after a recompute its effect is gone from `leaderboard` (verified 2026-09-26 in `supabase/tests/moderation.sql` against the linked project)
 
 ### 10a. Authors research (D16)
-- [ ] Find authors (and country where known) for the non-awarded entries: announcements, architects' own sites and portfolios, press; record a source for each
-- [ ] Add them to `entries.json` (zod still validates); the "Autori nisu objavljeni" fallback stays for entries we can't confirm
+- [x] Find authors (and country where known) for the non-awarded entries: announcements, architects' own sites and portfolios, press; record a source for each
+- [x] Add them to `entries.json` (zod still validates); the "Autori nisu objavljeni" fallback stays for entries we can't confirm. Found 6 (31, 35, 42, 47, 69, 80); each entry's `authorsSources` is required by zod when authors are set and shown as "Izvor" on `/rad/[id]`
 - ✅ Done when: every author we add has a source, and nothing is guessed
 
 ### 10. Launch
