@@ -1,12 +1,13 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import '@fontsource/anton';
-import '@fontsource/schibsted-grotesk/400.css';
-import '@fontsource/schibsted-grotesk/500.css';
-import '@fontsource/schibsted-grotesk/600.css';
-import '@fontsource/schibsted-grotesk/700.css';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
+// The home LCP is the Anton headline ("Žiri je odlučio." needs latin-ext too):
+// fetch both subsets before the CSS asks for them.
+import antonLatin from '@fontsource/anton/files/anton-latin-400-normal.woff2?url';
+import antonLatinExt from '@fontsource/anton/files/anton-latin-ext-400-normal.woff2?url';
+// Variable fonts: one file per subset covers every weight we use.
+import '@fontsource-variable/schibsted-grotesk';
+import '@fontsource-variable/jetbrains-mono';
 import '../styles/tokens.css';
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
@@ -47,6 +48,8 @@ const nav = navItems(Astro.url.pathname);
     {canonical && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href={antonLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={antonLatinExt} as="font" type="font/woff2" crossorigin />
 
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:locale" content="hr_HR" />
@@ -233,3 +236,9 @@ const nav = navItems(Astro.url.pathname);
     }
   }
 </style>
+
+<script>
+  import { initReveal } from '../lib/motion';
+
+  document.addEventListener('astro:page-load', initReveal);
+</script>

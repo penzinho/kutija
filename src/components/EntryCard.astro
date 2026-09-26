@@ -13,9 +13,11 @@ interface Props {
   featured?: boolean;
   /** Load the image eagerly (cards above the fold). */
   eager?: boolean;
+  /** Scroll-reveal stagger index (data-reveal); omit for no reveal. */
+  reveal?: number;
 }
 
-const { entry, rank, featured = entry.award !== null, eager = false } = Astro.props;
+const { entry, rank, featured = entry.award !== null, eager = false, reveal } = Astro.props;
 const img = coverImage(entry);
 const num = String(entry.id).padStart(2, '0');
 const fmt = new Intl.NumberFormat('hr-HR');
@@ -29,12 +31,13 @@ const fmt = new Intl.NumberFormat('hr-HR');
   data-code={entry.code}
   data-award={entry.award ?? undefined}
   data-rank={rank?.rank}
+  data-reveal={reveal}
 >
   <div class="media">
     <div class="img" transition:name={`entry-${entry.id}`}>
       {
         img ? (
-          <Picture src={img} alt={imageAlt(entry)} loading={eager ? 'eager' : 'lazy'} {...IMAGE_PRESETS.card} />
+          <Picture src={img} alt={imageAlt(entry)} loading={eager ? 'eager' : 'lazy'} {...(featured ? IMAGE_PRESETS.featured : IMAGE_PRESETS.card)} />
         ) : (
           <div class="missing" role="img" aria-label={imageAlt(entry)} />
         )
@@ -226,13 +229,12 @@ const fmt = new Intl.NumberFormat('hr-HR');
 </style>
 
 <script>
+  import { reducedMotion } from '../lib/motion';
+
   // Pointer tilt (max ±6° X / ±8° Y). One delegated listener survives ClientRouter navigations.
   const MAX_X = 6;
   const MAX_Y = 8;
-  const canTilt = () =>
-    matchMedia('(hover: hover) and (pointer: fine)').matches &&
-    !matchMedia('(prefers-reduced-motion: reduce)').matches &&
-    document.documentElement.dataset.motion !== 'calm';
+  const canTilt = () => matchMedia('(hover: hover) and (pointer: fine)').matches && !reducedMotion();
 
   document.addEventListener('pointermove', (ev) => {
     const card = (ev.target as Element | null)?.closest?.<HTMLElement>('[data-tilt]');

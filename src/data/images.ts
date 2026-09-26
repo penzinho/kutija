@@ -37,11 +37,19 @@ type Preset = {
 
 /** Responsive presets for <Picture>. Widths cover 1x–2x of each layout slot. */
 export const IMAGE_PRESETS = {
-  // Grid card, 4:3; ~300 px wide on desktop (4 columns), up to full width on phones.
+  // Grid card, 4:3; ~300 px wide on desktop (4 columns), half the width on phones (2 columns).
   card: {
     width: 640,
     widths: [320, 480, 640, 960],
-    sizes: '(max-width: 760px) 100vw, (max-width: 1320px) 25vw, 330px',
+    sizes: '(max-width: 760px) 50vw, (max-width: 1320px) 25vw, 330px',
+    formats: ['avif'],
+    fallbackFormat: 'webp',
+  },
+  // Awarded grid card: 2×2 on desktop, full width at 16:10 on phones.
+  featured: {
+    width: 960,
+    widths: [480, 640, 960, 1280],
+    sizes: '(max-width: 760px) 100vw, (max-width: 1320px) 50vw, 660px',
     formats: ['avif'],
     fallbackFormat: 'webp',
   },

@@ -164,19 +164,19 @@ const { entries } = Astro.props;
 </style>
 
 <script>
+  import { reducedMotion } from '../lib/motion';
+
   // Cycle every 3.2 s (front card exits left) and follow the pointer with a small parallax.
   // Off with reduced motion or the calm toggle; paused while the tab is hidden or the
   // pointer is over the stack (so a card doesn't move away under a click).
   const STEP_MS = 3200;
-  const reduced = () =>
-    matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'calm';
 
   let timer: number | undefined;
 
   document.addEventListener('astro:page-load', () => {
     clearInterval(timer);
     const stack = document.querySelector<HTMLElement>('[data-hero-stack]');
-    if (!stack || reduced()) return;
+    if (!stack || reducedMotion()) return;
     const cards = [...stack.querySelectorAll<HTMLElement>('[data-slot]')];
     const inner = stack.querySelector<HTMLElement>('[data-stack-inner]')!;
     const hero = stack.closest<HTMLElement>('[data-hero]') ?? stack;

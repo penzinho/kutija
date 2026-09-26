@@ -27,6 +27,12 @@ a {
 a:hover {
   color: var(--c-accent-hover);
 }
+/* Links inside running text need more than colour to stand out (WCAG 1.4.1). */
+p a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+}
 
 button {
   font: inherit;

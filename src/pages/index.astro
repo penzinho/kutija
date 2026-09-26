@@ -77,11 +77,11 @@ const MARQUEE = `Žiri je odlučio ✶ Sad je red na narodu ✶ ${entries.length
 
   <section id="radovi" class="works" aria-labelledby="radovi-title">
     <div class="works-head">
-      <div>
+      <div data-reveal="0">
         <div class="eyebrow">01 — Natječajni radovi</div>
         <h2 id="radovi-title" class="h2">{entries.length} radova.<br /><span class="dim">Jedan stadion.</span></h2>
       </div>
-      <p class="works-note">
+      <p class="works-note" data-reveal="1">
         Otvori rad za galeriju i detalje. Nagrađeni radovi su istaknuti, a narodni rang se mijenja sa svakim dvobojem.
       </p>
     </div>
@@ -89,7 +89,7 @@ const MARQUEE = `Žiri je odlučio ✶ Sad je red na narodu ✶ ${entries.length
     <FilterBar client:idle grid="radovi-grid" empty="radovi-empty" total={entries.length} awarded={awarded.length} />
 
     <div id="radovi-grid" class="grid">
-      {entries.map((e) => <EntryCard entry={e} rank={getRank(e.id)} />)}
+      {entries.map((e, i) => <EntryCard entry={e} rank={getRank(e.id)} reveal={i % 8} />)}
     </div>
 
     <div id="radovi-empty" class="empty" hidden>

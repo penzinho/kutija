@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { loadSaved } from '../lib/store';
+import { reducedMotion } from '../lib/motion';
 import s from './FilterBar.module.css';
 
 type Filter = 'svi' | 'nagradeni' | 'ostali' | 'favoriti';
@@ -15,9 +16,6 @@ interface Props {
 }
 
 const RESTAGGER = 16;
-
-const reduced = () =>
-  matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'calm';
 
 /** 1 rad, 2–4 rada, 5+ radova (11–14 radova). */
 function radova(n: number) {
@@ -63,7 +61,7 @@ export default function FilterBar({ grid, empty, total, awarded }: Props) {
     setFavCount(cards.some((c) => id(c) === fav) ? 1 : 0);
 
     const untouched = firstRun.current && filter === 'svi' && sort === 'broj';
-    const animate = !firstRun.current && !reduced();
+    const animate = !firstRun.current && !reducedMotion();
     firstRun.current = false;
     if (untouched) return;
 

@@ -66,7 +66,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
       <Gallery entry={entry} />
 
       <aside class="aside">
-        <div>
+        <div data-reveal="0">
           <div class="eyebrow">Natječajni rad · {num} / {total}</div>
           <div class="headline">
             <h1 class="num"><span class="visually-hidden">Rad </span>{num}</h1>
@@ -77,7 +77,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
           </div>
         </div>
 
-        <dl class="facts">
+        <dl class="facts" data-reveal="1">
           <dt>Autori</dt>
           <dd class:list={{ muted: !entry.authors.length }}>
             {entry.authors.length ? entry.authors.join(', ') : 'Autori nisu objavljeni'}
@@ -104,7 +104,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
           }
         </dl>
 
-        <section class="versus" aria-label="Žiri protiv naroda">
+        <section class="versus" data-reveal="2" aria-label="Žiri protiv naroda">
           <div class="side">
             <span class="side-label">Žiri</span>
             <span class="side-value">{jury.big}</span>
@@ -126,7 +126,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
           </div>
         </section>
 
-        <dl class="stats">
+        <dl class="stats" data-reveal="3">
           {
             stats.map(([label, value]) => (
               <div class="stat">
@@ -139,14 +139,14 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
 
         {
           inVote ? (
-            <div class="actions">
+            <div class="actions" data-reveal="4">
               <FavoriteButton client:load id={entry.id} />
               <a href={`/dvoboj?a=${entry.id}`} class="duel">
                 Usporedi u dvoboju <span class="duel-vs" aria-hidden="true">VS</span>
               </a>
             </div>
           ) : (
-            <p class="out">Ovaj rad nije prihvaćen u ocjenjivanje, pa ne sudjeluje u glasanju.</p>
+            <p class="out" data-reveal="4">Ovaj rad nije prihvaćen u ocjenjivanje, pa ne sudjeluje u glasanju.</p>
           )
         }
       </aside>
@@ -155,7 +155,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
     <div class="texts">
       {
         entry.descriptionHr && (
-          <section class="block">
+          <section class="block" data-reveal="0">
             <h2 class="block-title">Opis rada</h2>
             <div class="block-body">
               <p>{entry.descriptionHr}</p>
@@ -165,7 +165,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
       }
       {
         entry.juryHr.length > 0 && (
-          <section class="block">
+          <section class="block" data-reveal="0">
             <h2 class="block-title">{juryHeading}</h2>
             <div class="block-body">
               {entry.juryHr.map((p) => (
@@ -177,7 +177,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
       }
       {
         entry.roundNoteHr.length > 0 && (
-          <section class="block">
+          <section class="block" data-reveal="0">
             <h2 class="block-title">
               Ispao u {entry.eliminatedInRound}. krugu
               <span class="block-sub">Obrazloženje žirija za sve radove koji su ispali u tom krugu</span>

@@ -1,0 +1,178 @@
+---
+import Base from '../layouts/Base.astro';
+import { entries, meta } from '../data/entries';
+
+// Placeholders until launch (plan step 10). Bracketed text is shown as-is until then.
+const AUTHOR = '[Ime autora], navijač i [zanimanje] iz Zagreba.';
+const TAKEDOWN_EMAIL: string | null = null;
+---
+
+<Base
+  title="O projektu"
+  description="Narodni Maksimir je neslužbena, volonterska stranica za narodno glasanje o radovima s natječaja za novi stadion Maksimir. Kako se glasa, odakle su podaci i kako zatražiti uklanjanje sadržaja."
+>
+  <section class="about">
+    <div class="eyebrow" data-reveal="0">05 — O projektu</div>
+    <h1 class="title" data-reveal="1">Stadion je naš.<br /><span class="accent">Mišljenje isto.</span></h1>
+    <p class="lead" data-reveal="2">
+      Narodni Maksimir je nezavisna stranica na kojoj svatko može pregledati svih {entries.length} radova s međunarodnog
+      natječaja za novi stadion Maksimir i glasati za onaj koji mu je najbolji. Žiri je donio svoju odluku. Ovo je mjesto
+      za glas navijača i građana.
+    </p>
+
+    <div class="disclaimer" data-reveal="3">
+      <span class="stamp" aria-hidden="true">Neslužbeno</span>
+      <p>
+        <strong class="visually-hidden">Neslužbeno. </strong>Ova stranica nije povezana s klubom, Gradom Zagrebom, Društvom
+        arhitekata Zagreba ni organizatorima natječaja i ne koristi njihove znakove. Rezultati narodnog glasanja nemaju pravni
+        učinak na ishod natječaja. Autorska prava na sve radove pripadaju njihovim autorima.
+      </p>
+    </div>
+
+    <div class="blocks">
+      <section class="block" data-reveal="0" aria-labelledby="kako">
+        <div class="block-num" aria-hidden="true">01</div>
+        <h2 id="kako" class="block-title">Kako se glasa</h2>
+        <p>
+          Dobiješ dva rada i izabereš bolji. Iz svih dvoboja računamo Elo ocjenu za svaki rad — pobjeda protiv jačeg donosi
+          više bodova. Jedan glas malo mijenja, tisuće mijenjaju sve. Uz dvoboje možeš izabrati i jednog favorita.
+        </p>
+      </section>
+
+      <section class="block" data-reveal="1" aria-labelledby="izvori">
+        <div class="block-num" aria-hidden="true">02</div>
+        <h2 id="izvori" class="block-title">Izvori</h2>
+        <p>
+          Svi podaci i slike preuzeti su iz javno objavljenih materijala natječaja. Opisi i ocjene žirija dolaze iz dokumenta
+          „{meta.source}“.
+        </p>
+        <div class="links">
+          <a href={meta.sourceUrl} target="_blank" rel="noopener">Službena objava rezultata <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section class="block" data-reveal="2" aria-labelledby="tko">
+        <div class="block-num" aria-hidden="true">03</div>
+        <h2 id="tko" class="block-title">Tko stoji iza</h2>
+        <p>
+          {AUTHOR} Projekt je volonterski, bez oglasa, bez analitike i bez prikupljanja osobnih podataka. Za glasanje se koristi
+          nevidljiva anonimna sesija. IP adrese ne spremamo, samo njihov jednosmjerni sažetak za zaštitu od botova.
+        </p>
+      </section>
+
+      <section class="block" data-reveal="3" aria-labelledby="uklanjanje">
+        <div class="block-num" aria-hidden="true">04</div>
+        <h2 id="uklanjanje" class="block-title">Uklanjanje sadržaja</h2>
+        <p>Autor si rada ili nositelj prava? Javi se i uklonit ćemo ili ispraviti sadržaj u roku od 48 sati.</p>
+        <div class="links">
+          {TAKEDOWN_EMAIL ? <a href={`mailto:${TAKEDOWN_EMAIL}`}>{TAKEDOWN_EMAIL}</a> : <span>[e-mail za uklanjanje]</span>}
+        </div>
+      </section>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: clamp(28px, 5vw, 72px) var(--gutter) var(--sp-8);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+  }
+  .title {
+    margin: 10px 0 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-display-l);
+    /* Looser than --lh-display: the háček on MIŠLJENJE would touch the line above. */
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  .accent {
+    color: var(--c-accent);
+  }
+  .lead {
+    margin: 26px 0 0;
+    max-width: 38em;
+    font-size: var(--fs-body-l);
+    line-height: var(--lh-body);
+    color: var(--c-ink-2);
+    text-wrap: pretty;
+  }
+
+  .disclaimer {
+    margin: 40px 0;
+    padding: clamp(20px, 3vw, 32px);
+    border: 2px solid var(--c-ink);
+    border-radius: var(--r-lg);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .stamp {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3vw, 40px);
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border: 2px solid var(--c-ink);
+    border-radius: var(--r-xs);
+    transform: rotate(-4deg);
+  }
+  .disclaimer p {
+    margin: 0;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+  @media (max-width: 559.98px) {
+    .disclaimer {
+      grid-template-columns: 1fr;
+    }
+    .stamp {
+      justify-self: start;
+    }
+  }
+
+  /* 2×2 on desktop (3 + 1 would leave an empty cell), stacked on phones. */
+  .blocks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 1px;
+    background: var(--c-line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .block {
+    background: var(--c-navy-950);
+    padding: 26px;
+  }
+  .block-num {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1;
+    color: var(--c-ink-3);
+  }
+  .block-title {
+    margin: var(--sp-3) 0 var(--sp-2);
+    font-size: 20px;
+    line-height: var(--lh-tight);
+  }
+  .block p {
+    margin: 0;
+    color: var(--c-ink-2);
+    line-height: 1.55;
+  }
+  .links {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: 600;
+  }
+</style>

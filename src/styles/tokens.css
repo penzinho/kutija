@@ -42,8 +42,8 @@
 
   /* ---- Type ---- (all three families ship latin-ext: č ć đ š ž) */
   --font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;      /* always uppercase, weight 400 */
-  --font-body: 'Schibsted Grotesk', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;      /* codes, labels, kbd */
+  --font-body: 'Schibsted Grotesk Variable', 'Schibsted Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, Menlo, monospace;      /* codes, labels, kbd */
 
   --fs-display-xl: clamp(58px, 7.6vw, 128px); /* hero h1 */
   --fs-display-l: clamp(48px, 7vw, 112px);    /* page titles */
