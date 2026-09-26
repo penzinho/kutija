@@ -1,0 +1,248 @@
+---
+import Base from '../layouts/Base.astro';
+import AwardBadge from '../components/AwardBadge.astro';
+import RankChip from '../components/RankChip.astro';
+import { entries } from '../data/entries';
+import type { RankInfo } from '../lib/rank';
+
+// Fixed sample for the legend: not a live rank.
+const sample: RankInfo = { rank: 7, rank24h: 9, elo: 1562, duels: 0, wins: 0, favorites: 0 };
+
+// What the data still lacks, counted from entries.json so the text stays true as it fills up.
+const withAuthors = entries.filter((e) => e.authors.length > 0).length;
+const withJury = entries.filter((e) => e.juryHr.length > 0).length;
+const inVote = entries.filter((e) => e.status !== 'excluded').length;
+---
+
+<Base
+  title="Brojke i šifre"
+  description="Kako radi Elo rang građana, što znače brojke i oznake na slikama radova i šifre ispod njih, i koji podaci još nedostaju."
+>
+  <section class="brojke">
+    <div class="eyebrow" data-reveal="0">Brojke i šifre</div>
+    <h1 class="title" data-reveal="1">Što znače<br /><span class="accent">sve te brojke.</span></h1>
+    <p class="lead" data-reveal="2">
+      Kratko objašnjenje kako nastaje rang građana i kako pročitati karticu rada. Bez formula koje moraš znati, ali s
+      jednom koju možeš provjeriti.
+    </p>
+
+    <section class="part" aria-labelledby="elo">
+      <h2 id="elo" class="part-title">Kako radi Elo rang</h2>
+      <p>
+        Rang građana ne nastaje brojanjem glasova, nego iz dvoboja. U svakom dvoboju vidiš dva rada i izabereš bolji. Svaki
+        od {inVote} radova u glasanju krenuo je s istom ocjenom od <strong>1500</strong> bodova. Pobjednik uzima bodove,
+        poraženi ih gubi točno toliko.
+      </p>
+      <p>
+        Koliko bodova? Ovisi o tome koga si pobijedio. Sustav prije svakog dvoboja procijeni koliko je vjerojatno da
+        pobijedi jedan ili drugi. Očekivana pobjeda donosi malo, iznenađenje donosi puno. Isti sustav koristi se u šahu, a
+        ovdje je postavljen ovako:
+      </p>
+      <ul class="examples">
+        <li><span class="ex-num">+16</span> dva rada s jednakom ocjenom: pobjednik dobiva 16, poraženi gubi 16.</li>
+        <li><span class="ex-num">+24</span> rad s 1400 bodova pobijedi rad s 1600: to je iznenađenje, pa donosi puno.</li>
+        <li><span class="ex-num">+8</span> rad s 1600 bodova pobijedi rad s 1400: to se očekivalo, pa donosi malo.</li>
+      </ul>
+      <p class="formula">
+        Za one koji žele provjeriti: pobjednik dobiva 32 × (1 − E), gdje je E = 1 / (1 + 10<sup>(R<sub>protivnik</sub> −
+        R<sub>pobjednik</sub>) / 400</sup>).
+      </p>
+      <p>
+        Parovi nisu posve slučajni. Prvi rad se izvuče nasumično, ali radovi koji su bili u manje dvoboja dolaze češće, da
+        svi dobiju pošten broj prilika. Drugi se izvuče među radovima sa sličnom ocjenom, jer takvi dvoboji najviše govore.
+        Isti par ne dobiješ dvaput. Mjesto na listi određuje ocjena, a kod jednake ocjene više
+        pobjeda.
+      </p>
+      <p>
+        Jedan glas malo pomakne, tisuće pomaknu sve. Zato na početku lista još skače, a smiruje se kako dvoboja ima sve
+        više. Glasove koji izgledaju kao botovi ili navijanje iz jedne sobe isključujemo, a rang se tada iznova preračuna
+        bez njih.
+      </p>
+    </section>
+
+    <section class="part" aria-labelledby="kartica">
+      <h2 id="kartica" class="part-title">Kako pročitati karticu</h2>
+      <dl class="legend">
+        <div class="row">
+          <dt><span class="num-sample">07</span></dt>
+          <dd>
+            <strong>Redni broj rada</strong>, od 01 do {entries.length}. To je redoslijed iz službene objave rezultata, a ne
+            ocjena. Isti broj je i u adresi rada, npr. /rad/7.
+          </dd>
+        </div>
+        <div class="row">
+          <dt><AwardBadge award={1} /></dt>
+          <dd>
+            <strong>Nagrada žirija</strong>, od 1. do 5. Imaju je samo nagrađeni radovi. To je odluka žirija, ne naša.
+          </dd>
+        </div>
+        <div class="row">
+          <dt><span class="code-sample">MJY2USY2W</span></dt>
+          <dd>
+            <strong>Šifra rada.</strong> Natječaj je bio anoniman: autori su predali radove pod šifrom od devet znakova, a
+            žiri je ocjenjivao radove znajući samo šifre. Po šifri rad možeš naći u službenim dokumentima natječaja.
+          </dd>
+        </div>
+        <div class="row">
+          <dt><RankChip rank={sample} /></dt>
+          <dd>
+            <strong>Mjesto kod građana</strong> na rang listi, uživo. Strelica pokazuje za koliko se mjesta rad pomaknuo
+            od jučer: ▲ gore, ▼ dolje, — bez promjene ili još nema podatka.
+          </dd>
+        </div>
+        <div class="row">
+          <dt><span class="code-sample">Građani #7 · 1.562</span></dt>
+          <dd>
+            <strong>Mjesto i Elo ocjena</strong>, kad prijeđeš mišem preko slike. Ocjena iznad 1500 znači da rad više
+            pobjeđuje nego gubi.
+          </dd>
+        </div>
+      </dl>
+      <p>
+        Na stranici rada vidiš još i broj <strong>dvoboja</strong> u kojima je rad bio, <strong>postotak pobjeda</strong>
+        i koliko ga je ljudi izabralo za <strong>favorita</strong>. Radovi koje žiri nije primio u ocjenjivanje nisu u
+        glasanju i nemaju rang.
+      </p>
+    </section>
+
+    <section class="part note" aria-labelledby="nedostaje">
+      <h2 id="nedostaje" class="part-title">Što još nedostaje</h2>
+      <p>
+        Iskreno: nisam stigao iz službenih materijala izvući sve slike i sve podatke. Zasad svaki rad ima jednu sliku, autore
+        znamo za {withAuthors} od {entries.length} radova, a obrazloženje žirija imamo za {withJury}. Ostale slike, autore i
+        podatke dodajem naknadno, rad po rad.
+      </p>
+      <p>Ako znaš tko je autor nekog rada ili imaš bolju sliku iz službenih materijala, javi se.</p>
+    </section>
+  </section>
+</Base>
+
+<style>
+  .brojke {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: clamp(28px, 5vw, 72px) var(--gutter) var(--sp-8);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+  }
+  .title {
+    margin: 10px 0 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-display-l);
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  .accent {
+    color: var(--c-accent);
+  }
+  .lead {
+    margin: 26px 0 0;
+    max-width: 38em;
+    font-size: var(--fs-body-l);
+    line-height: var(--lh-body);
+    color: var(--c-ink-2);
+    text-wrap: pretty;
+  }
+
+  .part {
+    margin-top: var(--sp-7);
+    max-width: 44em;
+  }
+  .part-title {
+    margin: 0 0 var(--sp-4);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  .part p {
+    margin: 0 0 var(--sp-4);
+    color: var(--c-ink-2);
+    line-height: var(--lh-body);
+    text-wrap: pretty;
+  }
+  .part strong {
+    color: var(--c-ink);
+  }
+
+  .examples {
+    margin: 0 0 var(--sp-4);
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--sp-2);
+    color: var(--c-ink-2);
+    line-height: var(--lh-body);
+  }
+  .examples li {
+    display: grid;
+    grid-template-columns: 3.2em 1fr;
+    align-items: baseline;
+    gap: var(--sp-3);
+  }
+  .ex-num {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--c-accent);
+  }
+  .part .formula {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    color: var(--c-ink-3);
+  }
+
+  .legend {
+    margin: 0 0 var(--sp-5);
+    display: grid;
+    gap: 1px;
+    background: var(--c-line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 13em) 1fr;
+    gap: var(--sp-4);
+    align-items: center;
+    padding: 18px 22px;
+    background: var(--c-navy-950);
+  }
+  .row dt {
+    min-width: 0;
+  }
+  .row dd {
+    margin: 0;
+    color: var(--c-ink-2);
+    line-height: var(--lh-body);
+    text-wrap: pretty;
+  }
+  @media (max-width: 559.98px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: var(--sp-2);
+    }
+  }
+  .num-sample {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1;
+  }
+  .code-sample {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--c-ink);
+  }
+
+  .note {
+    padding-left: var(--sp-5);
+    border-left: 3px solid var(--c-accent);
+  }
+</style>

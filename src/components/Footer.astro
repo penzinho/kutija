@@ -22,6 +22,7 @@ const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
     </div>
     <nav class="footer-nav" aria-label="Podnožje">
       {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+      <a href="/brojke">Brojke i šifre</a>
       {
         analytics && (
           <button type="button" class="footer-link" data-consent-open hidden>
