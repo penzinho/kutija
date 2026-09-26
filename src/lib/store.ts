@@ -37,7 +37,7 @@ export function saveSaved(next: Saved): void {
   }
 }
 
-/** Set (or clear, with null) the one favorite. STUB for step 3: only the local mirror; step 7 calls `set_favorite`. */
+/** Mirrors the one favorite (or null) after `set_favorite` accepted it. */
 export function setFavorite(id: number | null): Saved {
   const next = { ...loadSaved(), fav: id };
   saveSaved(next);

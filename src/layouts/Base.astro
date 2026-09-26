@@ -12,6 +12,8 @@ import '../styles/tokens.css';
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import TabBar from '../components/TabBar.astro';
+import DigitReel from '../components/DigitReel.astro';
+import { totalDuels } from '../data/ranks';
 import { navItems } from '../lib/nav';
 
 interface Props {
@@ -84,7 +86,11 @@ const nav = navItems(Astro.url.pathname);
           }
         </nav>
         <div class="bar-end">
-          {/* LiveCounter island goes here in step 7. */}
+          <span class="live" title="Glasova do sada">
+            <span class="live-dot" aria-hidden="true"></span>
+            <DigitReel value={totalDuels ?? 0} data-counter />
+            <span class="visually-hidden"> glasova do sada</span>
+          </span>
           <a href="/dvoboj" class="cta">Kreni glasati →</a>
         </div>
       </div>
@@ -209,6 +215,22 @@ const nav = navItems(Astro.url.pathname);
     align-items: center;
     gap: 14px;
   }
+  .live {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    color: var(--c-ink-2);
+  }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    box-shadow: 0 0 10px var(--c-accent);
+    animation: nm-pulse 1.6s ease-in-out infinite;
+  }
   .cta {
     padding: 11px 18px;
     border-radius: var(--r-pill);
@@ -239,6 +261,10 @@ const nav = navItems(Astro.url.pathname);
 
 <script>
   import { initReveal } from '../lib/motion';
+  import { bindLivePage } from '../lib/live-dom';
 
-  document.addEventListener('astro:page-load', initReveal);
+  document.addEventListener('astro:page-load', () => {
+    initReveal();
+    bindLivePage();
+  });
 </script>

@@ -1,0 +1,110 @@
+---
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Leaderboard, { type BoardEntry } from '../components/Leaderboard';
+import { entries } from '../data/entries';
+import { buildRanks } from '../data/ranks';
+import { coverImage } from '../data/images';
+import { juryBands, juryShort } from '../lib/jury';
+
+const bands = juryBands(entries);
+
+const data: BoardEntry[] = await Promise.all(
+  entries.map(async (e) => {
+    const img = coverImage(e);
+    // Row thumbnail: 56 px slot at 2x. Hero pick: half of the 1320 px page, WebP only.
+    const [thumb, cover] = img
+      ? await Promise.all([
+          getImage({ src: img, width: 112, format: 'webp' }),
+          bands.has(e.id) ? getImage({ src: img, width: 960, format: 'webp' }) : undefined,
+        ])
+      : [];
+    return {
+      id: e.id,
+      code: e.code,
+      award: e.award,
+      jury: juryShort(e),
+      band: bands.get(e.id) ?? null,
+      thumb: thumb?.src ?? null,
+      cover: cover?.src ?? null,
+    };
+  }),
+);
+---
+
+<Base
+  title="Narodni rang"
+  description="Narod vs žiri: uživo ljestvica svih radova za novi stadion Maksimir, složena iz dvoboja, i gdje se narod najviše razilazi sa žirijem."
+>
+  <section class="rang">
+    <div class="head">
+      <div data-reveal="0">
+        <div class="eyebrow">
+          03 — Narodni rang <span class="live"><span class="live-dot" aria-hidden="true"></span>uživo</span>
+        </div>
+        <h1 class="h1">Narod <span class="dim">vs</span> Žiri</h1>
+      </div>
+      <p class="intro" data-reveal="1">
+        Rang se računa iz svih odigranih dvoboja (Elo, kao u šahu). Svaki glas pomiče ljestvicu — prati je uživo.
+      </p>
+    </div>
+
+    <Leaderboard client:load entries={data} ranks={[...buildRanks]} />
+  </section>
+</Base>
+
+<style>
+  .rang {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: clamp(24px, 4vw, 56px) var(--gutter) 72px;
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--sp-4) 40px;
+  }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+  }
+  .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--c-accent);
+  }
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    animation: nm-pulse 1.6s ease-in-out infinite;
+  }
+  .h1 {
+    margin: 10px 0 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-display-l);
+    line-height: var(--lh-display);
+    text-transform: uppercase;
+  }
+  .dim {
+    color: var(--c-ink-3);
+  }
+  .intro {
+    margin: 0;
+    max-width: 380px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--c-ink-2);
+  }
+</style>

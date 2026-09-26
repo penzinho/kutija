@@ -26,6 +26,10 @@
 .fav:active {
   transform: scale(.97);
 }
+.fav[aria-busy='true'] {
+  cursor: progress;
+  opacity: .7;
+}
 .fav[aria-pressed='true'] {
   background: var(--c-ink);
   border-color: var(--c-ink);
@@ -44,4 +48,8 @@
   margin: 0;
   font-size: var(--fs-small);
   color: var(--c-ink-2);
+}
+
+.error {
+  color: var(--c-danger);
 }

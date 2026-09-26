@@ -26,7 +26,6 @@ const data: DuelEntry[] = await Promise.all(
       code: e.code,
       award: e.award,
       country: e.country ? (countries.of(e.country) ?? null) : null,
-      // STUB ranks until step 7 (src/data/ranks.ts).
       rank: getRank(e.id)?.rank ?? null,
       alt: imageAlt(e),
       img: webp && avif ? { src: webp.src, webp: webp.srcSet.attribute, avif: avif.srcSet.attribute } : null,

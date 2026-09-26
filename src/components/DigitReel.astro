@@ -1,61 +1,15 @@
 ---
-// Flip-digit reel: each digit is a 0–9 strip shifted by -n × 1.1em. Rendered on the
-// server so it shows the right value without JS; a script can later change `--d`
-// on a strip and the reel rolls (--dur-reel, --ease-snap).
+// Flip-digit reel, rendered on the server so it shows the right value without JS.
+// Markup and styles are shared with the browser updater (src/lib/reel.ts, global.css).
+import { reelHtml } from '../lib/reel';
+
 interface Props {
   value: number;
+  /** Extra attributes for live updates, e.g. data-counter or data-live. */
+  [attr: `data-${string}`]: string | number | undefined;
 }
 
-const { value } = Astro.props;
-const text = new Intl.NumberFormat('hr-HR').format(value);
+const { value, ...attrs } = Astro.props;
 ---
 
-<span class="reel" data-reel={value}>
-  <span class="visually-hidden">{text}</span>
-  <span class="cells" aria-hidden="true">
-    {
-      [...text].map((ch) =>
-        /\d/.test(ch) ? (
-          <span class="cell">
-            <span class="strip" style={`--d:${ch}`}>
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
-                <span>{d}</span>
-              ))}
-            </span>
-          </span>
-        ) : (
-          <span class="cell">{ch}</span>
-        ),
-      )
-    }
-  </span>
-</span>
-
-<style>
-  .reel {
-    display: inline-flex;
-    font-variant-numeric: tabular-nums;
-  }
-  .cells {
-    display: flex;
-    height: 1.1em;
-    line-height: 1.1;
-  }
-  .cell {
-    display: inline-block;
-    height: 1.1em;
-    overflow: hidden;
-    vertical-align: top;
-  }
-  .strip {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    transform: translateY(calc(var(--d) * -1.1em));
-    transition: transform var(--dur-reel) var(--ease-snap);
-  }
-  .strip > span {
-    display: block;
-    height: 1.1em;
-  }
-</style>
+<span class="nm-reel" data-reel={value} {...attrs} set:html={reelHtml(value)} />

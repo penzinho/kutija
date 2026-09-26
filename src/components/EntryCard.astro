@@ -51,12 +51,14 @@ const fmt = new Intl.NumberFormat('hr-HR');
     {!img && <span class="img-label">Slika nije dostupna</span>}
     <div class="panel" aria-hidden="true">
       <span class="panel-cta">Pogledaj rad →</span>
-      {rank && <span class="panel-rank">Narod #{rank.rank} · {fmt.format(rank.elo)}</span>}
+      <span class="panel-rank" data-panel-rank={entry.status === 'excluded' ? undefined : entry.id} hidden={!rank}>
+        {rank && `Narod #${rank.rank} · ${fmt.format(rank.elo)}`}
+      </span>
     </div>
   </div>
   <div class="meta">
     <span class="code">{entry.code}</span>
-    <RankChip rank={rank} variant="inline" />
+    <RankChip rank={rank} id={entry.status === 'excluded' ? undefined : entry.id} variant="inline" />
   </div>
 </a>
 

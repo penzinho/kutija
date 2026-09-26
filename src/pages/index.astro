@@ -5,14 +5,15 @@ import HeroStack from '../components/HeroStack.astro';
 import DigitReel from '../components/DigitReel.astro';
 import TopPicks from '../components/TopPicks.astro';
 import FilterBar from '../components/FilterBar';
-import { entries, awarded, duelEligible } from '../data/entries';
+import { entries, awarded, duelEligible, type Entry } from '../data/entries';
 import { getRank, totalDuels } from '../data/ranks';
 
-// Hero stack: the jury's five interleaved with the people's top three (outside the awards),
-// the same mix as the design reference.
+// Hero stack: the jury's five interleaved with the people's top three (outside the awards,
+// as of the build), the same mix as the design reference. Without rank data: the finalists.
+const heroOrder = (e: Entry) => getRank(e.id)?.rank ?? (e.status === 'finalist' ? 1000 : 2000) + e.id;
 const peoplesTop = duelEligible
   .filter((e) => e.award === null)
-  .sort((a, b) => getRank(a.id)!.rank - getRank(b.id)!.rank)
+  .sort((a, b) => heroOrder(a) - heroOrder(b))
   .slice(0, 3);
 const heroEntries = [awarded[0], peoplesTop[0], awarded[2], peoplesTop[1], awarded[1], peoplesTop[2], awarded[3], awarded[4]];
 
@@ -52,7 +53,7 @@ const MARQUEE = `Žiri je odlučio ✶ Sad je red na narodu ✶ ${entries.length
         <div class="scoreboard">
           <div class="score">
             <span class="score-label"><span class="live-dot" aria-hidden="true"></span>Uživo</span>
-            <span class="score-value" data-counter><DigitReel value={totalDuels} /></span>
+            <span class="score-value"><DigitReel value={totalDuels ?? 0} data-counter /></span>
             <span class="score-note">glasova do sada</span>
           </div>
           <div class="score-sep" aria-hidden="true"></div>

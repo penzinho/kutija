@@ -1,53 +1,38 @@
-import { duelEligible } from './entries';
+/**
+ * Build-time snapshot of the people's ranking, so the static HTML carries real numbers.
+ * The browser replaces them with live values (src/lib/live.ts). Without Supabase env or
+ * network the build still succeeds: pages render "—" until the live data arrives.
+ */
+import { fetchRanks, fetchStats, type RankInfo, type Ranks } from '../lib/rank';
 
-/** One row of the people's ranking; mirrors the `leaderboard` view (step 4). */
-export type RankInfo = {
-  rank: number;
-  /** Rank at the last daily snapshot; null until the first snapshot exists (D10). */
-  rank24h: number | null;
-  elo: number;
-  duels: number;
-  wins: number;
-  favorites: number;
-};
+export type { RankInfo } from '../lib/rank';
 
-// STUB for step 3: deterministic fake ranks so pages render without a backend.
-// Step 7 replaces this with data from the `leaderboard` view.
-function mulberry32(seed: number) {
-  return () => {
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+const env = { url: import.meta.env.PUBLIC_SUPABASE_URL ?? '', key: import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '' };
+
+async function snapshot(): Promise<{ ranks: Ranks; totalDuels: number | null }> {
+  if (!env.url || !env.key) {
+    console.warn('[ranks] PUBLIC_SUPABASE_URL / PUBLIC_SUPABASE_ANON_KEY not set: building without ranks');
+    return { ranks: new Map(), totalDuels: null };
+  }
+  try {
+    const signal = AbortSignal.timeout(8000);
+    const [ranks, stats] = await Promise.all([fetchRanks(env, signal), fetchStats(env, signal)]);
+    return { ranks, totalDuels: stats.totalDuels };
+  } catch (e) {
+    console.warn(`[ranks] could not read the leaderboard, building without ranks: ${String(e)}`);
+    return { ranks: new Map(), totalDuels: null };
+  }
 }
 
-function buildStub(): Map<number, RankInfo> {
-  const rnd = mulberry32(88);
-  const rows = duelEligible.map((e) => {
-    const elo = Math.round(1500 + (rnd() - 0.5) * 360 + (e.award ? (6 - e.award) * 30 : 0));
-    const duels = 40 + Math.floor(rnd() * 260);
-    const winRate = Math.min(0.85, Math.max(0.15, 0.5 + (elo - 1500) / 500));
-    return { id: e.id, elo, duels, wins: Math.round(duels * winRate), favorites: Math.floor(rnd() * 120) };
-  });
-  rows.sort((a, b) => b.elo - a.elo);
-  const n = rows.length;
-  return new Map(
-    rows.map((r, i) => {
-      const rank = i + 1;
-      const drift = Math.round((rnd() - 0.5) * 12);
-      const rank24h = rnd() < 0.15 ? null : Math.min(n, Math.max(1, rank + drift));
-      return [r.id, { rank, rank24h, elo: r.elo, duels: r.duels, wins: r.wins, favorites: r.favorites }];
-    }),
-  );
-}
+const { ranks, totalDuels: total } = await snapshot();
 
-const ranks = buildStub();
-
-/** The people's rank for an entry; undefined for excluded entries (they are never ranked). */
+/** The people's rank for an entry; undefined for excluded entries or when the build had no data. */
 export function getRank(id: number): RankInfo | undefined {
   return ranks.get(id);
 }
 
-/** Total duels played so far (the `stats` view, D11). STUB: every duel counts for two entries. */
-export const totalDuels = Math.round([...ranks.values()].reduce((sum, r) => sum + r.duels, 0) / 2);
+/** Every ranked entry, as of the build. */
+export const buildRanks: Ranks = ranks;
+
+/** Total duels played (the `stats` view, D11) as of the build; null when unknown. */
+export const totalDuels: number | null = total;

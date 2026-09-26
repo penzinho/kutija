@@ -180,3 +180,13 @@
   --c-confetti-4: #9CC7FF;
   --dur-slide: 420ms;      /* next pair slides in */
 }
+
+/* Rang (/rang) */
+:root {
+  --c-pick-jury-scrim: linear-gradient(90deg, rgba(3, 8, 21, .92), rgba(3, 8, 21, .55));
+  --c-pick-people-scrim: linear-gradient(90deg, rgba(10, 61, 158, .92), rgba(10, 61, 158, .55));
+  --c-row-awarded: rgba(10, 61, 158, .2);  /* --c-blue-600 at 20% */
+  --c-row-hover: rgba(160, 195, 255, .06);
+  --c-row-flash: rgba(77, 163, 255, .14);  /* FLIP flash on rank change */
+  --c-track-span: linear-gradient(90deg, var(--c-ink), var(--c-accent)); /* Ž → N on the 1–N track */
+}

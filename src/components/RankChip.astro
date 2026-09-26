@@ -1,36 +1,24 @@
 ---
-import type { RankInfo } from '../data/ranks';
+import { rankDelta, type RankInfo } from '../lib/rank';
 
 interface Props {
-  /** Undefined for entries outside the people's ranking (excluded). */
+  /** Undefined for entries outside the people's ranking (excluded) or before live data. */
   rank: RankInfo | undefined;
+  /** Entry id: the chip then follows live ranks (src/lib/live-dom.ts). Omit for a fixed sample. */
+  id?: number;
   /** pill: bordered chip; inline: bare text, as in the card meta row. */
   variant?: 'pill' | 'inline';
 }
 
-const { rank, variant = 'pill' } = Astro.props;
-
-// Positive = climbed since the 24h snapshot.
-const delta = rank && rank.rank24h !== null ? rank.rank24h - rank.rank : null;
-const trend = delta === null || delta === 0 ? 'flat' : delta > 0 ? 'up' : 'down';
-const deltaText = trend === 'up' ? `▲ ${delta}` : trend === 'down' ? `▼ ${-delta!}` : '—';
-const deltaLabel =
-  delta === null ? 'bez podatka od jučer' : trend === 'flat' ? 'bez promjene u 24 h' : `${trend === 'up' ? 'gore' : 'dolje'} ${Math.abs(delta)} u 24 h`;
+const { rank, id, variant = 'pill' } = Astro.props;
+const delta = rankDelta(rank);
 ---
 
-<span class:list={['rank-chip', variant]}>
+<span class:list={['rank-chip', variant]} data-rank-chip={id}>
   <span class="label">Narod</span>
-  {
-    rank ? (
-      <>
-        <span class="rank">#{rank.rank}</span>
-        <span class:list={['delta', trend]} aria-hidden="true">{deltaText}</span>
-        <span class="visually-hidden">{deltaLabel}</span>
-      </>
-    ) : (
-      <span class="rank">—</span>
-    )
-  }
+  <span class="rank" data-rc-rank>{rank ? `#${rank.rank}` : '—'}</span>
+  <span class="delta" data-rc-delta data-trend={delta.trend} aria-hidden="true" hidden={!rank}>{delta.text}</span>
+  <span class="visually-hidden" data-rc-label>{rank ? delta.label : ''}</span>
 </span>
 
 <style>
@@ -57,11 +45,11 @@ const deltaLabel =
   .rank {
     font-weight: 500;
   }
-  .delta.up {
+  .delta[data-trend='up'] {
     color: var(--c-up);
   }
-  .delta.down,
-  .delta.flat {
+  .delta[data-trend='down'],
+  .delta[data-trend='flat'] {
     color: var(--c-down);
   }
 </style>

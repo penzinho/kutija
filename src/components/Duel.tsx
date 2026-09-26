@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { getPair, voteDuel, type Pair, type VoteError, type DuelResult } from '../lib/vote';
 import { loadSaved, saveSaved } from '../lib/store';
 import { reducedMotion } from '../lib/motion';
+import { bumpTotal, refreshRanks, subscribeRanks } from '../lib/live';
+import type { Ranks } from '../lib/rank';
 import s from './Duel.module.css';
 
 /** What the island needs per entry; built at build time in src/pages/dvoboj.astro. */
@@ -11,6 +13,7 @@ export type DuelEntry = {
   award: number | null;
   /** Country name in Croatian, when known. */
   country: string | null;
+  /** The people's rank as of the build; live ranks replace it. */
   rank: number | null;
   alt: string;
   img: { src: string; webp: string; avif: string } | null;
@@ -60,6 +63,7 @@ export default function Duel({ entries, sizes }: Props) {
   const [rateLeft, setRateLeft] = useState(0);
   const [offline, setOffline] = useState(false);
   const [pill, setPill] = useState<{ id: number; key: number } | null>(null);
+  const [ranks, setRanks] = useState<Ranks | null>(null);
 
   const root = useRef<HTMLElement>(null);
   const prefetch = useRef<Promise<Pair | VoteError> | null>(null);
@@ -122,9 +126,12 @@ export default function Duel({ entries, sizes }: Props) {
     show(r);
   };
 
+  useEffect(() => subscribeRanks(setRanks), []);
+
   useEffect(() => {
     setPlayed(loadSaved().played);
     start();
+    void refreshRanks(2000);
     const onOnline = () => {
       setOffline(false);
       if (live.current.phase.kind === 'blocked' && live.current.phase.reason === 'offline') start();
@@ -186,6 +193,8 @@ export default function Duel({ entries, sizes }: Props) {
       const userWins = { ...saved.userWins, [winner]: (saved.userWins[winner] ?? 0) + 1 };
       saveSaved({ ...saved, played: saved.played + 1, userWins });
       setPlayed(saved.played + 1);
+      bumpTotal();
+      void refreshRanks(4000); // at most one leaderboard read per few votes
       clearTimeout(pillTimer.current);
       setPill({ id: winner, key: Date.now() });
       pillTimer.current = setTimeout(() => setPill(null), PILL_MS);
@@ -332,6 +341,7 @@ export default function Duel({ entries, sizes }: Props) {
                   key={side}
                   side={side}
                   entry={e}
+                  rank={ranks?.get(e.id)?.rank ?? e.rank}
                   sizes={sizes}
                   state={state}
                   disabled={disabled}
@@ -390,14 +400,15 @@ export default function Duel({ entries, sizes }: Props) {
 function Card(props: {
   side: Side;
   entry: DuelEntry;
+  rank: number | null;
   sizes: string;
   state?: 'picked' | 'chosen' | 'loser';
   disabled: boolean;
   onVote: () => void;
 }) {
-  const { side, entry: e, sizes, state, disabled, onVote } = props;
+  const { side, entry: e, rank, sizes, state, disabled, onVote } = props;
   const num = pad(e.id);
-  const sub = [e.country, e.rank ? `Narod #${e.rank}` : null].filter(Boolean).join(' · ');
+  const sub = [e.country, rank ? `Narod #${rank}` : null].filter(Boolean).join(' · ');
   return (
     <button
       type="button"

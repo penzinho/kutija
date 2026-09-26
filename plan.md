@@ -86,10 +86,11 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - ✅ Done when: 20 duels in a row are smooth on mobile and nothing breaks when offline or rate-limited (verified 2026-09-26 in Playwright against a mocked backend; re-check against the real function once step 5's dashboard setup is done)
 
 ### 7. Leaderboard + favorites + live data
-- [ ] `/rang`: Žiri vs Narod hero, "Najveća neslaganja" cards (1–88 track with Ž/N markers), top-20 table + "Prikaži svih 88", FLIP on rank change; highlight rows where the people disagree with the jury
-- [ ] Jury order for the comparison: award 1–5 → finalists → eliminated by round reached (6 → 1); excluded entries go last and are not ranked
-- [ ] Replace the step-3 stubs: ranks on the grid and detail page, favorite toggle via `set_favorite`, live counter poll (D11)
-- ✅ Done when: votes in one tab show up in `/rang` in another tab within ~5 s
+- [x] `/rang`: Žiri vs Narod hero, "Najveća neslaganja" cards (1–88 track with Ž/N markers), top-20 table + "Prikaži svih 88", FLIP on rank change; highlight rows where the people disagree with the jury
+- [x] Jury order for the comparison: award 1–5 → finalists → eliminated by round reached (6 → 1); excluded entries go last and are not ranked
+- [x] Replace the step-3 stubs: ranks on the grid and detail page, favorite toggle via `set_favorite`, live counter poll (D11)
+- ✅ Done when: votes in one tab show up in `/rang` in another tab within ~5 s (verified 2026-09-26 in Playwright against a mocked backend: ~3.3 s; reads verified against the real views. Re-check with real votes once step 5's dashboard setup is done)
+- Notes: "Najveća neslaganja" = the 5 entries furthest from their jury band (any status, not only the awarded); cards and row highlights (≥ 15 places) appear after the first 50 duels. The track runs 1–85 (only 85 entries are ranked). Build-time snapshot of ranks (`src/data/ranks.ts`), refreshed live in the browser.
 
 ### 8. Share, SEO, OG
 - [ ] "Moj top 3" modal after every 10th duel (user wins, padded with the people's top entries) → copy/share `/?top=a,b,c`

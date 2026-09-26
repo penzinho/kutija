@@ -66,6 +66,34 @@ button {
   border: 0;
 }
 
+/* Flip-digit reel (src/lib/reel.ts): markup is shared by the server and the browser. */
+.nm-reel {
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+}
+.nm-reel-cells {
+  display: flex;
+  height: 1.1em;
+  line-height: 1.1;
+}
+.nm-reel-cell {
+  display: inline-block;
+  height: 1.1em;
+  overflow: hidden;
+  vertical-align: top;
+}
+.nm-reel-strip {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  transform: translateY(calc(var(--d) * -1.1em));
+  transition: transform var(--dur-reel) var(--ease-snap);
+}
+.nm-reel-strip > span {
+  display: block;
+  height: 1.1em;
+}
+
 @keyframes nm-sweep-l { from { transform: rotate(-7deg); } to { transform: rotate(9deg); } }
 @keyframes nm-sweep-r { from { transform: rotate(7deg); } to { transform: rotate(-9deg); } }
 @keyframes nm-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }

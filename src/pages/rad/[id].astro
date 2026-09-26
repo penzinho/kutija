@@ -7,6 +7,7 @@ import DigitReel from '../../components/DigitReel.astro';
 import FavoriteButton from '../../components/FavoriteButton';
 import { entries, duelEligible, meta, type Entry } from '../../data/entries';
 import { getRank } from '../../data/ranks';
+import { winRate } from '../../lib/rank';
 
 export const getStaticPaths = (() => entries.map((entry) => ({ params: { id: String(entry.id) }, props: { entry } }))) satisfies GetStaticPaths;
 
@@ -38,12 +39,14 @@ const jury: { big: string; note: string } =
         ? { big: `${entry.eliminatedInRound}. krug`, note: 'tu je ispao' }
         : { big: '—', note: 'nije ocjenjivan' };
 
+// Build-time values; the browser keeps them live (data-live, src/lib/live-dom.ts).
 const stats = [
-  ['Ocjena', rank ? fmt.format(rank.elo) : '—'],
-  ['Dvoboji', rank ? fmt.format(rank.duels) : '—'],
-  ['Pobjede', rank && rank.duels ? `${Math.round((rank.wins / rank.duels) * 100)} %` : '—'],
-  ['Favoriti', rank ? fmt.format(rank.favorites) : '—'],
+  ['Ocjena', 'elo', rank ? fmt.format(rank.elo) : '—'],
+  ['Dvoboji', 'duels', rank ? fmt.format(rank.duels) : '—'],
+  ['Pobjede', 'winrate', rank ? winRate(rank) : '—'],
+  ['Favoriti', 'favorites', rank ? fmt.format(rank.favorites) : '—'],
 ] as const;
+const liveId = inVote ? entry.id : undefined;
 
 const juryHeading = entry.status === 'excluded' ? 'Odluka žirija' : 'Ocjena žirija';
 
@@ -114,24 +117,29 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
           <div class="side side-narod">
             <span class="side-label narod">Narod</span>
             {
-              rank ? (
+              inVote ? (
                 <span class="side-value">
-                  #<DigitReel value={rank.rank} />
+                  #
+                  {rank ? (
+                    <DigitReel value={rank.rank} data-live="rank" data-live-id={liveId} />
+                  ) : (
+                    <span class="nm-reel" data-live="rank" data-live-id={liveId}>—</span>
+                  )}
                 </span>
               ) : (
                 <span class="side-value">—</span>
               )
             }
-            <span class="side-note">{rank ? `od ${duelEligible.length} radova` : 'nije u glasanju'}</span>
+            <span class="side-note">{inVote ? `od ${duelEligible.length} radova` : 'nije u glasanju'}</span>
           </div>
         </section>
 
         <dl class="stats" data-reveal="3">
           {
-            stats.map(([label, value]) => (
+            stats.map(([label, field, value]) => (
               <div class="stat">
                 <dt>{label}</dt>
-                <dd>{value}</dd>
+                <dd data-live={field} data-live-id={liveId}>{value}</dd>
               </div>
             ))
           }

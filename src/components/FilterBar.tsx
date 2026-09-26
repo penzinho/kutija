@@ -32,14 +32,28 @@ export default function FilterBar({ grid, empty, total, awarded }: Props) {
   const [fav, setFav] = useState<number | null>(null);
   const [favCount, setFavCount] = useState(0);
   const [shown, setShown] = useState(total);
+  // Bumped when live ranks change the cards' data-rank while sorted by rank.
+  const [ranksVersion, setRanksVersion] = useState(0);
   const firstRun = useRef(true);
+  const quiet = useRef(false);
+  const sortRef = useRef(sort);
+  sortRef.current = sort;
 
   useEffect(() => {
     const read = () => setFav(loadSaved().fav);
     read();
     // Another tab picked a favorite.
     addEventListener('storage', read);
-    return () => removeEventListener('storage', read);
+    const onRanks = () => {
+      if (sortRef.current !== 'rang') return;
+      quiet.current = true;
+      setRanksVersion((v) => v + 1);
+    };
+    document.addEventListener('nm:ranks', onRanks);
+    return () => {
+      removeEventListener('storage', read);
+      document.removeEventListener('nm:ranks', onRanks);
+    };
   }, []);
 
   useEffect(() => {
@@ -61,8 +75,9 @@ export default function FilterBar({ grid, empty, total, awarded }: Props) {
     setFavCount(cards.some((c) => id(c) === fav) ? 1 : 0);
 
     const untouched = firstRun.current && filter === 'svi' && sort === 'broj';
-    const animate = !firstRun.current && !reducedMotion();
+    const animate = !firstRun.current && !quiet.current && !reducedMotion();
     firstRun.current = false;
+    quiet.current = false;
     if (untouched) return;
 
     const key = sort === 'rang' ? rank : id;
@@ -92,7 +107,7 @@ export default function FilterBar({ grid, empty, total, awarded }: Props) {
           ),
         );
     }
-  }, [filter, sort, fav]);
+  }, [filter, sort, fav, ranksVersion]);
 
   const filters: [Filter, string, number][] = [
     ['svi', 'Svi', total],
