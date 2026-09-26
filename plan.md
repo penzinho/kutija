@@ -116,5 +116,10 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 
 ---
 
+## Later (not scheduled)
+- [ ] Calm motion toggle: a visible switch that sets `html[data-motion="calm"]` and remembers the choice in `nm-v1`. The CSS and `reducedMotion()` in `src/lib/motion.ts` already honour the attribute; only the UI and persistence are missing. Needs a design (no toggle in the reference).
+
+---
+
 ## Out of scope for v1
 EN language toggle · accounts / login (never) · analytics · Realtime push · admin UI (SQL only).
