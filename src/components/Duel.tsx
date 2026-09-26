@@ -28,11 +28,16 @@ type Phase =
   | { kind: 'idle' }
   /** Waiting for the next pair after a skip or a rejected token; the cards stay visible. */
   | { kind: 'switching' }
+  /** Tapped, waiting for the server: the card is highlighted, nothing is celebrated yet. */
+  | { kind: 'pending'; side: Side }
+  /** The server recorded the vote: stamp, loser dimmed, FX. */
   | { kind: 'won'; side: Side }
   | { kind: 'blocked'; reason: Blocked; retryAfter?: number };
 
 // SPECS motion table.
 const HOLD = { normal: 720, reduced: 250 };
+// A slow confirmation still gets this long to show the stamp before the next pair.
+const MIN_WON = { normal: 450, reduced: 150 };
 const PILL_MS = 1500;
 const CONFETTI = 34;
 // Server: one duel per 1.5 s per session. Sending no earlier avoids a needless 429.
@@ -167,13 +172,16 @@ export default function Duel({ entries, sizes }: Props) {
       return;
     }
     setOffline(false);
-    setPhase({ kind: 'won', side });
+    setPhase({ kind: 'pending', side });
     const reduced = reducedMotion();
-    if (!reduced) burst(root.current, side);
+    const tappedAt = Date.now();
 
-    const [r] = await Promise.all([send(p.token, winner), sleep(reduced ? HOLD.reduced : HOLD.normal)]);
+    const r = await send(p.token, winner);
 
     if (r.ok) {
+      // Celebrate only what the server recorded.
+      setPhase({ kind: 'won', side });
+      if (!reduced) burst(root.current, side);
       const saved = loadSaved(); // another tab may have played too
       const userWins = { ...saved.userWins, [winner]: (saved.userWins[winner] ?? 0) + 1 };
       saveSaved({ ...saved, played: saved.played + 1, userWins });
@@ -181,6 +189,8 @@ export default function Duel({ entries, sizes }: Props) {
       clearTimeout(pillTimer.current);
       setPill({ id: winner, key: Date.now() });
       pillTimer.current = setTimeout(() => setPill(null), PILL_MS);
+      const hold = reduced ? HOLD.reduced : HOLD.normal;
+      await sleep(Math.max(hold - (Date.now() - tappedAt), reduced ? MIN_WON.reduced : MIN_WON.normal));
       await advance();
       return;
     }
@@ -257,7 +267,8 @@ export default function Duel({ entries, sizes }: Props) {
   const toGo = SEGMENTS - inSet || SEGMENTS;
   const locked = rateLeft > 0;
   const won = phase.kind === 'won' ? phase.side : null;
-  const showCards = pair && (phase.kind === 'idle' || phase.kind === 'won' || phase.kind === 'switching');
+  const picked = phase.kind === 'pending' ? phase.side : null;
+  const showCards = pair && phase.kind !== 'loading' && phase.kind !== 'blocked';
 
   return (
     <section class={s.duel} ref={root} aria-labelledby="duel-title">
@@ -314,7 +325,7 @@ export default function Duel({ entries, sizes }: Props) {
             {(['a', 'b'] as const).map((side) => {
               const e = showCards ? byId.get(side === 'a' ? pair.a : pair.b) : undefined;
               if (!e) return <div key={side} class={s.skeleton} data-duel-card={side} aria-hidden="true" />;
-              const state = won === side ? 'chosen' : won ? 'loser' : undefined;
+              const state = won === side ? 'chosen' : won ? 'loser' : picked === side ? 'picked' : undefined;
               const disabled = phase.kind !== 'idle' || locked;
               return (
                 <Card
@@ -380,7 +391,7 @@ function Card(props: {
   side: Side;
   entry: DuelEntry;
   sizes: string;
-  state?: 'chosen' | 'loser';
+  state?: 'picked' | 'chosen' | 'loser';
   disabled: boolean;
   onVote: () => void;
 }) {

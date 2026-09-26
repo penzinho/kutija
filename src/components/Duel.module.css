@@ -173,6 +173,12 @@
 .card:focus-visible {
   outline-color: var(--c-accent);
 }
+/* Tapped, waiting for the server: instant feedback without claiming the win. */
+.card[data-state='picked'] {
+  transform: translateY(-6px);
+  outline-color: var(--c-accent);
+  box-shadow: var(--sh-lift);
+}
 .card[data-state='chosen'] {
   transform: scale(1.035) translateY(-6px);
   outline-color: var(--c-accent);
