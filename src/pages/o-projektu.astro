@@ -2,8 +2,8 @@
 import Base from '../layouts/Base.astro';
 import { entries, meta } from '../data/entries';
 
-// Placeholders until launch (plan step 10). Bracketed text is shown as-is until then.
-const AUTHOR = '[Ime autora], navijač i [zanimanje] iz Zagreba.';
+// The author stays anonymous. The takedown e-mail is a placeholder until launch (plan step 10).
+const AUTHOR = 'Autor je anonimni navijač s istočne tribine, iz Zagreba.';
 const TAKEDOWN_EMAIL: string | null = null;
 const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
 ---
@@ -20,6 +20,30 @@ const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
       natječaja za novi stadion Maksimir i glasati za onaj koji mu je najbolji. Žiri je donio svoju odluku. Ovo je mjesto
       za glas navijača i građana.
     </p>
+
+    <section class="letter" data-reveal="3" aria-labelledby="rijec">
+      <h2 id="rijec" class="letter-title">Riječ s Istoka</h2>
+      <p>
+        Anoniman sam, iz Zagreba, i Dinamo gledam s istočne tribine. Novi stadion čekam od devedesetih. U tih trideset
+        godina vidio sam toliko ideja, maketa i rendera da bi se od samog papira dala složiti još jedna tribina. Od svega
+        toga, ovo što je izabrano uvjerljivo je najgore.
+      </p>
+      <p>
+        Još gore od samog rješenja bili su pamfleti s predstavljanja i tekstovi koji su poslije izlazili u medijima. Iz
+        njih smo, otprilike, saznali da mi zapravo ne znamo što želimo, ali da će nam to netko pametniji rado objasniti.
+        Hvala lijepa. Inteligenciju smo ponijeli od kuće.
+      </p>
+      <p>
+        Stadion je naš. Dinamo je udruga građana, a ne nečija izložba, i nitko nam neće nametati kako bi naš dom trebao
+        izgledati. Pravila struke, naravno, poštujemo: kad se stadion jednom izabere, neka ga projektiraju i grade oni koji
+        to znaju. Ali izbor nije njihov.
+      </p>
+      <p>
+        Stadion nije poligon za elitističko i nadmeno dociranje, a ni za l'art pour l'art. To je funkcionalna građevina koja
+        treba služiti nama: krov nad glavom, tribine uz teren i zvuk koji ostaje unutra. Skulpture neka stoje u parku.
+      </p>
+      <p class="letter-sign">— Jedan s Istoka</p>
+    </section>
 
     <div class="disclaimer" data-reveal="3">
       <span class="stamp" aria-hidden="true">Neslužbeno</span>
@@ -110,6 +134,35 @@ const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
     line-height: var(--lh-body);
     color: var(--c-ink-2);
     text-wrap: pretty;
+  }
+
+  .letter {
+    margin: 40px 0 0;
+    max-width: 38em;
+    padding-left: var(--sp-5);
+    border-left: 3px solid var(--c-accent);
+  }
+  .letter-title {
+    margin: 0 0 var(--sp-4);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  .letter p {
+    margin: 0 0 var(--sp-4);
+    color: var(--c-ink-2);
+    line-height: var(--lh-body);
+    text-wrap: pretty;
+  }
+  .letter .letter-sign {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink);
   }
 
   .disclaimer {
