@@ -93,7 +93,7 @@ Provide `.env.example` (PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, PUBLIC_TU
 - Share after 10 duels: "Moj top 3" — share URL `/?top=12,5,40` that renders the user's top picks.
 - Accessibility: keyboard voting in duels (← / →), alt texts from entry code + authors.
 - Performance: lazy-loaded images, `<Image>` from astro:assets; Lighthouse mobile ≥ 90 on the grid page.
-- No analytics and no cookies beyond the Supabase anonymous session.
+- No cookies beyond the Supabase anonymous session, except Google Analytics after the visitor accepts it (plan D17).
 
 ## Order of work
 1. Astro scaffold + tokens.css + layout + entries.json (88) + zod schema

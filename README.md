@@ -40,3 +40,18 @@ pnpm tsx --env-file=.env scripts/smoke-vote.ts                      # end-to-end
 ```
 
 The smoke test records one real duel and one favorite; clear test data before launch.
+
+## Share and OG images
+
+- Per-entry OG images (`/og/rad/<id>.jpg`) and the site-wide one (`/og/default.jpg`) are rendered at build time with satori + sharp (`src/lib/og.ts`, `src/pages/og/`). Colors come from `src/styles/tokens.css`.
+- `og:image` must be absolute, so set `SITE_URL` in Vercel (the Vercel production domain is the fallback).
+- "Moj top 3" links (`/?top=a,b,c`) share the home page's OG image: the site is static, so a per-share image would need a serverless function (plan D12).
+- Check previews after deploy: [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/), [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/), or [opengraph.xyz](https://www.opengraph.xyz/).
+
+## Google Analytics (optional)
+
+Set `PUBLIC_GA_ID` (GA4 measurement ID, `G-…`) in `.env` / Vercel. Without it there is no analytics and no banner.
+
+- GA loads only after the visitor clicks *Prihvati* on the cookie banner (`src/components/ConsentBanner.astro`, `src/lib/analytics.ts`); before that no request goes to Google. The footer's *Kolačići* button reopens the banner; *Odbij* removes the `_ga` cookies.
+- Google signals and ad personalization are off. Page views are sent on every ClientRouter navigation.
+- Custom events: `duel_vote`, `top3_ready`, `share`.

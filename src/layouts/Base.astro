@@ -12,6 +12,7 @@ import '../styles/tokens.css';
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import TabBar from '../components/TabBar.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 import DigitReel from '../components/DigitReel.astro';
 import { totalDuels } from '../data/ranks';
 import { navItems } from '../lib/nav';
@@ -20,8 +21,10 @@ interface Props {
   /** Page title; the site name is appended. Omit on the home page. */
   title?: string;
   description?: string;
-  /** Absolute or root-relative OG image path (step 8 adds per-page images). */
+  /** Root-relative or absolute 1200×630 OG image; defaults to the site-wide image. */
   ogImage?: string;
+  /** Alt text for the OG image. */
+  ogImageAlt?: string;
   ogType?: 'website' | 'article';
   noindex?: boolean;
 }
@@ -30,7 +33,14 @@ const SITE_NAME = 'Narodni Maksimir';
 const DEFAULT_DESCRIPTION =
   'Neslužbena galerija svih 88 radova s natječaja za novi stadion Maksimir. Usporedi radove u dvobojima i vidi kako narod rangira ono što je žiri već odlučio.';
 
-const { title, description = DEFAULT_DESCRIPTION, ogImage, ogType = 'website', noindex = false } = Astro.props;
+const {
+  title,
+  description = DEFAULT_DESCRIPTION,
+  ogImage = '/og/default.jpg',
+  ogImageAlt = 'Narodni Maksimir: Žiri je odlučio. Sad je red na narodu.',
+  ogType = 'website',
+  noindex = false,
+} = Astro.props;
 
 const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME} · Narod bira stadion`;
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
@@ -59,10 +69,16 @@ const nav = navItems(Astro.url.pathname);
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
-    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-    {ogImageUrl && <meta property="og:image:width" content="1200" />}
-    {ogImageUrl && <meta property="og:image:height" content="630" />}
-    <meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <ClientRouter />
   </head>
@@ -103,6 +119,8 @@ const nav = navItems(Astro.url.pathname);
     <Footer nav={nav} />
 
     <TabBar nav={nav} />
+
+    <ConsentBanner />
   </body>
 </html>
 

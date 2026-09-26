@@ -5,6 +5,7 @@ import { entries, meta } from '../data/entries';
 // Placeholders until launch (plan step 10). Bracketed text is shown as-is until then.
 const AUTHOR = '[Ime autora], navijač i [zanimanje] iz Zagreba.';
 const TAKEDOWN_EMAIL: string | null = null;
+const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
 ---
 
 <Base
@@ -51,12 +52,17 @@ const TAKEDOWN_EMAIL: string | null = null;
         </div>
       </section>
 
-      <section class="block" data-reveal="2" aria-labelledby="tko">
+      <section id="privatnost" class="block" data-reveal="2" aria-labelledby="tko">
         <div class="block-num" aria-hidden="true">03</div>
         <h2 id="tko" class="block-title">Tko stoji iza</h2>
         <p>
-          {AUTHOR} Projekt je volonterski, bez oglasa, bez analitike i bez prikupljanja osobnih podataka. Za glasanje se koristi
-          nevidljiva anonimna sesija. IP adrese ne spremamo, samo njihov jednosmjerni sažetak za zaštitu od botova.
+          {AUTHOR} Projekt je volonterski i bez oglasa. Za glasanje se koristi nevidljiva anonimna sesija. IP adrese ne
+          spremamo, samo njihov jednosmjerni sažetak za zaštitu od botova.
+          {
+            analytics
+              ? ' Statistiku posjeta (Google Analytics, bez oglasnih značajki) uključujemo samo ako je prihvatiš; odluku možeš promijeniti preko poveznice „Kolačići“ u podnožju.'
+              : ' Ne koristimo analitiku.'
+          }
         </p>
       </section>
 

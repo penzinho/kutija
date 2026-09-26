@@ -55,7 +55,13 @@ const summary = entry.descriptionHr ?? entry.juryHr[0] ?? '';
 const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+\S*$/, '')}…` : summary;
 ---
 
-<Base title={`Rad ${num} · ${entry.code}`} description={description} ogType="article">
+<Base
+  title={`Rad ${num} · ${entry.code}`}
+  description={description}
+  ogType="article"
+  ogImage={`/og/rad/${entry.id}.jpg`}
+  ogImageAlt={`Rad ${num} · ${entry.code} · ${entry.award ? `${entry.award}. nagrada žirija` : 'Narodni Maksimir'}`}
+>
   <article class="rad">
     <div class="topbar">
       <a href="/#radovi" class="back">← Svi radovi</a>

@@ -4,6 +4,9 @@ import { loadSaved, saveSaved } from '../lib/store';
 import { reducedMotion } from '../lib/motion';
 import { bumpTotal, refreshRanks, subscribeRanks } from '../lib/live';
 import type { Ranks } from '../lib/rank';
+import { pickTop3 } from '../lib/top3';
+import { track } from '../lib/analytics';
+import ShareModal from './ShareModal';
 import s from './Duel.module.css';
 
 /** What the island needs per entry; built at build time in src/pages/dvoboj.astro. */
@@ -64,14 +67,16 @@ export default function Duel({ entries, sizes }: Props) {
   const [offline, setOffline] = useState(false);
   const [pill, setPill] = useState<{ id: number; key: number } | null>(null);
   const [ranks, setRanks] = useState<Ranks | null>(null);
+  /** "Moj top 3" ids while the share modal is open (after every 10th duel). */
+  const [share, setShare] = useState<number[] | null>(null);
 
   const root = useRef<HTMLElement>(null);
   const prefetch = useRef<Promise<Pair | VoteError> | null>(null);
   const lastVoteAt = useRef(0);
   const pillTimer = useRef<ReturnType<typeof setTimeout>>();
   // Latest state for the async flows and the key handler.
-  const live = useRef({ pair, phase, rateLeft });
-  live.current = { pair, phase, rateLeft };
+  const live = useRef({ pair, phase, rateLeft, share, ranks });
+  live.current = { pair, phase, rateLeft, share, ranks };
 
   const startPrefetch = () => {
     const p = getPair();
@@ -170,8 +175,8 @@ export default function Duel({ entries, sizes }: Props) {
   };
 
   const vote = async (side: Side) => {
-    const { pair: p, phase: ph, rateLeft: rl } = live.current;
-    if (!p || ph.kind !== 'idle' || rl > 0) return;
+    const { pair: p, phase: ph, rateLeft: rl, share: sh } = live.current;
+    if (!p || ph.kind !== 'idle' || rl > 0 || sh) return;
     const winner = side === 'a' ? p.a : p.b;
 
     if (!navigator.onLine) {
@@ -191,9 +196,11 @@ export default function Duel({ entries, sizes }: Props) {
       if (!reduced) burst(root.current, side);
       const saved = loadSaved(); // another tab may have played too
       const userWins = { ...saved.userWins, [winner]: (saved.userWins[winner] ?? 0) + 1 };
-      saveSaved({ ...saved, played: saved.played + 1, userWins });
-      setPlayed(saved.played + 1);
+      const total = saved.played + 1;
+      saveSaved({ ...saved, played: total, userWins });
+      setPlayed(total);
       bumpTotal();
+      track('duel_vote', { played: total });
       void refreshRanks(4000); // at most one leaderboard read per few votes
       clearTimeout(pillTimer.current);
       setPill({ id: winner, key: Date.now() });
@@ -201,6 +208,7 @@ export default function Duel({ entries, sizes }: Props) {
       const hold = reduced ? HOLD.reduced : HOLD.normal;
       await sleep(Math.max(hold - (Date.now() - tappedAt), reduced ? MIN_WON.reduced : MIN_WON.normal));
       await advance();
+      if (total % SEGMENTS === 0) openShare(userWins);
       return;
     }
 
@@ -230,9 +238,16 @@ export default function Duel({ entries, sizes }: Props) {
     }
   };
 
+  /** The visitor's top 3: most-picked winners, padded with the people's top entries. */
+  const openShare = (userWins: Record<string, number>) => {
+    const r = live.current.ranks;
+    setShare(pickTop3(userWins, entries.map((e) => e.id), (id) => r?.get(id)?.rank ?? byId.get(id)?.rank ?? null));
+    track('top3_ready', { played: loadSaved().played });
+  };
+
   const skip = async () => {
-    const { phase: ph, rateLeft: rl } = live.current;
-    if (ph.kind !== 'idle' || rl > 0) return;
+    const { phase: ph, rateLeft: rl, share: sh } = live.current;
+    if (ph.kind !== 'idle' || rl > 0 || sh) return;
     setOffline(false);
     setPhase({ kind: 'switching' });
     await advance();
@@ -243,7 +258,9 @@ export default function Duel({ entries, sizes }: Props) {
   keys.current = { vote, skip };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.defaultPrevented) return;
+      // The share modal has its own keys (Esc closes it).
+      if (live.current.share) return;
       const t = e.target as HTMLElement;
       if (t.closest('input, textarea, select, [contenteditable]')) return;
       const onControl = !!t.closest('button, a');
@@ -377,6 +394,14 @@ export default function Duel({ entries, sizes }: Props) {
             )}
           </div>
         </>
+      )}
+
+      {share && (
+        <ShareModal
+          entries={share.map((id) => byId.get(id)).filter((e): e is DuelEntry => !!e)}
+          played={played}
+          onClose={() => setShare(null)}
+        />
       )}
 
       <p class="visually-hidden" aria-live="polite">

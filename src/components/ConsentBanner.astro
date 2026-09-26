@@ -1,0 +1,127 @@
+---
+// Cookie consent for Google Analytics (src/lib/analytics.ts). Rendered only when
+// PUBLIC_GA_ID is set; the script shows it until the visitor chooses, and the footer's
+// "Kolačići" button ([data-consent-open]) brings it back.
+const enabled = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
+---
+
+{
+  enabled && (
+    <aside class="consent" data-consent aria-labelledby="consent-title" hidden>
+      <div class="text">
+        <h2 id="consent-title" class="title">Kolačići za statistiku</h2>
+        <p class="body">
+          Uz tvoj pristanak koristimo Google Analytics da vidimo koliko ljudi posjećuje stranicu. Bez oglasa i bez
+          profiliranja; glasanje radi i ako odbiješ. <a href="/o-projektu#privatnost">Više o privatnosti</a>
+        </p>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn secondary" data-consent-choice="denied">
+          Odbij
+        </button>
+        <button type="button" class="btn primary" data-consent-choice="granted">
+          Prihvati
+        </button>
+      </div>
+    </aside>
+  )
+}
+
+<style>
+  .consent {
+    position: fixed;
+    left: 50%;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: var(--z-toast);
+    width: min(720px, calc(100% - 2 * var(--sp-4)));
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-4) var(--sp-5);
+    padding: var(--sp-4) var(--sp-5);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-md);
+    background: var(--c-consent-bg);
+    box-shadow: var(--sh-lift);
+  }
+  .consent[hidden] {
+    display: none;
+  }
+  .text {
+    flex: 1 1 320px;
+  }
+  .title {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 700;
+  }
+  .body {
+    margin: var(--sp-1) 0 0;
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--c-ink-2);
+  }
+  .actions {
+    display: flex;
+    gap: var(--sp-2);
+    flex: 1 1 200px;
+  }
+  .btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 10px 18px;
+    border-radius: var(--r-pill);
+    font: inherit;
+    font-weight: 700;
+    font-size: var(--fs-small);
+    cursor: pointer;
+  }
+  .primary {
+    border: 0;
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+  }
+  .primary:hover {
+    box-shadow: var(--sh-cta);
+  }
+  .secondary {
+    border: 1px solid var(--c-line-strong);
+    background: transparent;
+    color: var(--c-ink);
+  }
+  .secondary:hover {
+    background: var(--c-hover-tint);
+  }
+
+  @media (max-width: 759.98px) {
+    .consent {
+      bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + var(--sp-3));
+    }
+  }
+</style>
+
+<script>
+  import { getConsent, onPageLoad, setConsent, type Consent } from '../lib/analytics';
+
+  document.addEventListener('astro:page-load', () => {
+    onPageLoad();
+    const banner = document.querySelector<HTMLElement>('[data-consent]');
+    if (!banner) return;
+    banner.hidden = getConsent() !== null;
+    banner.querySelectorAll<HTMLButtonElement>('[data-consent-choice]').forEach((b) =>
+      b.addEventListener('click', () => {
+        setConsent(b.dataset.consentChoice as Consent);
+        banner.hidden = true;
+      }),
+    );
+    document.querySelectorAll<HTMLElement>('[data-consent-open]').forEach((b) => {
+      b.hidden = false;
+      b.addEventListener('click', () => {
+        banner.hidden = false;
+        banner.querySelector<HTMLButtonElement>('[data-consent-choice="granted"]')?.focus();
+      });
+    });
+  });
+</script>

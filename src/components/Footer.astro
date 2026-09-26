@@ -7,6 +7,8 @@ interface Props {
 }
 
 const { nav } = Astro.props;
+// Reopens the analytics consent banner (ConsentBanner.astro); only exists with GA configured.
+const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
 ---
 
 <footer class="site-footer">
@@ -20,6 +22,13 @@ const { nav } = Astro.props;
     </div>
     <nav class="footer-nav" aria-label="Podnožje">
       {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+      {
+        analytics && (
+          <button type="button" class="footer-link" data-consent-open hidden>
+            Kolačići
+          </button>
+        )
+      }
     </nav>
   </div>
 </footer>
@@ -62,10 +71,22 @@ const { nav } = Astro.props;
     gap: var(--sp-2) 22px;
     font-size: var(--fs-small);
   }
-  .footer-nav a {
+  .footer-nav a,
+  .footer-link {
     color: var(--c-ink-2);
   }
-  .footer-nav a:hover {
+  .footer-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+  }
+  .footer-link[hidden] {
+    display: none;
+  }
+  .footer-nav a:hover,
+  .footer-link:hover {
     color: var(--c-ink);
   }
 </style>

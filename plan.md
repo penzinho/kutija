@@ -33,6 +33,7 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 | ✅ D13 | EN toggle | optional | not designed | **Croatian only.** The EN fields stay in the data but are not shown. |
 | ✅ D14 | Hosting cost | Vercel | — | **Free tiers only:** Vercel Hobby + Supabase Free + Turnstile Free = €0. **Ask before** anything that needs Pro (e.g. heavy image optimization, serverless OG at scale). Note: Vercel Hobby is non-commercial only. |
 | ✅ D15 | Git | commit after each step | `kutija/` is currently an untracked folder inside the `~/Documents/DEV` repo | **You create the repo** for `kutija/` (needed for Vercel anyway). I commit into it after each step. |
+| ✅ D17 | Analytics | no analytics, no cookies beyond the session | — | **Google Analytics 4**, requested on 2026-09-26. Loads only after consent (cookie banner; GA sets cookies, so GDPR/ePrivacy apply). Off entirely without `PUBLIC_GA_ID`. Google signals and ad personalization off. Events: page views on every navigation, `duel_vote`, `top3_ready`, `share`. |
 | ✅ D16 | Missing content | — | authors known only for the 5 awarded; country for 3; no PDF for the others | **We will research the authors** and add them to `entries.json` (step 10a). Until then, show "Autori nisu objavljeni", hide empty fields, and link the PDF only where one exists. |
 
 ---
@@ -93,10 +94,11 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - Notes: "Najveća neslaganja" = the 5 entries furthest from their jury band (any status, not only the awarded); cards and row highlights (≥ 15 places) appear after the first 50 duels. The track runs 1–85 (only 85 entries are ranked). Build-time snapshot of ranks (`src/data/ranks.ts`), refreshed live in the browser.
 
 ### 8. Share, SEO, OG
-- [ ] "Moj top 3" modal after every 10th duel (user wins, padded with the people's top entries) → copy/share `/?top=a,b,c`
-- [ ] Per-page title/description/OG; build-time per-entry OG images with satori (`/og/rad/[id].png`)
-- [ ] Decide D12/D14 on dynamic top-3 OG images
-- ✅ Done when: OG previews are correct (checked with a debugger tool) for `/`, `/rad/16`, `/?top=…`
+- [x] "Moj top 3" modal after every 10th duel (user wins, padded with the people's top entries) → copy/share `/?top=a,b,c`
+- [x] Per-page title/description/OG; build-time per-entry OG images with satori (`/og/rad/[id].jpg`, JPEG ~100 KB; PNG was ~1 MB) plus `/og/default.jpg` for every other page
+- [x] Decide D12/D14 on dynamic top-3 OG images: **no** for now. `/?top=` shares the home OG image; a per-share image needs a serverless function (revisit only if sharing takes off, and ask first)
+- [x] Google Analytics behind a consent banner (D17)
+- ✅ Done when: OG previews are correct (checked with a debugger tool) for `/`, `/rad/16`, `/?top=…` (tags and images verified locally on 2026-09-26; the modal, share link and consent flow verified in Playwright against a mocked backend. **Re-check with a debugger tool once the production URL exists**, step 10)
 
 ### 9. Moderation tooling
 - [ ] `scripts/flag-suspicious.sql`: sessions/IP hashes with >90% votes for one entry, bursts, and too many sessions per IP; helper to set `excluded`
@@ -112,7 +114,8 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - [ ] README: Supabase project, anonymous + Turnstile setup, migrations, secrets, function deploy, Vercel env and deploy
 - [ ] Create the Supabase cloud project + Turnstile site key + Vercel project (**confirm the free tiers with you first**)
 - [ ] Fill in the bracketed placeholders on O projektu (author, takedown email)
-- [ ] Final checks: Lighthouse, keyboard-only pass, reduced-motion pass, no cookies beyond the Supabase session, no analytics
+- [ ] Create the GA4 property and set `PUBLIC_GA_ID` in Vercel (D17)
+- [ ] Final checks: Lighthouse, keyboard-only pass, reduced-motion pass, no cookies beyond the Supabase session until the visitor accepts analytics
 - ✅ Done when: production URL is live and one real vote works end to end
 
 ---
@@ -123,4 +126,4 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 ---
 
 ## Out of scope for v1
-EN language toggle · accounts / login (never) · analytics · Realtime push · admin UI (SQL only).
+EN language toggle · accounts / login (never) · Realtime push · admin UI (SQL only).
