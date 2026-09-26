@@ -13,3 +13,9 @@ supabase/.temp/
 
 # Original renders; the imported masters live in src/assets/entries/
 /entries/
+
+# Planning docs and local prototype, not part of the shipped app
+/plan.md
+/SPEC.md
+/CLAUDE.md
+/Narodni Maksimir prototype/
