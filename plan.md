@@ -73,9 +73,9 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - ✅ Done when: `pnpm dlx supabase db push` applies cleanly and `pnpm dlx supabase db query --linked -f supabase/tests/voting.sql` prints "all passed" (each test rolls itself back)
 
 ### 5. Edge Function `vote` + session
-- [ ] `supabase/functions/vote`: verify the JWT (anonymous user), take the IP from `x-forwarded-for`, `ip_hash` = sha256(ip + daily salt derived from `IP_HASH_SALT_SECRET`), route `get_pair` / `vote_duel` / `set_favorite` to the service-role RPC, set CORS
-- [ ] Client `src/lib/session.ts`: lazy anonymous sign-in with the Turnstile token (invisible widget), only when the visitor first interacts with voting, so page views set no session
-- [ ] Enable anonymous sign-ins + Turnstile captcha in the Supabase dashboard (documented in the README)
+- [x] `supabase/functions/vote`: verify the JWT (anonymous user), take the IP from `x-forwarded-for`, `ip_hash` = sha256(ip + daily salt derived from `IP_HASH_SALT_SECRET`), route `get_pair` / `vote_duel` / `set_favorite` to the service-role RPC, set CORS
+- [x] Client `src/lib/session.ts`: lazy anonymous sign-in with the Turnstile token (invisible widget), only when the visitor first interacts with voting, so page views set no session
+- [ ] Enable anonymous sign-ins + Turnstile captcha in the Supabase dashboard (documented in the README ✅; dashboard: you)
 - ✅ Done when: a `functions serve` (or deployed) round trip works (get pair → vote → Elo changes; a replayed token is rejected)
 
 ### 6. Duel island (`/dvoboj`)

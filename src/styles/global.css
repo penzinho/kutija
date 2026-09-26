@@ -107,3 +107,12 @@ html[data-motion='calm']::view-transition-old(*),
 html[data-motion='calm']::view-transition-new(*) {
   animation: none !important;
 }
+
+/* Turnstile host (src/lib/session.ts). Empty unless Cloudflare asks for an interaction. */
+.nm-turnstile {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: var(--z-modal);
+}
