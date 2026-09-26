@@ -44,7 +44,7 @@ The smoke test records one real duel and one favorite; clear test data before la
 ## Share and OG images
 
 - Per-entry OG images (`/og/rad/<id>.jpg`) and the site-wide one (`/og/default.jpg`) are rendered at build time with satori + sharp (`src/lib/og.ts`, `src/pages/og/`). Colors come from `src/styles/tokens.css`.
-- `og:image` must be absolute, so set `SITE_URL` in Vercel (the Vercel production domain is the fallback).
+- `og:image` must be absolute, so the site defaults to `https://nasdom.top` (override with `SITE_URL`).
 - "Moj top 3" links (`/?top=a,b,c`) share the home page's OG image: the site is static, so a per-share image would need a serverless function (plan D12).
 - Check previews after deploy: [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/), [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/), or [opengraph.xyz](https://www.opengraph.xyz/).
 

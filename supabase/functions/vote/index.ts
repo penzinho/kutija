@@ -18,7 +18,7 @@ const SERVICE_KEY =
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ??
   JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}').default;
 const SALT_SECRET = Deno.env.get('IP_HASH_SALT_SECRET');
-// Comma-separated origins, e.g. "https://narodnimaksimir.hr,http://localhost:4321". Unset = any.
+// Comma-separated origins, e.g. "https://nasdom.top,http://localhost:4321". Unset = any.
 const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ?? '')
   .split(',')
   .map((o) => o.trim())

@@ -102,7 +102,7 @@ export async function renderJpeg(tree: Node): Promise<Response> {
   return new Response(new Uint8Array(jpg), { headers: { 'content-type': 'image/jpeg' } });
 }
 
-/** Host shown on the images ("narodni-maksimir.hr"); null without a configured site. */
+/** Host shown on the images ("nasdom.top"); null without a configured site. */
 export function siteHost(site: URL | undefined): string | null {
   return site ? site.host.replace(/^www\./, '') : null;
 }
