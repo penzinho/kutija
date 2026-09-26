@@ -69,7 +69,7 @@ Pair selection (server-side): prefer entries with the fewest duels so all 88 get
 Abuse mitigation (since there are no accounts):
 - Turnstile on session creation.
 - Server-issued pair tokens — votes only count for pairs the server handed out.
-- Rate limits per session AND per IP hash: max 1 duel / 1.5 s; 300 duels / day per session; 1000 duels / day per IP hash; max 5 favorites per IP hash per day (households/offices share IPs).
+- Rate limits per session AND per IP hash: max 1 duel / 1.5 s; 100 duels / day per session; 200 duels / day per IP hash; at most 5 voting sessions per IP hash per day (migration 20260926120400); max 5 favorites per IP hash per day (households/offices share IPs).
 - Store `ip_hash` = sha256(ip + daily-rotating salt) — never raw IPs. Read client IP in an Edge Function from `x-forwarded-for`.
 - Admin SQL script `scripts/flag-suspicious.sql` listing sessions/IP hashes with abnormal patterns (e.g. >90% votes for one entry, bursts), plus an `excluded` flag so flagged votes drop out of the leaderboard without being deleted. `recompute_elo()` replays non-excluded duels in order.
 

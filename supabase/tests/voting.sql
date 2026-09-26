@@ -73,7 +73,8 @@ begin
 exception when sqlstate 'NM000' then null;
 end $$;
 
--- Rate limits: 1 duel per 1.5 s, 300 per session per day, 1000 per ip_hash per day.
+-- Rate limits: 1 duel per 1.5 s, 100 per session per day, 200 per ip_hash per day,
+-- 5 voting sessions per ip_hash per day.
 do $$
 declare
   s uuid := gen_random_uuid();
@@ -94,12 +95,16 @@ begin
   r := public.vote_duel(t, 3, s, 'ip-rate');
   assert r->>'ok' = 'true', format('rate: vote after pause failed: %s', r);
 
-  -- session: 300 duels today
+  -- session: 99 duels today still vote, 100 don't
   delete from public.duels;
   insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
   select s, 'ip-rate', p.a, p.b, now() - interval '2 seconds'
   from (select a.id as a, b.id as b from public.entries a join public.entries b on a.id < b.id
-        order by a.id, b.id limit 300) as p;
+        order by a.id, b.id limit 99) as p;
+  r := public.get_pair(s, 'ip-rate');
+  assert r->>'ok' = 'true', format('rate: 99 duels should still get a pair, got %s', r);
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  values (s, 'ip-rate', 80, 82, now() - interval '2 seconds');
   r := public.get_pair(s, 'ip-rate');
   assert r->>'code' = 'daily_limit', format('rate: get_pair should hit the session daily_limit, got %s', r);
   insert into public.pair_tokens (session_id, a, b) values (s, 80, 81) returning token into t;
@@ -107,14 +112,38 @@ begin
   assert r->>'code' = 'daily_limit', format('rate: vote should hit the session daily_limit, got %s', r);
   assert (r->>'retry_after')::int between 1 and 90000, format('rate: daily retry_after %s', r);
 
-  -- ip_hash: 1000 duels today from other sessions
+  -- ip_hash: 200 duels today from 4 sessions stop all of them, each under its own limit
   delete from public.duels;
   insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
-  select gen_random_uuid(), 'ip-busy', 1, 2, now() - interval '2 seconds' from generate_series(1, 1000);
-  r := public.get_pair(gen_random_uuid(), 'ip-busy');
+  select ('00000000-0000-0000-0000-00000000000' || (i % 4))::uuid, 'ip-busy', 1, 2,
+    now() - interval '2 seconds'
+  from generate_series(1, 199) as i;
+  r := public.get_pair('00000000-0000-0000-0000-000000000001', 'ip-busy');
+  assert r->>'ok' = 'true', format('rate: 199 duels on an ip should still get a pair, got %s', r);
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  values ('00000000-0000-0000-0000-000000000001', 'ip-busy', 1, 2, now() - interval '2 seconds');
+  r := public.get_pair('00000000-0000-0000-0000-000000000001', 'ip-busy');
   assert r->>'code' = 'daily_limit', format('rate: expected ip daily_limit, got %s', r);
   r := public.get_pair(gen_random_uuid(), 'ip-quiet');
   assert r->>'ok' = 'true', format('rate: another ip should still get a pair: %s', r);
+
+  -- sessions: 5 sessions voted on an ip_hash today; a 6th can't, the 5 still can
+  delete from public.duels;
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  select ('00000000-0000-0000-0000-00000000000' || i)::uuid, 'ip-shared', 1, 2, now() - interval '2 seconds'
+  from generate_series(1, 4) as i;
+  r := public.get_pair(gen_random_uuid(), 'ip-shared');
+  assert r->>'ok' = 'true', format('rate: a 5th session should get a pair, got %s', r);
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  values ('00000000-0000-0000-0000-000000000005', 'ip-shared', 1, 2, now() - interval '2 seconds');
+  r := public.get_pair(gen_random_uuid(), 'ip-shared');
+  assert r->>'code' = 'daily_limit', format('rate: a 6th session should hit daily_limit, got %s', r);
+  r := public.get_pair('00000000-0000-0000-0000-000000000003', 'ip-shared');
+  assert r->>'ok' = 'true', format('rate: a session that already voted keeps voting, got %s', r);
+  -- yesterday's sessions don't count
+  update public.duels set created_at = private.day_start() - interval '1 hour' where ip_hash = 'ip-shared';
+  r := public.get_pair(gen_random_uuid(), 'ip-shared');
+  assert r->>'ok' = 'true', format('rate: yesterday''s sessions should not count, got %s', r);
 
   raise exception using errcode = 'NM000';
 exception when sqlstate 'NM000' then null;
