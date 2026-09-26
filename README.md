@@ -50,16 +50,18 @@ The smoke test records one real duel and one favorite; clear test data before la
 
 ## Moderation
 
-`scripts/flag-suspicious.sql` finds sessions/IP hashes voting for one entry >90% of the
-time, bursts (20+ duels faster than one every 3 s), and IPs cycling through more than 20
-sessions in a day:
+`scripts/flag-suspicious.sql` lists sessions/IP hashes where one entry wins >90% of 10+
+duels (`bias`), sessions with 20+ duels inside 60 s (`burst`), and IP hashes with more
+than 20 sessions (`sessions`; the hash rotates daily, so that's per day). The logic is the
+`private.suspicious` view, which is one result set because `supabase db query` prints only
+the last statement.
 
 ```sh
 pnpm dlx supabase db query --linked -f scripts/flag-suspicious.sql
 ```
 
-Review its output, then flag what's actually abuse with the helpers it defines
-(`private.flag_session('<session_id>')` / `private.flag_ip('<ip_hash>')`, in
+Review the rows, then flag what's actually abuse: `private.flag_session('<session_id>')`
+for rows with a session, `private.flag_ip('<ip_hash>')` for IP-only rows (both in
 `supabase/migrations/20260926120200_moderation.sql`). These only set `excluded = true` on
 that session's/IP's `duels` and `favorites` rows; nothing is deleted. Once you're done
 flagging for the pass, replay Elo without the excluded rows:

@@ -5,120 +5,117 @@
 -- by raising the 'NM000' sentinel, caught by its own handler, which rolls back whatever
 -- the block did.
 
--- Single-entry bias: a session that always votes the same winner is flagged by the
--- detection query, private.flag_session() excludes its rows, and recompute_elo() undoes
--- its effect on the winner's Elo.
+-- Bias: an abusive session lifts entry 50 to the top of the leaderboard; it shows up in
+-- private.suspicious, flag_session() excludes it, and after recompute_elo() entry 50 is
+-- back where it started.
 do $$
 declare
   abuser uuid := gen_random_uuid();
   clean uuid := gen_random_uuid();
   r jsonb;
-  flagged int;
 begin
   delete from public.duels; delete from public.favorites; delete from public.rank_snapshots;
   update public.entries set elo = 1500, duels = 0, wins = 0;
 
-  -- abuser: entry 50 "wins" against 19 different opponents, unanimously
+  -- abuser: entry 50 wins against 19 different opponents, 10 s apart (not a burst)
   insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
-  select abuser, 'ip-mod-bias', 50, e.id, now() - interval '1 minute'
-  from public.entries e where e.eligible and e.id <> 50 limit 19;
+  select abuser, 'ip-mod-bias', 50, o.id, now() - o.n * interval '10 seconds'
+  from (select id, row_number() over (order by id) as n from public.entries where eligible and id <> 50 limit 19) as o;
+  insert into public.favorites (session_id, entry_id, ip_hash) values (abuser, 50, 'ip-mod-bias');
 
   -- clean session: a normal spread of winners, entry 50 never involved
   insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
-  select clean, 'ip-mod-clean', e.id, e.id + 1, now() - interval '1 minute'
-  from public.entries e where e.eligible and e.id < 20;
-
-  -- the bias query (scripts/flag-suspicious.sql, part 1) should flag the abuser only
-  with per_winner as (
-    select session_id, winner_id, count(*) as wins
-    from public.duels where not excluded group by session_id, winner_id
-  ), totals as (
-    select session_id, sum(wins) as total from per_winner group by session_id
-  )
-  select count(*) into flagged from per_winner p join totals t using (session_id)
-  where t.total >= 10 and p.wins::numeric / t.total > 0.9 and p.session_id = abuser;
-  assert flagged = 1, 'moderation: bias query should flag the abuser';
-
-  with per_winner as (
-    select session_id, winner_id, count(*) as wins
-    from public.duels where not excluded group by session_id, winner_id
-  ), totals as (
-    select session_id, sum(wins) as total from per_winner group by session_id
-  )
-  select count(*) into flagged from per_winner p join totals t using (session_id)
-  where t.total >= 10 and p.wins::numeric / t.total > 0.9 and p.session_id = clean;
-  assert flagged = 0, 'moderation: bias query should not flag the clean session';
-
-  r := private.flag_session(abuser);
-  assert (r->>'duels_excluded')::int = 19, format('moderation: expected 19 duels excluded, got %s', r);
-  assert (r->>'favorites_excluded')::int = 0, format('moderation: expected 0 favorites excluded, got %s', r);
-  assert (select bool_and(excluded) from public.duels where session_id = abuser), 'moderation: abuser duels excluded';
-  assert (select bool_and(not excluded) from public.duels where session_id = clean), 'moderation: clean duels untouched';
-
-  -- calling it again touches nothing (idempotent)
-  r := private.flag_session(abuser);
-  assert (r->>'duels_excluded')::int = 0, format('moderation: re-flagging should exclude nothing more, got %s', r);
+  select clean, 'ip-mod-clean', id, id + 1, now() - id * interval '10 seconds'
+  from public.entries where eligible and id < 20;
 
   perform public.recompute_elo();
-  assert (select elo = 1500 and duels = 0 and wins = 0 from public.entries where id = 50),
-    'moderation: entry 50 untouched once the abuser is excluded';
-  assert not exists (select 1 from public.leaderboard where id = 50 and elo <> 1500), 'moderation: leaderboard reflects it';
+  assert (select rank = 1 and favorites = 1 from public.leaderboard where id = 50),
+    'moderation: before flagging, the abuser puts entry 50 first with a favorite';
+
+  assert exists (select 1 from private.suspicious where reason = 'bias' and session_id = abuser),
+    'moderation: abuser listed as bias';
+  assert exists (select 1 from private.suspicious where reason = 'bias' and ip_hash = 'ip-mod-bias'),
+    'moderation: abuser ip listed as bias';
+  assert not exists (select 1 from private.suspicious where session_id = clean or ip_hash = 'ip-mod-clean'),
+    'moderation: clean session not listed';
+
+  r := private.flag_session(abuser);
+  assert (r->>'duels_excluded')::int = 19 and (r->>'favorites_excluded')::int = 1,
+    format('moderation: expected 19 duels and 1 favorite excluded, got %s', r);
+  assert (select bool_and(not excluded) from public.duels where session_id = clean), 'moderation: clean duels untouched';
+  r := private.flag_session(abuser);
+  assert (r->>'duels_excluded')::int = 0, format('moderation: re-flagging should exclude nothing more, got %s', r);
+  assert not exists (select 1 from private.suspicious where session_id = abuser or ip_hash = 'ip-mod-bias'),
+    'moderation: flagged rows drop out of the list';
+
+  perform public.recompute_elo();
+  assert (select elo = 1500 and duels = 0 and favorites = 0 and rank > 1 from public.leaderboard where id = 50),
+    'moderation: after recompute, entry 50 has no trace of the abuser';
 
   raise exception using errcode = 'NM000';
 exception when sqlstate 'NM000' then null;
 end $$;
 
--- Too many sessions on one IP: the detection query flags it, and private.flag_ip()
--- excludes every one of those sessions' duels in one call.
+-- Too many sessions on one ip_hash: listed, and flag_ip() excludes them all at once.
 do $$
 declare
   ip text := 'ip-mod-many';
   r jsonb;
-  sessions int;
 begin
-  delete from public.duels where ip_hash = ip;
+  delete from public.duels;
 
-  -- 25 distinct sessions from the same ip_hash, one duel each
   insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
-  select gen_random_uuid(), ip, 1, 2, now() - interval '1 minute' from generate_series(1, 25);
+  select gen_random_uuid(), ip, 1 + i % 2, 2 - i % 2, now() - i * interval '1 minute' from generate_series(1, 25) as i;
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  select gen_random_uuid(), 'ip-mod-few', 1, 2, now() from generate_series(1, 20);
 
-  select count(distinct session_id) into sessions
-  from public.duels where ip_hash = ip and not excluded
-  having count(distinct session_id) > 20;
-  assert sessions = 25, format('moderation: too-many-sessions query should flag %s, found %s', ip, sessions);
+  assert exists (select 1 from private.suspicious where reason = 'sessions' and ip_hash = ip and detail = '25 sessions'),
+    'moderation: 25 sessions on one ip listed';
+  assert not exists (select 1 from private.suspicious where reason = 'sessions' and ip_hash = 'ip-mod-few'),
+    'moderation: 20 sessions on one ip is not listed';
 
   r := private.flag_ip(ip);
   assert (r->>'duels_excluded')::int = 25, format('moderation: expected 25 duels excluded, got %s', r);
-  assert (select bool_and(excluded) from public.duels where ip_hash = ip), 'moderation: all sessions on the ip excluded';
+  assert not exists (select 1 from private.suspicious where ip_hash = ip), 'moderation: flagged ip drops out';
 
   raise exception using errcode = 'NM000';
 exception when sqlstate 'NM000' then null;
 end $$;
 
--- Bursts: a session voting far faster than a real visitor is surfaced by the rate query.
+-- Bursts: 25 duels one second apart are listed even inside a long, otherwise slow
+-- session; 25 duels ten seconds apart are not.
 do $$
 declare
   bursty uuid := gen_random_uuid();
-  flagged int;
+  slow uuid := gen_random_uuid();
 begin
-  delete from public.duels where session_id = bursty;
+  delete from public.duels;
 
-  -- 25 duels one second apart: 62.5/min, well past the 20/min threshold
   insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
-  select bursty, 'ip-mod-burst', 1, i + 2, now() - (25 - i) * interval '1 second'
-  from generate_series(1, 25) as i;
+  select bursty, 'ip-mod-burst', 1, i + 2, now() - (25 - i) * interval '1 second' from generate_series(1, 25) as i;
+  -- plus 25 slow duels over the previous 10 hours, which would dilute a whole-session average
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  select bursty, 'ip-mod-burst', 1, i + 29, now() - i * interval '24 minutes' from generate_series(1, 25) as i;
 
-  select count(*) into flagged from (
-    select session_id
-    from public.duels where not excluded and session_id = bursty
-    group by session_id
-    having count(*) >= 20
-       and count(*) / greatest(extract(epoch from max(created_at) - min(created_at)) / 60, 0.01) > 20
-  ) as bursts;
-  assert flagged = 1, 'moderation: burst query should flag the bursty session';
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  select slow, 'ip-mod-slow', 2, i + 2, now() - i * interval '10 seconds' from generate_series(1, 25) as i;
+
+  assert exists (select 1 from private.suspicious where reason = 'burst' and session_id = bursty and duels = 50),
+    'moderation: burst inside a long session listed';
+  assert not exists (select 1 from private.suspicious where reason = 'burst' and session_id = slow),
+    'moderation: one duel per 10 s is not a burst';
 
   raise exception using errcode = 'NM000';
 exception when sqlstate 'NM000' then null;
+end $$;
+
+-- Detection and flagging stay out of the API.
+do $$
+begin
+  assert not has_table_privilege('anon', 'private.suspicious', 'select'), 'perm: anon can read private.suspicious';
+  assert not has_function_privilege('anon', 'private.flag_session(uuid)', 'execute')
+    or not has_schema_privilege('anon', 'private', 'usage'), 'perm: anon can flag sessions';
+  assert not has_schema_privilege('authenticated', 'private', 'usage'), 'perm: authenticated can use private';
 end $$;
 
 select 'moderation tests: all passed' as result;
