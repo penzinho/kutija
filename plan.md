@@ -79,11 +79,11 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - ✅ Done when: a `functions serve` (or deployed) round trip works (get pair → vote → Elo changes; a replayed token is rejected)
 
 ### 6. Duel island (`/dvoboj`)
-- [ ] Two cards + VS; tap / ← → to vote, Space / ↓ to skip; prefetch the next pair
-- [ ] Win FX (stamp, flash, ≤34 confetti bits), next pair slides in after 720 ms (250 ms with reduced motion)
-- [ ] Progress "Odigrao si X dvoboja" + 10 segments; success pill; rate-limit banner with countdown; error/empty states
-- [ ] `?a=id` pins one side; localStorage `nm-v1` mirrors `played` and `userWins`
-- ✅ Done when: 20 duels in a row are smooth on mobile and nothing breaks when offline or rate-limited
+- [x] Two cards + VS; tap / ← → to vote, Space / ↓ to skip; prefetch the next pair
+- [x] Win FX (stamp, flash, ≤34 confetti bits), next pair slides in after 720 ms (250 ms with reduced motion)
+- [x] Progress "Odigrao si X dvoboja" + 10 segments; success pill; rate-limit banner with countdown; error/empty states
+- [x] `?a=id` pins one side; localStorage `nm-v1` mirrors `played` and `userWins`
+- ✅ Done when: 20 duels in a row are smooth on mobile and nothing breaks when offline or rate-limited (verified 2026-09-26 in Playwright against a mocked backend; re-check against the real function once step 5's dashboard setup is done)
 
 ### 7. Leaderboard + favorites + live data
 - [ ] `/rang`: Žiri vs Narod hero, "Najveća neslaganja" cards (1–88 track with Ž/N markers), top-20 table + "Prikaži svih 88", FLIP on rank change; highlight rows where the people disagree with the jury

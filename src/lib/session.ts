@@ -15,10 +15,16 @@ let clientPromise: Promise<SupabaseClient> | null = null;
 
 /** The shared client, loaded on first use. Reading the public views needs no session. */
 export function getSupabase(): Promise<SupabaseClient> {
-  clientPromise ??= import('@supabase/supabase-js').then(({ createClient }) =>
-    createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
-    }),
+  clientPromise ??= import('@supabase/supabase-js').then(
+    ({ createClient }) =>
+      createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false },
+      }),
+    (e: unknown) => {
+      // A failed chunk load (flaky network) must not stick: the next call tries again.
+      clientPromise = null;
+      throw e;
+    },
   );
   return clientPromise;
 }

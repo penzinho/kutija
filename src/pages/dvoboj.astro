@@ -1,0 +1,55 @@
+---
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Duel, { type DuelEntry } from '../components/Duel';
+import { duelEligible } from '../data/entries';
+import { getRank } from '../data/ranks';
+import { coverImage, imageAlt } from '../data/images';
+
+// Duel card: half of the 1240 px section on desktop, full width on phones. The widths
+// match the grid card preset, so the files are shared with the home page.
+const WIDTHS = [480, 640, 960];
+const SIZES = '(max-width: 760px) 100vw, 600px';
+
+const countries = new Intl.DisplayNames(['hr'], { type: 'region' });
+
+const data: DuelEntry[] = await Promise.all(
+  duelEligible.map(async (e) => {
+    const img = coverImage(e);
+    const [avif, webp] = img
+      ? await Promise.all(
+          (['avif', 'webp'] as const).map((format) => getImage({ src: img, width: 640, widths: WIDTHS, format })),
+        )
+      : [];
+    return {
+      id: e.id,
+      code: e.code,
+      award: e.award,
+      country: e.country ? (countries.of(e.country) ?? null) : null,
+      // STUB ranks until step 7 (src/data/ranks.ts).
+      rank: getRank(e.id)?.rank ?? null,
+      alt: imageAlt(e),
+      img: webp && avif ? { src: webp.src, webp: webp.srcSet.attribute, avif: avif.srcSet.attribute } : null,
+    };
+  }),
+);
+---
+
+<Base
+  title="Dvoboj"
+  description="Dva rada, jedan glas. Izaberi bolji stadion u dvoboju i pomakni narodni rang svih 88 radova za novi Maksimir."
+>
+  <Duel client:load entries={data} sizes={SIZES} />
+  <noscript>
+    <p class="noscript">Za glasanje u dvobojima treba uključen JavaScript.</p>
+  </noscript>
+</Base>
+
+<style>
+  .noscript {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 var(--gutter) var(--sp-7);
+    color: var(--c-ink-2);
+  }
+</style>

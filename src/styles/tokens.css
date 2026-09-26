@@ -165,3 +165,18 @@
   --c-versus-bg: linear-gradient(180deg, rgba(14, 38, 96, .55), rgba(6, 15, 42, .8)); /* Žiri vs Narod box */
   --dur-morph-fade: 180ms; /* page cross-fade around the card → detail morph */
 }
+
+/* Duel (/dvoboj) */
+:root {
+  --c-duel-scrim: linear-gradient(180deg, rgba(3, 8, 21, .25), transparent 35%, rgba(3, 8, 21, .85));
+  --c-duel-ring-hover: rgba(160, 200, 255, .55);
+  --c-duel-stamp-bg: rgba(10, 61, 158, .55);
+  --c-duel-flash: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, .9), rgba(77, 163, 255, .35) 45%, transparent 75%);
+  --c-vs-halo: 0 0 0 8px rgba(3, 8, 21, .75), 0 0 50px var(--c-accent-glow);
+  --c-danger-tint: rgba(255, 107, 122, .10);
+  --c-confetti-1: #FFFFFF;
+  --c-confetti-2: var(--c-accent);
+  --c-confetti-3: var(--c-blue-600);
+  --c-confetti-4: #9CC7FF;
+  --dur-slide: 420ms;      /* next pair slides in */
+}
