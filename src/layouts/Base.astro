@@ -194,6 +194,7 @@ const nav = navItems(Astro.url.pathname);
     letter-spacing: .02em;
     line-height: 1;
     text-transform: uppercase;
+    white-space: nowrap;
   }
   .top-nav {
     display: flex;
@@ -206,6 +207,7 @@ const nav = navItems(Astro.url.pathname);
     font-size: 15px;
     font-weight: 500;
     color: var(--c-ink-2);
+    white-space: nowrap;
   }
   .top-nav a::after {
     content: '';
@@ -252,6 +254,7 @@ const nav = navItems(Astro.url.pathname);
     color: var(--c-on-accent);
     font-weight: 700;
     font-size: var(--fs-small);
+    white-space: nowrap;
     transition:
       box-shadow var(--dur-base) var(--ease-out),
       transform var(--dur-base) var(--ease-out);
@@ -260,6 +263,17 @@ const nav = navItems(Astro.url.pathname);
     box-shadow: var(--sh-cta);
     transform: translateY(-1px);
     color: var(--c-on-accent);
+  }
+
+  /* Five nav items plus the CTA: tighten before the tab bar takes over. */
+  @media (max-width: 1023.98px) {
+    .bar {
+      gap: 18px;
+    }
+    .top-nav {
+      gap: 16px;
+      margin-left: 0;
+    }
   }
 
   @media (max-width: 759.98px) {

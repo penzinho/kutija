@@ -1,10 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import { entries, meta } from '../data/entries';
+import { CONTACT_EMAIL } from '../lib/contact';
 
-// The author stays anonymous. The takedown e-mail is a placeholder until launch (plan step 10).
+// The author stays anonymous.
 const AUTHOR = 'Autor je anonimni navijač s istočne tribine, iz Zagreba.';
-const TAKEDOWN_EMAIL: string | null = null;
 const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
 ---
 
@@ -93,12 +93,15 @@ const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
         </p>
       </section>
 
-      <section class="block" data-reveal="3" aria-labelledby="uklanjanje">
+      <section class="block" data-reveal="3" aria-labelledby="kontakt">
         <div class="block-num" aria-hidden="true">04</div>
-        <h2 id="uklanjanje" class="block-title">Uklanjanje sadržaja</h2>
-        <p>Autor si rada ili nositelj prava? Javi se i uklonit ćemo ili ispraviti sadržaj u roku od 48 sati.</p>
+        <h2 id="kontakt" class="block-title">Kontakt</h2>
+        <p>
+          Za sve upite, sugestije i prijedloge piši na adresu ispod. Autor si rada ili nositelj prava? Javi se i uklonit ćemo
+          ili ispraviti sadržaj u roku od 48 sati. Jedna molba: bez općenja s članovima obitelji. Hvala.
+        </p>
         <div class="links">
-          {TAKEDOWN_EMAIL ? <a href={`mailto:${TAKEDOWN_EMAIL}`}>{TAKEDOWN_EMAIL}</a> : <span>[e-mail za uklanjanje]</span>}
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
         </div>
       </section>
     </div>

@@ -4,6 +4,7 @@ import AwardBadge from '../components/AwardBadge.astro';
 import RankChip from '../components/RankChip.astro';
 import { entries } from '../data/entries';
 import type { RankInfo } from '../lib/rank';
+import { CONTACT_EMAIL } from '../lib/contact';
 
 // Fixed sample for the legend: not a live rank.
 const sample: RankInfo = { rank: 7, rank24h: 9, elo: 1562, duels: 0, wins: 0, favorites: 0 };
@@ -112,7 +113,10 @@ const inVote = entries.filter((e) => e.status !== 'excluded').length;
         znamo za {withAuthors} od {entries.length} radova, a obrazloženje žirija imamo za {withJury}. Ostale slike, autore i
         podatke dodajem naknadno, rad po rad.
       </p>
-      <p>Ako znaš tko je autor nekog rada ili imaš bolju sliku iz službenih materijala, javi se.</p>
+      <p>
+        Ako znaš tko je autor nekog rada ili imaš bolju sliku iz službenih materijala, javi se na
+        <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+      </p>
     </section>
   </section>
 </Base>
