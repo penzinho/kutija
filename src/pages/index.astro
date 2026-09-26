@@ -7,6 +7,7 @@ import TopPicks from '../components/TopPicks.astro';
 import FilterBar from '../components/FilterBar';
 import { entries, awarded, duelEligible, type Entry } from '../data/entries';
 import { getRank, totalDuels } from '../data/ranks';
+import mark from '../assets/logo/mark.png';
 
 // Hero stack: the jury's five interleaved with the people's top three (outside the awards,
 // as of the build), the same mix as the design reference. Without rank data: the finalists.
@@ -17,7 +18,7 @@ const peoplesTop = duelEligible
   .slice(0, 3);
 const heroEntries = [awarded[0], peoplesTop[0], awarded[2], peoplesTop[1], awarded[1], peoplesTop[2], awarded[3], awarded[4]];
 
-const MARQUEE = `Žiri je odlučio ✶ Sad je red na narodu ✶ ${entries.length} radova ✶ Jedan stadion ✶ Tvoj glas ✶ Narod vs Žiri ✶ `;
+const MARQUEE = ['Žiri je odlučio', 'Sad je red na narodu', `${entries.length} radova`, 'Jedan stadion', 'Tvoj glas', 'Narod vs Žiri'];
 ---
 
 <Base>
@@ -70,9 +71,19 @@ const MARQUEE = `Žiri je odlučio ✶ Sad je red na narodu ✶ ${entries.length
   </section>
 
   <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-      <span>{MARQUEE}</span>
-      <span>{MARQUEE}</span>
+    <div class="marquee-track" style={`--mark: url(${mark.src})`}>
+      {
+        [0, 1].map(() => (
+          <div class="marquee-run">
+            {MARQUEE.map((phrase) => (
+              <>
+                <span>{phrase}</span>
+                <i class="marquee-mark" />
+              </>
+            ))}
+          </div>
+        ))
+      }
     </div>
   </div>
 
@@ -331,13 +342,28 @@ const MARQUEE = `Žiri je odlučio ✶ Sad je red na narodu ✶ ${entries.length
     display: inline-flex;
     animation: nm-marquee var(--dur-marquee) linear infinite;
   }
-  .marquee-track span {
+  .marquee-run {
+    display: flex;
+    align-items: center;
+    flex: none;
+  }
+  .marquee-run span {
     padding: 14px 0;
     font-family: var(--font-display);
     font-size: clamp(22px, 2.4vw, 34px);
     letter-spacing: .02em;
     word-spacing: .2em;
     text-transform: uppercase;
+  }
+  /* The mono logo is an alpha mask, so it takes the marquee's text colour. */
+  .marquee-mark {
+    flex: none;
+    width: 1.3em;
+    height: 1.3em;
+    margin-inline: .7em;
+    font-size: clamp(22px, 2.4vw, 34px);
+    background: currentColor;
+    mask: var(--mark) center / contain no-repeat;
   }
 
   /* ---- Works ---- */

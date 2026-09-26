@@ -21,5 +21,6 @@ Astro (static, TS strict) · Supabase (anonymous sessions, RPC, Edge Function `v
 - check: `pnpm check` (astro check; needs TypeScript 6, not 7)
 - build: `pnpm build`
 - images: `pnpm tsx scripts/import-images.ts <folder>`
+- logo: `pnpm tsx scripts/build-logo.ts src/assets/logo/source-colour.png src/assets/logo/source-mono.png` (favicon, icons, header logo, marquee mark)
 - db (remote project srqdfixcngwpfwllljse, no local Docker): `pnpm dlx supabase db push`, tests `pnpm dlx supabase db query --linked -f supabase/tests/voting.sql`
 - moderation: `pnpm dlx supabase db query --linked -f scripts/flag-suspicious.sql`, tests `pnpm dlx supabase db query --linked -f supabase/tests/moderation.sql`
