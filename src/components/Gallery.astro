@@ -1,0 +1,169 @@
+---
+import { Picture } from 'astro:assets';
+import type { Entry } from '../data/entries';
+import { entryImages, imageAlt, IMAGE_PRESETS } from '../data/images';
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+const images = entryImages(entry);
+const alt = imageAlt(entry);
+const many = images.length > 1;
+---
+
+<div class="gallery" data-gallery>
+  {/* Same transition:name as the grid card image: the card morphs into this frame. */}
+  <div class="main" transition:name={`entry-${entry.id}`}>
+    {
+      images.length ? (
+        images.map((img, i) => (
+          <div class="slide" data-slide={i} hidden={i !== 0}>
+            <Picture
+              src={img}
+              alt={many ? `${alt} · slika ${i + 1} od ${images.length}` : alt}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+              {...IMAGE_PRESETS.detail}
+            />
+          </div>
+        ))
+      ) : (
+        <div class="missing" role="img" aria-label={alt}>
+          <span class="missing-label">Slika nije dostupna</span>
+        </div>
+      )
+    }
+    {
+      many && (
+        <>
+          <div class="scrim" aria-hidden="true" />
+          <span class="index" aria-hidden="true">
+            <span data-gallery-index>1</span> / {images.length}
+          </span>
+        </>
+      )
+    }
+  </div>
+
+  {
+    many && (
+      <div class="thumbs" role="group" aria-label="Slike rada">
+        {images.map((img, i) => (
+          <button type="button" class="thumb" data-thumb={i} aria-pressed={i === 0 ? 'true' : 'false'}>
+            <Picture src={img} alt="" loading="lazy" width={320} widths={[160, 320]} sizes="160px" formats={['avif']} fallbackFormat="webp" />
+            <span class="visually-hidden">Slika {i + 1}</span>
+          </button>
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .gallery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    min-width: 0;
+  }
+  .main {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--c-navy-900);
+    box-shadow: var(--sh-lift);
+  }
+  .slide,
+  .slide :global(picture),
+  .slide :global(img),
+  .missing {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .missing {
+    background: var(--c-img-missing);
+  }
+  .missing-label {
+    position: absolute;
+    left: 18px;
+    bottom: 16px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--c-card-label);
+  }
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: var(--c-detail-scrim);
+    pointer-events: none;
+  }
+  .index {
+    position: absolute;
+    right: 18px;
+    bottom: 16px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: .08em;
+    color: var(--c-ink-2);
+  }
+
+  .thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .thumb {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    padding: 0;
+    border-radius: var(--r-sm);
+    border: 2px solid transparent;
+    overflow: hidden;
+    background: var(--c-navy-900);
+    opacity: .55;
+    cursor: pointer;
+    transition:
+      opacity var(--dur-fast),
+      border-color var(--dur-fast);
+  }
+  .thumb:hover,
+  .thumb[aria-pressed='true'] {
+    opacity: 1;
+  }
+  .thumb[aria-pressed='true'] {
+    border-color: var(--c-accent);
+  }
+  .thumb :global(picture),
+  .thumb :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const gallery = document.querySelector<HTMLElement>('[data-gallery]');
+    if (!gallery) return;
+    const slides = [...gallery.querySelectorAll<HTMLElement>('[data-slide]')];
+    const thumbs = [...gallery.querySelectorAll<HTMLButtonElement>('[data-thumb]')];
+    const index = gallery.querySelector('[data-gallery-index]');
+    thumbs.forEach((thumb, i) =>
+      thumb.addEventListener('click', () => {
+        slides.forEach((s, k) => (s.hidden = k !== i));
+        thumbs.forEach((t, k) => t.setAttribute('aria-pressed', String(k === i)));
+        if (index) index.textContent = String(i + 1);
+      }),
+    );
+  });
+</script>

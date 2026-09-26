@@ -1,0 +1,47 @@
+/* Sits in the detail page's action row (flex, wraps); the island wrapper is display: contents. */
+.fav {
+  flex: 1 1 200px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 16px 22px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-instant) var(--ease-out);
+}
+.fav:hover {
+  box-shadow: var(--sh-cta);
+}
+.fav:active {
+  transform: scale(.97);
+}
+.fav[aria-pressed='true'] {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  color: var(--c-navy-950);
+  box-shadow: none;
+}
+.icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Wraps below both buttons. */
+.note {
+  order: 1;
+  flex-basis: 100%;
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--c-ink-2);
+}

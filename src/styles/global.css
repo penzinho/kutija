@@ -86,3 +86,18 @@ html[data-motion='calm'] *::after {
   animation-iteration-count: 1 !important;
   transition-duration: .01ms !important;
 }
+
+/* Card → detail morph (ClientRouter). The OS setting is handled by ClientRouter itself. */
+::view-transition-group(*) {
+  animation-duration: var(--dur-morph);
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-morph-fade);
+}
+html[data-motion='calm']::view-transition-group(*),
+html[data-motion='calm']::view-transition-old(*),
+html[data-motion='calm']::view-transition-new(*) {
+  animation: none !important;
+}

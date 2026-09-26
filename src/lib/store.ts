@@ -27,3 +27,19 @@ export function loadSaved(): Saved {
     return { ...EMPTY };
   }
 }
+
+/** Never throws; a blocked write just means the mirror is not kept. */
+export function saveSaved(next: Saved): void {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(next));
+  } catch {
+    // private mode or quota: the UI still reflects the choice for this page view
+  }
+}
+
+/** Set (or clear, with null) the one favorite. STUB for step 3: only the local mirror; step 7 calls `set_favorite`. */
+export function setFavorite(id: number | null): Saved {
+  const next = { ...loadSaved(), fav: id };
+  saveSaved(next);
+  return next;
+}

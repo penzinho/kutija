@@ -1,0 +1,506 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import Gallery from '../../components/Gallery.astro';
+import StatusBadge from '../../components/StatusBadge.astro';
+import DigitReel from '../../components/DigitReel.astro';
+import FavoriteButton from '../../components/FavoriteButton';
+import { entries, duelEligible, meta, type Entry } from '../../data/entries';
+import { getRank } from '../../data/ranks';
+
+export const getStaticPaths = (() => entries.map((entry) => ({ params: { id: String(entry.id) }, props: { entry } }))) satisfies GetStaticPaths;
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+const rank = getRank(entry.id);
+const pad = (n: number) => String(n).padStart(2, '0');
+const num = pad(entry.id);
+const fmt = new Intl.NumberFormat('hr-HR');
+
+// Wraps around: 88 → 1.
+const total = entries.length;
+const prevId = entry.id === 1 ? total : entry.id - 1;
+const nextId = entry.id === total ? 1 : entry.id + 1;
+
+const country = entry.country ? new Intl.DisplayNames(['hr'], { type: 'region' }).of(entry.country) : null;
+const inVote = entry.status !== 'excluded';
+
+// Žiri side of the versus box: the jury's verdict in one big word.
+const jury: { big: string; note: string } =
+  entry.status === 'awarded'
+    ? { big: `${entry.award}.`, note: 'nagrada žirija' }
+    : entry.status === 'finalist'
+      ? { big: 'Top 10', note: 'finalist bez nagrade' }
+      : entry.status === 'eliminated'
+        ? { big: `${entry.eliminatedInRound}. krug`, note: 'tu je ispao' }
+        : { big: '—', note: 'nije ocjenjivan' };
+
+const stats = [
+  ['Ocjena', rank ? fmt.format(rank.elo) : '—'],
+  ['Dvoboji', rank ? fmt.format(rank.duels) : '—'],
+  ['Pobjede', rank && rank.duels ? `${Math.round((rank.wins / rank.duels) * 100)} %` : '—'],
+  ['Favoriti', rank ? fmt.format(rank.favorites) : '—'],
+] as const;
+
+const juryHeading = entry.status === 'excluded' ? 'Odluka žirija' : 'Ocjena žirija';
+
+// Meta description: the start of the entry description, cut at a word boundary.
+const summary = entry.descriptionHr ?? entry.juryHr[0] ?? '';
+const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+\S*$/, '')}…` : summary;
+---
+
+<Base title={`Rad ${num} · ${entry.code}`} description={description} ogType="article">
+  <article class="rad">
+    <div class="topbar">
+      <a href="/#radovi" class="back">← Svi radovi</a>
+      <nav class="pager" aria-label="Susjedni radovi">
+        <a href={`/rad/${prevId}`} class="arrow" rel="prev" aria-label={`Prethodni rad, ${pad(prevId)}`}>←</a>
+        <a href={`/rad/${nextId}`} class="arrow" rel="next" aria-label={`Sljedeći rad, ${pad(nextId)}`}>→</a>
+      </nav>
+    </div>
+
+    <div class="layout">
+      <Gallery entry={entry} />
+
+      <aside class="aside">
+        <div>
+          <div class="eyebrow">Natječajni rad · {num} / {total}</div>
+          <div class="headline">
+            <h1 class="num"><span class="visually-hidden">Rad </span>{num}</h1>
+            <div class="badges">
+              <StatusBadge entry={entry} size="lg" />
+              <span class="code"><span class="code-label">Šifra </span>{entry.code}</span>
+            </div>
+          </div>
+        </div>
+
+        <dl class="facts">
+          <dt>Autori</dt>
+          <dd class:list={{ muted: !entry.authors.length }}>
+            {entry.authors.length ? entry.authors.join(', ') : 'Autori nisu objavljeni'}
+          </dd>
+          {
+            country && (
+              <>
+                <dt>Zemlja</dt>
+                <dd>{country}</dd>
+              </>
+            )
+          }
+          {
+            entry.pdf && (
+              <>
+                <dt>Dokumentacija</dt>
+                <dd>
+                  <a href={entry.pdf} target="_blank" rel="noopener" class="pdf">
+                    Službeni PDF <span aria-hidden="true">↗</span>
+                  </a>
+                </dd>
+              </>
+            )
+          }
+        </dl>
+
+        <section class="versus" aria-label="Žiri protiv naroda">
+          <div class="side">
+            <span class="side-label">Žiri</span>
+            <span class="side-value">{jury.big}</span>
+            <span class="side-note">{jury.note}</span>
+          </div>
+          <div class="vs" aria-hidden="true">VS</div>
+          <div class="side side-narod">
+            <span class="side-label narod">Narod</span>
+            {
+              rank ? (
+                <span class="side-value">
+                  #<DigitReel value={rank.rank} />
+                </span>
+              ) : (
+                <span class="side-value">—</span>
+              )
+            }
+            <span class="side-note">{rank ? `od ${duelEligible.length} radova` : 'nije u glasanju'}</span>
+          </div>
+        </section>
+
+        <dl class="stats">
+          {
+            stats.map(([label, value]) => (
+              <div class="stat">
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        {
+          inVote ? (
+            <div class="actions">
+              <FavoriteButton client:load id={entry.id} />
+              <a href={`/dvoboj?a=${entry.id}`} class="duel">
+                Usporedi u dvoboju <span class="duel-vs" aria-hidden="true">VS</span>
+              </a>
+            </div>
+          ) : (
+            <p class="out">Ovaj rad nije prihvaćen u ocjenjivanje, pa ne sudjeluje u glasanju.</p>
+          )
+        }
+      </aside>
+    </div>
+
+    <div class="texts">
+      {
+        entry.descriptionHr && (
+          <section class="block">
+            <h2 class="block-title">Opis rada</h2>
+            <div class="block-body">
+              <p>{entry.descriptionHr}</p>
+            </div>
+          </section>
+        )
+      }
+      {
+        entry.juryHr.length > 0 && (
+          <section class="block">
+            <h2 class="block-title">{juryHeading}</h2>
+            <div class="block-body">
+              {entry.juryHr.map((p) => (
+                <p>{p}</p>
+              ))}
+            </div>
+          </section>
+        )
+      }
+      {
+        entry.roundNoteHr.length > 0 && (
+          <section class="block">
+            <h2 class="block-title">
+              Ispao u {entry.eliminatedInRound}. krugu
+              <span class="block-sub">Obrazloženje žirija za sve radove koji su ispali u tom krugu</span>
+            </h2>
+            <div class="block-body">
+              {entry.roundNoteHr.map((p) => (
+                <p>{p}</p>
+              ))}
+            </div>
+          </section>
+        )
+      }
+      <p class="source">
+        Izvor teksta: <a href={meta.sourceUrl} target="_blank" rel="noopener">{meta.source} ↗</a>
+      </p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .rad {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: var(--sp-5) var(--gutter) var(--sp-8);
+  }
+
+  /* ---- Top bar ---- */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-bottom: 22px;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    color: var(--c-ink-2);
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .back:hover {
+    color: var(--c-ink);
+  }
+  .pager {
+    display: flex;
+    gap: var(--sp-2);
+  }
+  .arrow {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--c-line-strong);
+    color: var(--c-ink);
+    transition: background var(--dur-fast);
+  }
+  .arrow:hover {
+    background: var(--c-hover-tint);
+    color: var(--c-ink);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
+  }
+
+  /* ---- Aside ---- */
+  .aside {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+  }
+  .headline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px 18px;
+    margin-top: 10px;
+  }
+  .num {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: var(--fs-num-giant);
+    line-height: .78;
+  }
+  .badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 6px;
+  }
+  .code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: .06em;
+    padding: 6px 10px;
+    border-radius: var(--r-xs);
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+  }
+  .code-label {
+    color: var(--c-ink-3);
+  }
+
+  .facts {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px 20px;
+    padding: 18px 0;
+    border-block: 1px solid var(--c-line);
+    font-size: 15px;
+  }
+  .facts dt {
+    padding-top: 3px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+  }
+  .facts dd {
+    margin: 0;
+    min-width: 0;
+  }
+  .facts .muted {
+    color: var(--c-ink-3);
+  }
+  .pdf {
+    font-weight: 600;
+  }
+
+  .versus {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    background: var(--c-versus-bg);
+  }
+  .side {
+    padding: var(--sp-4) 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  .side-narod {
+    align-items: flex-end;
+    text-align: right;
+  }
+  .side-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-micro);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--c-ink-2);
+  }
+  .side-label.narod {
+    color: var(--c-accent);
+  }
+  .side-value {
+    display: flex;
+    font-family: var(--font-display);
+    font-size: var(--fs-display-s);
+    line-height: 1.1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .side-note {
+    font-size: 13px;
+    color: var(--c-ink-2);
+  }
+  .vs {
+    display: grid;
+    place-items: center;
+    padding: 0 10px;
+    border-inline: 1px solid var(--c-line);
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--c-ink-3);
+  }
+
+  .stats {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--c-line);
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+  .stat {
+    background: var(--c-navy-950);
+    padding: var(--sp-3);
+  }
+  .stat dt {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: var(--ls-mono);
+    text-transform: uppercase;
+    color: var(--c-ink-3);
+  }
+  .stat dd {
+    margin: var(--sp-1) 0 0;
+    font-family: var(--font-display);
+    font-size: 24px;
+    white-space: nowrap;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .duel {
+    flex: 1 1 200px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 16px 22px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--c-line-strong);
+    color: var(--c-ink);
+    font-weight: 700;
+    transition: background var(--dur-fast);
+  }
+  .duel:hover {
+    background: var(--c-hover-tint);
+    color: var(--c-ink);
+  }
+  .duel-vs {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+  .out {
+    margin: 0;
+    padding: 14px 18px;
+    border: 1px dashed var(--c-line-strong);
+    border-radius: var(--r-md);
+    color: var(--c-ink-2);
+    font-size: 15px;
+  }
+
+  /* ---- Texts ---- */
+  .texts {
+    margin-top: clamp(40px, 6vw, 80px);
+  }
+  .block {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: var(--sp-3) clamp(24px, 4vw, 56px);
+    padding: var(--sp-6) 0;
+    border-top: 1px solid var(--c-line);
+  }
+  .block-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(26px, 2.6vw, 36px);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .block-sub {
+    display: block;
+    margin-top: 10px;
+    max-width: 22em;
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    text-transform: none;
+    color: var(--c-ink-3);
+  }
+  /* The text column takes two thirds on wide screens. */
+  @media (min-width: 900px) {
+    .block {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+  .block-body {
+    max-width: 68ch;
+    color: var(--c-ink-2);
+    font-size: 17px;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+  .block-body p {
+    margin: 0;
+  }
+  .block-body p + p {
+    margin-top: 1em;
+  }
+  .block:first-child .block-body {
+    color: var(--c-ink);
+  }
+  .source {
+    margin: 0;
+    padding-top: var(--sp-5);
+    border-top: 1px solid var(--c-line);
+    font-size: var(--fs-small);
+    color: var(--c-ink-3);
+  }
+
+  @media (max-width: 759.98px) {
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
