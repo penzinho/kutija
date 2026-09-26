@@ -42,7 +42,7 @@ export const GET: APIRoute = async ({ site }) => {
           },
         },
         h('div', { style: { width: 12, height: 12, borderRadius: 999, background: token('--c-accent') } }),
-        `Narodni Maksimir · ${entries.length} radova`,
+        `Naš Dom · ${entries.length} radova`,
       ),
       h(
         'div',
@@ -53,7 +53,7 @@ export const GET: APIRoute = async ({ site }) => {
           'div',
           { style: { display: 'flex', gap: 24, fontSize: 112, lineHeight: 0.9 } },
           'na',
-          h('span', { style: { color: token('--c-accent') } }, 'narodu.'),
+          h('span', { style: { color: token('--c-accent') } }, 'nama.'),
         ),
       ),
       h(

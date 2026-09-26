@@ -1,4 +1,4 @@
-// Narodni Maksimir: the only write path for votes.
+// Naš Dom: the only write path for votes.
 //
 // POST { action: 'get_pair', pin?: number }
 //      { action: 'vote_duel', token: string, winner: number }

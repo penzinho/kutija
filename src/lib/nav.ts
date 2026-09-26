@@ -6,7 +6,7 @@ export function navItems(pathname: string): NavItem[] {
   return [
     { label: 'Radovi', href: '/', active: path === '/' || path.startsWith('/rad/') },
     { label: 'Dvoboj', href: '/dvoboj', active: path === '/dvoboj' },
-    { label: 'Rang', href: '/rang', active: path === '/rang' },
+    { label: 'Rang lista', href: '/rang', active: path === '/rang' },
     { label: 'O projektu', href: '/o-projektu', active: path === '/o-projektu' },
   ];
 }

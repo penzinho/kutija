@@ -52,7 +52,7 @@ const fmt = new Intl.NumberFormat('hr-HR');
     <div class="panel" aria-hidden="true">
       <span class="panel-cta">Pogledaj rad →</span>
       <span class="panel-rank" data-panel-rank={entry.status === 'excluded' ? undefined : entry.id} hidden={!rank}>
-        {rank && `Narod #${rank.rank} · ${fmt.format(rank.elo)}`}
+        {rank && `Građani #${rank.rank} · ${fmt.format(rank.elo)}`}
       </span>
     </div>
   </div>

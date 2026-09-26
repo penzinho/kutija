@@ -18,7 +18,7 @@ const peoplesTop = duelEligible
   .slice(0, 3);
 const heroEntries = [awarded[0], peoplesTop[0], awarded[2], peoplesTop[1], awarded[1], peoplesTop[2], awarded[3], awarded[4]];
 
-const MARQUEE = ['Žiri je odlučio', 'Sad je red na narodu', `${entries.length} radova`, 'Jedan stadion', 'Tvoj glas', 'Narod vs Žiri'];
+const MARQUEE = ['Žiri je odlučio', 'Sad je red na nama', `${entries.length} radova`, 'Jedan stadion', 'Tvoj glas', 'Mi vs Žiri'];
 ---
 
 <Base>
@@ -29,24 +29,31 @@ const MARQUEE = ['Žiri je odlučio', 'Sad je red na narodu', `${entries.length}
     <div class="beam beam-r" aria-hidden="true"></div>
     <div class="pitch-circle" aria-hidden="true"></div>
     <div class="pitch-line" aria-hidden="true"></div>
-    <div class="outline" aria-hidden="true">Narod</div>
+    <div class="outline" aria-hidden="true">Mi</div>
 
     <div class="hero-inner">
       <div>
         <div class="kicker">
-          <span class="star" aria-hidden="true">✶</span>Neslužbeno narodno glasanje<span class="dot" aria-hidden="true"
+          <span class="star" aria-hidden="true">✶</span>Neslužbeno glasanje građana<span class="dot" aria-hidden="true"
             >·</span
           >{entries.length} radova
         </div>
         <h1 class="h1">
           <span class="h1-pre">Žiri je odlučio.</span>
           <span class="h1-line">Sad je red</span>
-          <span class="h1-line">na <span class="glow">narodu.</span></span>
+          <span class="h1-line">na <span class="glow">nama.</span></span>
         </h1>
         <p class="lead">
           Na međunarodni natječaj za novi stadion Maksimir stiglo je {entries.length} radova. Žiri je nagradio pet. Pogledaj
-          sve, odigraj dvoboje i pokaži koji bi izabrao narod.
+          sve, odigraj dvoboje i pokaži koji bismo izabrali mi.
         </p>
+        <div class="manifesto">
+          <p class="manifesto-cry">Jer mi smo Dinamo, mi smo Zagreb.</p>
+          <p>
+            Samo smo htjeli zatvoreni stadion s krovom, bez propuha. Stadion je funkcionalna građevina, nije skulptura.
+            Stadion moraju izabrati oni koji će na njemu biti, ne arhitekti i političari.
+          </p>
+        </div>
         <div class="ctas">
           <a href="/dvoboj" class="btn btn-primary">Kreni glasati <span aria-hidden="true">→</span></a>
           <a href="#radovi" class="btn btn-secondary">Pregledaj radove</a>
@@ -94,7 +101,7 @@ const MARQUEE = ['Žiri je odlučio', 'Sad je red na narodu', `${entries.length}
         <h2 id="radovi-title" class="h2">{entries.length} radova.<br /><span class="dim">Jedan stadion.</span></h2>
       </div>
       <p class="works-note" data-reveal="1">
-        Otvori rad za galeriju i detalje. Nagrađeni radovi su istaknuti, a narodni rang se mijenja sa svakim dvobojem.
+        Otvori rad za galeriju i detalje. Nagrađeni radovi su istaknuti, a rang građana se mijenja sa svakim dvobojem.
       </p>
     </div>
 
@@ -234,6 +241,27 @@ const MARQUEE = ['Žiri je odlučio', 'Sad je red na narodu', `${entries.length}
     line-height: var(--lh-body);
     color: var(--c-ink-2);
     text-wrap: pretty;
+  }
+  .manifesto {
+    margin: var(--sp-4) 0 0;
+    max-width: 30em;
+    padding-left: var(--sp-4);
+    border-left: 3px solid var(--c-accent);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--c-ink-2);
+    text-wrap: pretty;
+  }
+  .manifesto p {
+    margin: 0;
+  }
+  .manifesto .manifesto-cry {
+    margin-bottom: var(--sp-2);
+    font-family: var(--font-display);
+    font-size: var(--fs-body-l);
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    color: var(--c-ink);
   }
   .ctas {
     display: flex;

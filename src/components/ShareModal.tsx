@@ -12,7 +12,7 @@ interface Props {
 }
 
 const CARD_W = 1200;
-const TEXT = 'Moj top 3 za novi Maksimir. Žiri je odlučio, sad je red na narodu.';
+const TEXT = 'Moj top 3 za novi Maksimir. Žiri je odlučio, sad je red na nama.';
 const pad = (n: number) => String(n).padStart(2, '0');
 
 /** "Moj top 3" after every 10th duel: the 1200×630 share card, scaled, plus share / continue. */
@@ -49,7 +49,7 @@ export default function ShareModal({ entries, played, onClose }: Props) {
   const share = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Narodni Maksimir', text: TEXT, url });
+        await navigator.share({ title: 'Naš Dom', text: TEXT, url });
         track('share', { method: 'native', content_type: 'top3' });
       } catch {
         // dismissed by the visitor
@@ -87,7 +87,7 @@ export default function ShareModal({ entries, played, onClose }: Props) {
         <div class={s.frame} ref={frame} style={{ aspectRatio: `${CARD_W} / 630` }}>
           <div class={s.card} style={{ transform: `scale(${scale})` }} role="img" aria-label={cardLabel(entries)}>
             <div class={s.cardText}>
-              <div class={s.cardKicker}>✶ Narodni Maksimir</div>
+              <div class={s.cardKicker}>✶ Naš Dom</div>
               <div>
                 <div class={s.cardTitle}>
                   Moj

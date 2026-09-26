@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Narodni Maksimir — design tokens (single source of truth)
+   Naš Dom — design tokens (single source of truth)
    Astro: import once in the base layout: import '../styles/tokens.css'
    ========================================================================== */
 :root {
@@ -161,7 +161,7 @@
 /* Detail page (/rad/[id]) */
 :root {
   --c-detail-scrim: linear-gradient(180deg, transparent 60%, rgba(3, 8, 21, .7));
-  --c-versus-bg: linear-gradient(180deg, rgba(14, 38, 96, .55), rgba(6, 15, 42, .8)); /* Žiri vs Narod box */
+  --c-versus-bg: linear-gradient(180deg, rgba(14, 38, 96, .55), rgba(6, 15, 42, .8)); /* Žiri vs Građani box */
   --dur-morph-fade: 180ms; /* page cross-fade around the card → detail morph */
 }
 

@@ -80,7 +80,7 @@ export const GET: APIRoute<{ entry: Entry }> = async ({ props: { entry: e }, sit
           },
         },
         h('div', { style: { width: 12, height: 12, borderRadius: 999, background: token('--c-accent') } }),
-        'Narodni Maksimir',
+        'Naš Dom',
       ),
       h(
         'div',

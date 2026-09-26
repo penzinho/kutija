@@ -135,7 +135,7 @@ export default function FilterBar({ grid, empty, total, awarded }: Props) {
             Po broju
           </button>
           <button type="button" class={s.segment} aria-pressed={sort === 'rang'} onClick={() => setSort('rang')}>
-            Po <span class={s.wide}>narodnom </span>rangu
+            Po rangu<span class={s.wide}> građana</span>
           </button>
         </div>
       </div>

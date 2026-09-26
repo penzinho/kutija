@@ -31,20 +31,20 @@ interface Props {
   noindex?: boolean;
 }
 
-const SITE_NAME = 'Narodni Maksimir';
+const SITE_NAME = 'Naš Dom';
 const DEFAULT_DESCRIPTION =
-  'Neslužbena galerija svih 88 radova s natječaja za novi stadion Maksimir. Usporedi radove u dvobojima i vidi kako narod rangira ono što je žiri već odlučio.';
+  'Neslužbena galerija svih 88 radova s natječaja za novi stadion Maksimir. Usporedi radove u dvobojima i vidi kako građani rangiraju ono što je žiri već odlučio.';
 
 const {
   title,
   description = DEFAULT_DESCRIPTION,
   ogImage = '/og/default.jpg',
-  ogImageAlt = 'Narodni Maksimir: Žiri je odlučio. Sad je red na narodu.',
+  ogImageAlt = 'Naš Dom: Žiri je odlučio. Sad je red na nama.',
   ogType = 'website',
   noindex = false,
 } = Astro.props;
 
-const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME} · Narod bira stadion`;
+const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME} · Građani biraju stadion`;
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 const ogImageUrl = ogImage && Astro.site ? new URL(ogImage, Astro.site).href : ogImage;
 
@@ -95,7 +95,7 @@ const nav = navItems(Astro.url.pathname);
       <div class="bar">
         <a href="/" class="brand">
           <Image src={logo} alt="" class="brand-logo" width={40} height={40} densities={[1, 2]} loading="eager" />
-          <span class="brand-name">Narodni Maksimir</span>
+          <span class="brand-name">Naš Dom</span>
         </a>
         <nav class="top-nav" aria-label="Glavna navigacija">
           {

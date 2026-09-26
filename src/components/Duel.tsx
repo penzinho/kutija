@@ -41,7 +41,7 @@ type Phase =
   | { kind: 'blocked'; reason: Blocked; retryAfter?: number };
 
 // SPECS motion table.
-const HOLD = { normal: 720, reduced: 250 };
+const HOLD = { normal: 1100, reduced: 400 };
 // A slow confirmation still gets this long to show the stamp before the next pair.
 const MIN_WON = { normal: 450, reduced: 150 };
 const PILL_MS = 1500;
@@ -433,7 +433,7 @@ function Card(props: {
 }) {
   const { side, entry: e, rank, sizes, state, disabled, onVote } = props;
   const num = pad(e.id);
-  const sub = [e.country, rank ? `Narod #${rank}` : null].filter(Boolean).join(' · ');
+  const sub = [e.country, rank ? `Građani #${rank}` : null].filter(Boolean).join(' · ');
   return (
     <button
       type="button"

@@ -60,7 +60,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
   description={description}
   ogType="article"
   ogImage={`/og/rad/${entry.id}.jpg`}
-  ogImageAlt={`Rad ${num} · ${entry.code} · ${entry.award ? `${entry.award}. nagrada žirija` : 'Narodni Maksimir'}`}
+  ogImageAlt={`Rad ${num} · ${entry.code} · ${entry.award ? `${entry.award}. nagrada žirija` : 'Naš Dom'}`}
 >
   <article class="rad">
     <div class="topbar">
@@ -127,7 +127,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
           }
         </dl>
 
-        <section class="versus" data-reveal="2" aria-label="Žiri protiv naroda">
+        <section class="versus" data-reveal="2" aria-label="Žiri protiv građana">
           <div class="side">
             <span class="side-label">Žiri</span>
             <span class="side-value">{jury.big}</span>
@@ -135,7 +135,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
           </div>
           <div class="vs" aria-hidden="true">VS</div>
           <div class="side side-narod">
-            <span class="side-label narod">Narod</span>
+            <span class="side-label narod">Građani</span>
             {
               inVote ? (
                 <span class="side-value">

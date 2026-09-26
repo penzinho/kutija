@@ -15,7 +15,7 @@ const delta = rankDelta(rank);
 ---
 
 <span class:list={['rank-chip', variant]} data-rank-chip={id}>
-  <span class="label">Narod</span>
+  <span class="label">Građani</span>
   <span class="rank" data-rc-rank>{rank ? `#${rank.rank}` : '—'}</span>
   <span class="delta" data-rc-delta data-trend={delta.trend} aria-hidden="true" hidden={!rank}>{delta.text}</span>
   <span class="visually-hidden" data-rc-label>{rank ? delta.label : ''}</span>

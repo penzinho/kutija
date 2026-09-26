@@ -2,7 +2,7 @@
  * Fills server-rendered pages with live data. Markup opts in with attributes:
  *   [data-counter]                      .nm-reel showing total duels (header, home hero)
  *   [data-rank-chip="id"]               RankChip.astro
- *   [data-panel-rank="id"]              "Narod #N · Elo" on a card's hover panel
+ *   [data-panel-rank="id"]              "Građani #N · Elo" on a card's hover panel
  *   .entry-card[data-id]                gets data-rank (FilterBar sorts by it)
  *   [data-live="field"][data-live-id]   one number: rank | elo | duels | wins | favorites | winrate
  * After ranks are applied, `nm:ranks` is dispatched on document.
@@ -35,7 +35,7 @@ function applyRanks(ranks: Ranks): void {
   document.querySelectorAll<HTMLElement>('[data-panel-rank]').forEach((el) => {
     const r = rankOf(el, 'data-panel-rank');
     if (!r) return;
-    el.textContent = `Narod #${r.rank} · ${formatNumber(r.elo)}`;
+    el.textContent = `Građani #${r.rank} · ${formatNumber(r.elo)}`;
     el.hidden = false;
   });
 

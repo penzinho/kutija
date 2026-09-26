@@ -1,4 +1,4 @@
-# Narodni Maksimir
+# Naš Dom
 
 Unofficial public gallery + people's vote for the 88 Maksimir stadium competition entries. Full spec: SPEC.md — read it before larger changes.
 

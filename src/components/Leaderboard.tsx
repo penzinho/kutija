@@ -117,7 +117,7 @@ export default function Leaderboard({ entries, ranks: initial }: Props) {
           <span>
             <span class={s.pickNum}>Rad {pad(juryPick.id)}</span>
             <span class={s.pickNote}>
-              1. nagrada · kod naroda{' '}
+              1. nagrada · kod građana{' '}
               {juryRank ? (
                 <>
                   {juryRank === 1 ? 'također' : 'tek'} <strong>#{juryRank}</strong>
@@ -131,7 +131,7 @@ export default function Leaderboard({ entries, ranks: initial }: Props) {
         {peoplePick ? (
           <a href={`/rad/${peoplePick.id}`} class={`${s.pick} ${s.pickPeople}`}>
             {peoplePick.cover && <img key={peoplePick.id} class={s.pickImg} src={peoplePick.cover} alt="" decoding="async" />}
-            <span class={s.pickLabel}>Izbor naroda · #1</span>
+            <span class={s.pickLabel}>Izbor građana · #1</span>
             <span>
               <span class={s.pickNum}>Rad {pad(peoplePick.id)}</span>
               <span class={s.pickNote}>Žiri: {lowerFirst(peoplePick.jury)}</span>
@@ -139,10 +139,10 @@ export default function Leaderboard({ entries, ranks: initial }: Props) {
           </a>
         ) : (
           <a href="/dvoboj" class={`${s.pick} ${s.pickPeople}`}>
-            <span class={s.pickLabel}>Izbor naroda · #1</span>
+            <span class={s.pickLabel}>Izbor građana · #1</span>
             <span>
               <span class={s.pickNum}>Još nitko</span>
-              <span class={s.pickNote}>Narod još nije glasao. Odigraj prvi dvoboj →</span>
+              <span class={s.pickNote}>Građani još nisu glasali. Odigraj prvi dvoboj →</span>
             </span>
           </a>
         )}
@@ -159,11 +159,11 @@ export default function Leaderboard({ entries, ranks: initial }: Props) {
             ))}
           </div>
         ) : (
-          <p class={s.note}>Zasad se narod slaže sa žirijem: svaki rad je unutar skupine koju mu je dodijelio žiri.</p>
+          <p class={s.note}>Zasad se građani slažu sa žirijem: svaki rad je unutar skupine koju mu je dodijelio žiri.</p>
         )
       ) : (
         <p class={s.note}>
-          Neslaganja pokazujemo kad narod odigra prvih {MIN_DUELS} dvoboja. Do tada je rang premalo pouzdan.{' '}
+          Neslaganja pokazujemo kad građani odigraju prvih {MIN_DUELS} dvoboja. Do tada je rang premalo pouzdan.{' '}
           {totalDuels < MIN_DUELS && <>Još {Math.ceil(MIN_DUELS - totalDuels)}.</>}
         </p>
       )}
@@ -173,13 +173,13 @@ export default function Leaderboard({ entries, ranks: initial }: Props) {
         {settled && (
           <p class={s.legend}>
             <span class={s.legendMark} aria-hidden="true" />
-            Narod i žiri razilaze se za {DISAGREE} ili više mjesta
+            Građani i žiri razilaze se za {DISAGREE} ili više mjesta
           </p>
         )}
       </div>
       <div class={s.table}>
         <div class={s.head} aria-hidden="true">
-          <span>Narod</span>
+          <span>Građani</span>
           <span>24 h</span>
           <span>Rad</span>
           <span>Žiri</span>
@@ -222,7 +222,7 @@ function DisagreeCard({ entry: e, rank, gap, end, stagger }: { entry: BoardEntry
         <span>
           <span class={s.cardTitle}>Rad {pad(e.id)}</span>
           <span class={s.cardSub}>
-            {e.jury} → narod #{rank}
+            {e.jury} → građani #{rank}
           </span>
         </span>
         <span class={s.cardBig} data-up={up}>
@@ -235,13 +235,13 @@ function DisagreeCard({ entry: e, rank, gap, end, stagger }: { entry: BoardEntry
         <span class={`${s.marker} ${s.markerJury}`} style={{ left: pos(jury) }} title="Žiri">
           Ž
         </span>
-        <span class={`${s.marker} ${s.markerPeople}`} style={{ left: pos(rank) }} title="Narod">
+        <span class={`${s.marker} ${s.markerPeople}`} style={{ left: pos(rank) }} title="Građani">
           N
         </span>
       </span>
       <span class={s.trackLabels}>
         <span aria-hidden="true">#1</span>
-        <span>{up ? `narod ga diže ${places(gap)}` : `narod ga spušta ${places(-gap)}`}</span>
+        <span>{up ? `građani ga dižu ${places(gap)}` : `građani ga spuštaju ${places(-gap)}`}</span>
         <span aria-hidden="true">#{end}</span>
       </span>
     </a>
@@ -253,10 +253,10 @@ function Row({ entry: e, rank: r, gap, rowRef }: { entry: BoardEntry; rank: Rank
   const flagged = Math.abs(gap) >= DISAGREE;
   const label = [
     `Rad ${pad(e.id)}`,
-    r ? `narod #${r.rank}` : e.band ? 'narod: još bez ranga' : 'nije u glasanju',
+    r ? `građani #${r.rank}` : e.band ? 'građani: još bez ranga' : 'nije u glasanju',
     `žiri: ${lowerFirst(e.jury)}`,
     ...(r ? [`ocjena ${formatNumber(r.elo)}`, d.label] : []),
-    ...(flagged ? [gap > 0 ? `narod ga diže ${places(gap)}` : `narod ga spušta ${places(-gap)}`] : []),
+    ...(flagged ? [gap > 0 ? `građani ga dižu ${places(gap)}` : `građani ga spuštaju ${places(-gap)}`] : []),
   ].join(', ');
 
   return (
