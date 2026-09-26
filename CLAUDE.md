@@ -22,3 +22,4 @@ Astro (static, TS strict) · Supabase (anonymous sessions, RPC, Edge Function `v
 - build: `pnpm build`
 - images: `pnpm tsx scripts/import-images.ts <folder>`
 - db (remote project srqdfixcngwpfwllljse, no local Docker): `pnpm dlx supabase db push`, tests `pnpm dlx supabase db query --linked -f supabase/tests/voting.sql`
+- moderation: `pnpm dlx supabase db query --linked -f scripts/flag-suspicious.sql`, tests `pnpm dlx supabase db query --linked -f supabase/tests/moderation.sql`

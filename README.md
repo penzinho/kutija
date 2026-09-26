@@ -48,6 +48,28 @@ The smoke test records one real duel and one favorite; clear test data before la
 - "Moj top 3" links (`/?top=a,b,c`) share the home page's OG image: the site is static, so a per-share image would need a serverless function (plan D12).
 - Check previews after deploy: [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/), [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/), or [opengraph.xyz](https://www.opengraph.xyz/).
 
+## Moderation
+
+`scripts/flag-suspicious.sql` finds sessions/IP hashes voting for one entry >90% of the
+time, bursts (20+ duels faster than one every 3 s), and IPs cycling through more than 20
+sessions in a day:
+
+```sh
+pnpm dlx supabase db query --linked -f scripts/flag-suspicious.sql
+```
+
+Review its output, then flag what's actually abuse with the helpers it defines
+(`private.flag_session('<session_id>')` / `private.flag_ip('<ip_hash>')`, in
+`supabase/migrations/20260926120200_moderation.sql`). These only set `excluded = true` on
+that session's/IP's `duels` and `favorites` rows; nothing is deleted. Once you're done
+flagging for the pass, replay Elo without the excluded rows:
+
+```sql
+select public.recompute_elo();
+```
+
+Tests: `pnpm dlx supabase db query --linked -f supabase/tests/moderation.sql`.
+
 ## Google Analytics (optional)
 
 Set `PUBLIC_GA_ID` (GA4 measurement ID, `G-…`) in `.env` / Vercel. Without it there is no analytics and no banner.

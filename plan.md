@@ -101,9 +101,9 @@ SPEC.md was written before the real data and the design arrived. Parts of it are
 - ✅ Done when: OG previews are correct (checked with a debugger tool) for `/`, `/rad/16`, `/?top=…` (tags and images verified locally on 2026-09-26; the modal, share link and consent flow verified in Playwright against a mocked backend. **Re-check with a debugger tool once the production URL exists**, step 10)
 
 ### 9. Moderation tooling
-- [ ] `scripts/flag-suspicious.sql`: sessions/IP hashes with >90% votes for one entry, bursts, and too many sessions per IP; helper to set `excluded`
-- [ ] `recompute_elo()` wired into the flow after flagging; document the procedure in the README
-- ✅ Done when: a seeded abusive session is flagged, excluded, and after a recompute its effect is gone from `leaderboard`
+- [x] `scripts/flag-suspicious.sql`: sessions/IP hashes with >90% votes for one entry, bursts, and too many sessions per IP; helper to set `excluded`
+- [x] `recompute_elo()` wired into the flow after flagging; document the procedure in the README
+- ✅ Done when: a seeded abusive session is flagged, excluded, and after a recompute its effect is gone from `leaderboard` (verified 2026-09-26 in `supabase/tests/moderation.sql` against the linked project)
 
 ### 10a. Authors research (D16)
 - [ ] Find authors (and country where known) for the non-awarded entries: announcements, architects' own sites and portfolios, press; record a source for each
