@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import preact from '@astrojs/preact';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
@@ -10,5 +11,9 @@ export default defineConfig({
   output: 'static',
   // The CSS is small (~25 KB); inlining it removes render-blocking requests on first load.
   build: { inlineStylesheets: 'always' },
-  integrations: [preact()],
+  integrations: [
+    preact(),
+    // /komponente is an internal component sheet (noindex); OG images aren't pages.
+    sitemap({ filter: (page) => !/\/(komponente|og)\//.test(page) }),
+  ],
 });
