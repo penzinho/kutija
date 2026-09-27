@@ -21,7 +21,8 @@ export type VoteErrorCode =
 
 export type VoteError = { ok: false; code: VoteErrorCode; retry_after?: number };
 
-export type Pair = { ok: true; token: string; a: number; b: number; expires_at: string };
+/** `pinned` is false when the server ignored the pin (that entry was already shown today). */
+export type Pair = { ok: true; token: string; a: number; b: number; expires_at: string; pinned?: boolean };
 export type DuelResult = { ok: true; winner: number; loser: number; delta: number };
 export type FavoriteResult = { ok: true; entry: number | null };
 

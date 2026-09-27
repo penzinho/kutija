@@ -66,6 +66,8 @@ export default function Duel({ entries, sizes }: Props) {
   const [rateLeft, setRateLeft] = useState(0);
   const [offline, setOffline] = useState(false);
   const [pill, setPill] = useState<{ id: number; key: number } | null>(null);
+  /** The entry from `?a=id` that the server declined to pin (already shown today). */
+  const [pinRefused, setPinRefused] = useState<number | null>(null);
   const [ranks, setRanks] = useState<Ranks | null>(null);
   /** "Moj top 3" ids while the share modal is open (after every 10th duel). */
   const [share, setShare] = useState<number[] | null>(null);
@@ -128,6 +130,7 @@ export default function Duel({ entries, sizes }: Props) {
     const pin = Number(new URLSearchParams(location.search).get('a'));
     let r = Number.isInteger(pin) && byId.has(pin) ? await getPair(pin) : await getPair();
     if (!r.ok && r.code === 'invalid_entry') r = await getPair();
+    setPinRefused(r.ok && r.pinned === false ? pin : null);
     show(r);
   };
 
@@ -184,6 +187,7 @@ export default function Duel({ entries, sizes }: Props) {
       return;
     }
     setOffline(false);
+    setPinRefused(null);
     setPhase({ kind: 'pending', side });
     const reduced = reducedMotion();
     const tappedAt = Date.now();
@@ -249,6 +253,7 @@ export default function Duel({ entries, sizes }: Props) {
     const { phase: ph, rateLeft: rl, share: sh } = live.current;
     if (ph.kind !== 'idle' || rl > 0 || sh) return;
     setOffline(false);
+    setPinRefused(null);
     setPhase({ kind: 'switching' });
     await advance();
   };
@@ -339,6 +344,20 @@ export default function Duel({ entries, sizes }: Props) {
           <div>
             <div class={s.bannerTitle}>Nema veze</div>
             <div class={s.bannerText}>Glas nije zabilježen. Provjeri internet pa izaberi ponovno.</div>
+          </div>
+        </div>
+      )}
+
+      {pinRefused !== null && !locked && !offline && phase.kind !== 'blocked' && (
+        <div class={s.banner} role="status">
+          <span class={s.bannerIcon} aria-hidden="true">
+            i
+          </span>
+          <div>
+            <div class={s.bannerTitle}>Rad {pad(pinRefused)} si danas već imao u dvoboju</div>
+            <div class={s.bannerText}>
+              Da bi glasanje bilo fer, pojedini rad možeš izravno pozvati u dvoboj jednom dnevno. Ovo je nasumičan par.
+            </div>
           </div>
         </div>
       )}

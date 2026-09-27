@@ -54,6 +54,43 @@ const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
       </p>
     </div>
 
+    <section id="posteno" class="notice" data-reveal="0" aria-labelledby="posteno-title">
+      <div class="eyebrow">Obavijest · 27. rujna 2026.</div>
+      <h2 id="posteno-title" class="letter-title">Pošteno glasanje</h2>
+      <p>
+        Na upozorenje jednog od projektnih ureda provjerili smo glasove i potvrdili da se sustav dao zloupotrijebiti. Gumb
+        „Usporedi u dvoboju” na stranici rada svaki je put u dvoboj stavljao upravo taj rad. Tko je stranicu učitavao iznova,
+        mogao je do dnevnog ograničenja glasati samo za jedan rad ili samo protiv njega.
+      </p>
+      <p>
+        Našli smo 11 anonimnih sesija koje su to radile. U njima se jedan rad pojavljivao višestruko češće nego što nasumičan
+        odabir dopušta i gotovo uvijek pobjeđivao. Radilo se o radovima 71, 32, 44, 47 i 69, a u jednoj je sesiji rad 71
+        sustavno gubio. Ne znamo tko je iza toga i ne pripisujemo to autorima tih radova: glasati je mogao bilo tko.
+      </p>
+      <p>
+        Svih 1246 dvoboja iz tih sesija (oko 13 % dotadašnjih) isključili smo iz ljestvice i Elo ocjene izračunali ispočetka.
+        Glasovi nisu obrisani, samo se više ne broje.
+      </p>
+      <h3 class="notice-sub">Što smo promijenili</h3>
+      <ul>
+        <li>„Usporedi u dvoboju” za pojedini rad radi jednom na dan. Ponovno učitavanje daje nasumičan par.</li>
+        <li>
+          Isti rad može se u jednoj sesiji pojaviti u najviše četiri dvoboja dnevno, pa ni preskakanjem parova ne možeš
+          „loviti” svoj rad.
+        </li>
+        <li>
+          Parove i dalje bira isključivo server, a broj parova koje jedna sesija ili jedna mreža može dobiti u danu je
+          ograničen. Svaki izdani par se bilježi.
+        </li>
+        <li>Sumnjive obrasce provjeravamo i takve glasove isključujemo.</li>
+        <li>Favorita s iste mreže mogu dnevno postaviti najviše tri sesije.</li>
+      </ul>
+      <p>
+        Bez prijave nijedno javno glasanje nije potpuno otporno na nekoga tko je spreman mijenjati uređaje i mreže. Takav
+        pokušaj sada donosi tek nekoliko glasova i ostavlja trag koji vidimo. Primijetiš li nešto čudno, javi nam se.
+      </p>
+    </section>
+
     <div class="blocks">
       <section class="block" data-reveal="0" aria-labelledby="kako">
         <div class="block-num" aria-hidden="true">01</div>
@@ -169,6 +206,38 @@ const analytics = /^G-[A-Z0-9]+$/.test(import.meta.env.PUBLIC_GA_ID ?? '');
     letter-spacing: var(--ls-mono);
     text-transform: uppercase;
     color: var(--c-ink);
+  }
+
+  .notice {
+    margin: 0 0 40px;
+    max-width: 38em;
+    padding-left: var(--sp-5);
+    border-left: 3px solid var(--c-accent);
+    scroll-margin-top: var(--sp-8);
+  }
+  .notice .eyebrow {
+    margin-bottom: var(--sp-2);
+  }
+  .notice p,
+  .notice li {
+    color: var(--c-ink-2);
+    line-height: var(--lh-body);
+    text-wrap: pretty;
+  }
+  .notice p {
+    margin: 0 0 var(--sp-4);
+  }
+  .notice ul {
+    margin: 0 0 var(--sp-4);
+    padding-left: 1.2em;
+  }
+  .notice li + li {
+    margin-top: var(--sp-2);
+  }
+  .notice-sub {
+    margin: var(--sp-5) 0 var(--sp-3);
+    font-size: 20px;
+    line-height: var(--lh-tight);
   }
 
   .disclaimer {
