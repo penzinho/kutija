@@ -172,9 +172,11 @@ begin
   assert r->>'ok' = 'true', format('dup: pinned get_pair failed: %s', r);
   assert least((r->>'a')::int, (r->>'b')::int) = 1 and greatest((r->>'a')::int, (r->>'b')::int) = 2,
     format('dup: only 1 vs 2 is left, got %s', r);
-  -- 1 vs 2 is now held by an open token: nothing left for a pinned 1
+  assert r->>'pinned' = 'true', format('dup: first pin should be honoured, got %s', r);
+  -- 1 vs 2 is now held by an open token, and 1 was already shown today: the pin is
+  -- ignored and a normal pair comes back
   r := public.get_pair(s, 'ip-dup', 1);
-  assert r->>'code' = 'no_pair', format('dup: expected no_pair, got %s', r);
+  assert r->>'ok' = 'true' and r->>'pinned' = 'false', format('dup: second pin should fall back, got %s', r);
 
   -- a hand-made token for a judged pair (either order) is rejected
   insert into public.pair_tokens (session_id, a, b) values (s, 5, 1) returning token into t;
@@ -191,6 +193,76 @@ begin
         and greatest(d.winner_id, d.loser_id) = greatest((r->>'a')::int, (r->>'b')::int)),
       format('dup: judged pair re-issued: %s', r);
   end loop;
+
+  raise exception using errcode = 'NM000';
+exception when sqlstate 'NM000' then null;
+end $$;
+
+-- Fair pairs: a pin works once per entry per session-day, an entry is in at most 4 of a
+-- session's pairs per day, and at most 100 pairs per session / 300 per ip_hash are issued.
+do $$
+declare
+  s uuid := gen_random_uuid();
+  r jsonb;
+  t uuid;
+  i int;
+  seen int;
+begin
+  delete from public.duels; delete from public.pair_tokens; delete from public.pair_issues;
+
+  -- the pinned-reload attack: pin 71, vote 71, repeat
+  r := public.get_pair(s, 'ip-fair', 71);
+  assert r->>'ok' = 'true' and r->>'pinned' = 'true' and 71 in ((r->>'a')::int, (r->>'b')::int),
+    format('fair: first pin should be honoured, got %s', r);
+  r := public.vote_duel((r->>'token')::uuid, 71, s, 'ip-fair');
+  assert r->>'ok' = 'true', format('fair: vote failed: %s', r);
+  for i in 1..20 loop
+    r := public.get_pair(s, 'ip-fair', 71);
+    assert r->>'ok' = 'true' and r->>'pinned' = 'false', format('fair: pin %s should be ignored, got %s', i, r);
+    if 71 in ((r->>'a')::int, (r->>'b')::int) then
+      update public.duels set created_at = now() - interval '2 seconds' where session_id = s;
+      r := public.vote_duel((r->>'token')::uuid, 71, s, 'ip-fair');
+      assert r->>'ok' = 'true', format('fair: vote failed: %s', r);
+    end if;
+  end loop;
+  assert private.entry_load(s, 71) <= 4, format('fair: 71 in %s pairs today', private.entry_load(s, 71));
+
+  -- skip-fishing: whatever is requested, no entry goes past 4 pairs in a day
+  delete from public.duels; delete from public.pair_tokens; delete from public.pair_issues;
+  s := gen_random_uuid();
+  for i in 1..99 loop
+    r := public.get_pair(s, 'ip-fish');
+    assert r->>'ok' = 'true', format('fair: pair %s failed: %s', i, r);
+    -- vote for the lower id every time, as if fishing for it
+    update public.duels set created_at = now() - interval '2 seconds' where session_id = s;
+    if (select count(*) from public.duels where session_id = s) < 49 then
+      perform public.vote_duel((r->>'token')::uuid, least((r->>'a')::int, (r->>'b')::int), s, 'ip-fish');
+    end if;
+  end loop;
+  select max(n) into seen from (
+    select count(*) as n from public.duels d cross join lateral (values (d.winner_id), (d.loser_id)) as v(e)
+    where d.session_id = s group by v.e) as x;
+  assert seen <= 4, format('fair: an entry was in %s judged duels', seen);
+
+  -- issuance cap: the 100th pair still comes, the 101st doesn't
+  r := public.get_pair(s, 'ip-fish');
+  assert r->>'ok' = 'true', format('fair: 100th pair should be issued, got %s', r);
+  r := public.get_pair(s, 'ip-fish');
+  assert r->>'code' = 'daily_limit', format('fair: 101st pair should hit daily_limit, got %s', r);
+
+  -- ip_hash cap: 300 pairs issued on an ip stop even a fresh session
+  insert into public.pair_issues (session_id, ip_hash, a, b, pinned)
+  select gen_random_uuid(), 'ip-issued', 1, 2, false from generate_series(1, 300);
+  r := public.get_pair(gen_random_uuid(), 'ip-issued');
+  assert r->>'code' = 'daily_limit', format('fair: ip issuance cap, got %s', r);
+  -- yesterday's issues don't count
+  update public.pair_issues set created_at = private.day_start() - interval '1 hour' where ip_hash = 'ip-issued';
+  r := public.get_pair(gen_random_uuid(), 'ip-issued');
+  assert r->>'ok' = 'true', format('fair: yesterday''s issues should not count, got %s', r);
+
+  -- pair_issues is not readable from the API
+  assert not has_table_privilege('anon', 'public.pair_issues', 'select'), 'fair: anon can read pair_issues';
+  assert not has_table_privilege('authenticated', 'public.pair_issues', 'select'), 'fair: authenticated can read pair_issues';
 
   raise exception using errcode = 'NM000';
 exception when sqlstate 'NM000' then null;
@@ -213,16 +285,16 @@ begin
     assert r->>'a' <> r->>'b', format('excluded: self pair: %s', r);
   end loop;
 
-  r := public.get_pair(gen_random_uuid(), 'ip-excl', 56);
+  r := public.get_pair(gen_random_uuid(), 'ip-excl-pin', 56);
   assert r->>'code' = 'invalid_entry', format('excluded: pin 56 should be invalid_entry, got %s', r);
-  r := public.set_favorite(87, gen_random_uuid(), 'ip-excl');
+  r := public.set_favorite(87, gen_random_uuid(), 'ip-excl-pin');
   assert r->>'code' = 'invalid_entry', format('excluded: favorite 87 should be invalid_entry, got %s', r);
 
   raise exception using errcode = 'NM000';
 exception when sqlstate 'NM000' then null;
 end $$;
 
--- Favorites: one per session, 5 sessions per ip_hash per day, changing your own is free.
+-- Favorites: one per session, 3 sessions per ip_hash per day, changing your own is free.
 do $$
 declare
   s uuid := gen_random_uuid();
@@ -238,12 +310,12 @@ begin
   assert (select count(*) from public.favorites where session_id = s) = 1, 'fav: one row per session';
   assert (select entry_id from public.favorites where session_id = s) = 62, 'fav: changed entry';
 
-  for i in 1..4 loop
+  for i in 1..2 loop
     r := public.set_favorite(16, gen_random_uuid(), 'ip-fav');
-    assert r->>'ok' = 'true', format('fav: session %s of 5 failed: %s', i + 1, r);
+    assert r->>'ok' = 'true', format('fav: session %s of 3 failed: %s', i + 1, r);
   end loop;
   r := public.set_favorite(16, gen_random_uuid(), 'ip-fav');
-  assert r->>'code' = 'daily_limit', format('fav: 6th session should hit daily_limit, got %s', r);
+  assert r->>'code' = 'daily_limit', format('fav: 4th session should hit daily_limit, got %s', r);
   r := public.set_favorite(37, s, 'ip-fav');
   assert r->>'ok' = 'true', format('fav: own change after the limit failed: %s', r);
 

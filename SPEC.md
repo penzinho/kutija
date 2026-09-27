@@ -69,9 +69,10 @@ Pair selection (server-side): prefer entries with the fewest duels so all 88 get
 Abuse mitigation (since there are no accounts):
 - Turnstile on session creation.
 - Server-issued pair tokens — votes only count for pairs the server handed out.
-- Rate limits per session AND per IP hash: max 1 duel / 1.5 s; 50 duels / day per session; 150 duels / day per IP hash; at most 3 voting sessions per IP hash per day (migration 20260926120500); max 5 favorites per IP hash per day (households/offices share IPs).
+- Rate limits per session AND per IP hash: max 1 duel / 1.5 s; 50 duels / day per session; 150 duels / day per IP hash; at most 3 voting sessions per IP hash per day (migration 20260926120500); max 3 favorite-setting sessions per IP hash per day (migration 20260927120000).
+- Fair pairs (migration 20260927120000, after the pinned-duel abuse of 26–27 Sep): a pin (`/dvoboj?a=id`) is honoured only for an entry the session hasn't seen yet that day, otherwise get_pair returns a normal pair with `pinned: false`; an entry appears in at most 4 of a session's pairs per day; at most 100 pairs issued per session and 300 per IP hash per day, all logged in `pair_issues`.
 - Store `ip_hash` = sha256(ip + daily-rotating salt) — never raw IPs. Read client IP in an Edge Function from `x-forwarded-for`.
-- Admin SQL script `scripts/flag-suspicious.sql` listing sessions/IP hashes with abnormal patterns (e.g. >90% votes for one entry, bursts), plus an `excluded` flag so flagged votes drop out of the leaderboard without being deleted. `recompute_elo()` replays non-excluded duels in order.
+- Admin SQL script `scripts/flag-suspicious.sql` listing sessions/IP hashes with abnormal patterns (e.g. >90% votes for one entry, one entry pinned far above chance, bursts), plus an `excluded` flag so flagged votes drop out of the leaderboard without being deleted. `recompute_elo()` replays non-excluded duels in order.
 
 ## Supabase
 Migrations in `supabase/migrations/`. Tables:

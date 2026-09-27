@@ -109,6 +109,41 @@ begin
 exception when sqlstate 'NM000' then null;
 end $$;
 
+-- Pinned: an entry that is in 12 of a session's 40 duels and wins them all is listed,
+-- even though the session's winners are otherwise spread out; an entry in 12 of 40 that
+-- wins about half is not.
+do $$
+declare
+  pinner uuid := gen_random_uuid();
+  mixed uuid := gen_random_uuid();
+begin
+  delete from public.duels;
+
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  select pinner, 'ip-mod-pin', 71, i + 1, now() - i * interval '10 seconds' from generate_series(1, 12) as i;
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  select pinner, 'ip-mod-pin', i + 20, i + 50, now() - (i + 12) * interval '10 seconds' from generate_series(1, 28) as i;
+
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  select mixed, 'ip-mod-mixed', case when i % 2 = 0 then 71 else i + 1 end, case when i % 2 = 0 then i + 1 else 71 end,
+    now() - i * interval '10 seconds' from generate_series(1, 12) as i;
+  insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
+  select mixed, 'ip-mod-mixed', i + 20, i + 50, now() - (i + 12) * interval '10 seconds' from generate_series(1, 28) as i;
+
+  assert exists (select 1 from private.suspicious where reason = 'pinned' and session_id = pinner and duels = 40),
+    'moderation: pinned session listed';
+  assert not exists (select 1 from private.suspicious where session_id = pinner and reason = 'bias'),
+    'moderation: pinned session is not a plain bias case';
+  assert not exists (select 1 from private.suspicious where session_id = mixed),
+    'moderation: an often-seen entry with mixed results is not listed';
+
+  perform private.flag_session(pinner);
+  assert not exists (select 1 from private.suspicious where session_id = pinner), 'moderation: flagged pinner drops out';
+
+  raise exception using errcode = 'NM000';
+exception when sqlstate 'NM000' then null;
+end $$;
+
 -- Detection and flagging stay out of the API.
 do $$
 begin

@@ -4,6 +4,7 @@
 --   pnpm dlx supabase db query --linked -f scripts/flag-suspicious.sql
 --
 -- reason = bias (one entry wins >90% of 10+ duels), burst (20+ duels within 60 s),
+-- pinned (one entry in 10+ duels of a session-day, 3x chance, winning or losing 90%+),
 -- sessions (>20 sessions on one ip_hash). Review the rows, then flag what's abuse:
 --
 --   select private.flag_session('<session_id>');   -- rows with a session_id
