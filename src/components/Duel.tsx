@@ -127,10 +127,13 @@ export default function Duel({ entries, sizes }: Props) {
   /** First pair; `?a=id` pins one side. An unknown or excluded pin falls back to a random pair. */
   const start = async () => {
     setPhase({ kind: 'loading' });
-    const pin = Number(new URLSearchParams(location.search).get('a'));
-    let r = Number.isInteger(pin) && byId.has(pin) ? await getPair(pin) : await getPair();
+    const raw = new URLSearchParams(location.search).get('a');
+    const pin = raw === null ? null : Number(raw);
+    const pinned = pin !== null && Number.isInteger(pin) && byId.has(pin);
+    let r = pinned ? await getPair(pin) : await getPair();
     if (!r.ok && r.code === 'invalid_entry') r = await getPair();
-    setPinRefused(r.ok && r.pinned === false ? pin : null);
+    // Every unpinned pair comes back with `pinned: false`; only a requested pin can be refused.
+    setPinRefused(pinned && r.ok && r.pinned === false ? pin : null);
     show(r);
   };
 
