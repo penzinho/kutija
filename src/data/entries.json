@@ -2011,9 +2011,16 @@
         "In the third round, the jury eliminated projects that were well developed but generic, hermetic in their relationship with public space, insufficiently resolved in structural terms, financially demanding or unable to express the primary programme clearly.",
         "A large proportion of the proposals offered a well-articulated but insufficiently specific response to the site and its legacy. A project that retained parts of the existing structure was considered particularly interesting, but this approach was not feasible because the structure had to be demolished due to identified structural deficiencies."
       ],
-      "authors": [],
-      "authorsSources": [],
-      "country": null,
+      "authors": [
+        "SIRRAH-PROJEKT d.o.o."
+      ],
+      "authorsSources": [
+        {
+          "url": "https://www.sirrah.hr",
+          "note": "Ured javio e-mailom (Tvrtko Salitrežić)"
+        }
+      ],
+      "country": "HR",
       "images": [
         "71-1.jpg",
         "71-2.jpg",
