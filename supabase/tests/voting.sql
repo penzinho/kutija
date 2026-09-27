@@ -116,13 +116,15 @@ begin
   -- (5 sessions: only possible if fresh sessions race past the session count)
   delete from public.duels;
   insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
-  select ('00000000-0000-0000-0000-00000000000' || (i % 5))::uuid, 'ip-busy', 1, 2,
+  select ('00000000-0000-0000-0000-00000000000' || (p.i % 5))::uuid, 'ip-busy', p.a, p.b,
     now() - interval '2 seconds'
-  from generate_series(1, 149) as i;
+  from (select a.id as a, b.id as b, row_number() over (order by a.id, b.id) as i
+        from public.entries a join public.entries b on a.id < b.id
+        order by a.id, b.id limit 149) as p;
   r := public.get_pair('00000000-0000-0000-0000-000000000001', 'ip-busy');
   assert r->>'ok' = 'true', format('rate: 149 duels on an ip should still get a pair, got %s', r);
   insert into public.duels (session_id, ip_hash, winner_id, loser_id, created_at)
-  values ('00000000-0000-0000-0000-000000000001', 'ip-busy', 1, 2, now() - interval '2 seconds');
+  values ('00000000-0000-0000-0000-000000000001', 'ip-busy', 80, 82, now() - interval '2 seconds');
   r := public.get_pair('00000000-0000-0000-0000-000000000001', 'ip-busy');
   assert r->>'code' = 'daily_limit', format('rate: expected ip daily_limit, got %s', r);
   r := public.get_pair(gen_random_uuid(), 'ip-quiet');
