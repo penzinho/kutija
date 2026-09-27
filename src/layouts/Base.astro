@@ -290,9 +290,11 @@ const nav = navItems(Astro.url.pathname);
 <script>
   import { initReveal } from '../lib/motion';
   import { bindLivePage } from '../lib/live-dom';
+  import { trackReturnTo } from '../lib/return-to';
 
   document.addEventListener('astro:page-load', () => {
     initReveal();
     bindLivePage();
+    trackReturnTo();
   });
 </script>

@@ -64,7 +64,7 @@ const description = summary.length > 155 ? `${summary.slice(0, 155).replace(/\s+
 >
   <article class="rad">
     <div class="topbar">
-      <a href="/#radovi" class="back">← Svi radovi</a>
+      <a href="/#radovi" class="back" data-back>← <span data-back-label>Svi radovi</span></a>
       <nav class="pager" aria-label="Susjedni radovi">
         <a href={`/rad/${prevId}`} class="arrow" rel="prev" aria-label={`Prethodni rad, ${pad(prevId)}`}>←</a>
         <a href={`/rad/${nextId}`} class="arrow" rel="next" aria-label={`Sljedeći rad, ${pad(nextId)}`}>→</a>
